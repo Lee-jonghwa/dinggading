@@ -1,0 +1,66 @@
+# 필수
+HELLO: hello
+
+spring:
+  application:
+    name: dinggading-test
+
+  jackson:
+    time-zone: Asia/Seoul
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        jdbc:
+          time_zone: Asia/Seoul
+        format_sql: true
+        show_sql: true
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    hikari:
+      pool-name: test-hikari-pool
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 5000
+      connection-init-sql: "SELECT 1"
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      auto-commit: true
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+decorator:
+  datasource:
+    p6spy:
+      enabled: false
+logging:
+  level:
+    root: warn
+    com.mickey: debug
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+# JWT setting
+jwt:
+  secret-key: test_jwt_secret_key_for_testing_purposes_only_not_for_production_use
+  access-token:
+    expiretime: 86400000
+  refresh-token:
+    expiretime: 604800000

@@ -1,0 +1,147 @@
+stages:
+  - test
+  - build
+  - push
+  - deploy
+
+variables:
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_HUB_USERNAME: $DOCKER_HUB_USERNAME
+  DOCKER_HUB_PASSWORD: $DOCKER_HUB_PASSWORD
+  DOCKER_REGISTRY: docker.io
+  SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY
+  SERVER_HOST: j12e107.p.ssafy.io
+  PEM_FILE: J12E107T.pem
+  PROJECT_NAME: s12p21e107
+
+
+# 필요한 서비스 정의
+services:
+  - docker:dind
+
+# 모든 작업에 적용되는 기본 설정
+default:
+  image: docker:latest
+  before_script:
+    - docker info
+    - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD $DOCKER_REGISTRY
+
+
+# 1. MR 생성 시 테스트 실행 --------------------------------------
+test:
+  stage: test
+  image: openjdk:17-slim
+  before_script:
+    # Install Node.js and npm
+    - apt-get update
+    - apt-get install -y curl
+    - curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+    - apt-get install -y nodejs
+    - node --version
+    - npm --version
+    
+  variables:
+    HELLO: "$HELLO"
+  services:
+    - docker:dind # Docker-in-Docker service
+  script:
+    # Next.js tests
+    - cd frontend
+    - npm install
+    - npm run test
+    - cd ..
+    
+    # Spring tests
+    - cd backend
+    - chmod +x gradlew
+    - ./gradlew test -i
+    - cd ..
+  cache:
+    paths:
+      - frontend/node_modules/
+      - backend/.gradle/
+
+
+  only:
+    - merge_requests # MR 생성 시에만 실행
+  tags:
+    - ci
+
+# 2. 빌드 단계 (MR & main 브랜치) --------------------------------
+build:
+  stage: build
+  needs: 
+    - test
+  image: docker:latest
+  services:
+    - name: docker:dind
+  script:
+    # docker-compose.prod.local.yaml 사용하여 빌드
+    - docker-compose -f docker-compose.prod.local.yaml build --build-arg PLATFORM=linux/amd64
+    # 빌드된 이미지 태그 설정
+    - docker tag ${PROJECT_NAME}-spring $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest
+    - docker tag ${PROJECT_NAME}-next $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest
+    - docker tag ${PROJECT_NAME}-nginx $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest
+  artifacts:
+    paths:
+      - docker-compose.prod.yaml
+    expire_in: 1 hour
+  tags:
+    - ci
+  rules: # MR 생성 시 + main 브랜치에서 실행
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == 'develop'
+
+# 3. 푸시 단계 (main 브랜치에서만) -------------------------------
+push:
+  stage: push
+  needs:
+    - build
+  tags:
+    - ci
+  script:
+    - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest
+    - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest
+    - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest
+  only:
+    - develop
+
+# 서버에 배포
+deploy:
+  stage: deploy
+  needs:
+    - push
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client bash
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" > $PEM_FILE
+    - chmod 400 $PEM_FILE
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $SERVER_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - echo "Deploying to $SERVER_HOST..."
+    - ssh -i $PEM_FILE ubuntu@$SERVER_HOST "mkdir -p /home/ubuntu/${PROJECT_NAME}"
+    - ssh -i $PEM_FILE ubuntu@$SERVER_HOST "mkdir -p /home/ubuntu/${PROJECT_NAME}/infra/env"
+    - scp -i $PEM_FILE docker-compose.prod.yaml ubuntu@$SERVER_HOST:/home/ubuntu/${PROJECT_NAME}/
+    # ubuntu 사용자를 docker 그룹에 추가하는 명령을 실행
+    - ssh -i $PEM_FILE ubuntu@$SERVER_HOST "sudo usermod -aG docker ubuntu && newgrp docker"
+    - cat docker-compose.prod.yaml
+    - ssh -i $PEM_FILE ubuntu@$SERVER_HOST "
+        cd /home/ubuntu/${PROJECT_NAME} &&
+        echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin &&
+        docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest &&
+        docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest &&
+        docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest &&
+        docker-compose -f docker-compose.prod.yaml down &&
+        docker-compose -f docker-compose.prod.yaml up -d"
+    
+  environment:
+    name: production
+    url: http://$SERVER_HOST:3000
+  tags:
+    - ci
+  only:
+    - develop

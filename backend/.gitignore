@@ -41,17 +41,5 @@ out/
 /env/.env
 /env/.env.*
 
-# generated 폴더 내의 모든 파일 무시
-/generated/*
 
-# 하위 폴더 자체는 무시하지 않음
-!/generated/api/
-!/generated/model/
 
-# 하위 폴더 내의 모든 파일은 무시
-/generated/api/*
-/generated/model/*
-
-# .gitkeep 파일만 예외 처리
-!/generated/api/.gitkeep
-!/generated/model/.gitkeep

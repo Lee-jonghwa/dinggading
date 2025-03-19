@@ -1,13 +1,13 @@
 "use client";
 import { useState } from 'react';
 import type { NextPage } from 'next';
-//import { OwnerApi } from '@generated/api';
+import { OwnerApi } from '@generated/api';
 
 const Home: NextPage = () => {
   const [response, setResponse] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  //const s = new OwnerApi();
-
+  const s = new OwnerApi();
+  console.log(s);
   // /src/app/page.tsx
 
   const testApi = async () => {

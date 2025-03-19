@@ -1,0 +1,43 @@
+# 개발 환경 + 로컬 환경에서 사용할 도커 컴포즈 파일
+# 백엔드: 로컬, mysql: 로컬, next: 로컬
+services:
+  spring:
+    build:
+      context: ./backend
+    env_file:
+      - ./infra/env/.env.development
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    
+  next:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+      
+  mysql:
+    image: mysql:8.0
+    env_file: ./infra/env/.env.development
+      
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD']
+      interval: 5s  # 기본값(30초)에서 5초로 감소
+      timeout: 3s   # 20초에서 3초로 감소하여 빠르게 실패 감지
+      retries: 3    # 10회에서 3회로 줄여 빠르게 재시도
+      start_period: 30s
+    restart: always
+
+  nginx:
+    platform: linux/amd64
+    build:
+      context: ./nginx
+      dockerfile: ../infra/dockerfiles/nginx.Dockerfile
+    ports:
+      - "80:80"
+    depends_on: 
+      - next
+      - spring

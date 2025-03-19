@@ -1,0 +1,34 @@
+# 개발 환경 + 로컬 환경에서 사용할 도커 컴포즈 파일
+#
+services:
+  spring:
+    platform: linux/amd64
+    image: wnsgh712/s12p21e107-spring:latest
+    env_file: ./infra/env/.env.production
+    networks:
+      - ding-ga-ding-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  next:
+    platform: linux/amd64
+    image: wnsgh712/s12p21e107-next:latest
+    networks:
+      - ding-ga-ding-network
+
+
+  nginx:
+    platform: linux/amd64
+    image: wnsgh712/s12p21e107-nginx:latest
+    networks:
+      - ding-ga-ding-network
+    ports:
+      - "80:80"
+
+networks:
+  ding-ga-ding-network:
+    external: true

@@ -2,7 +2,6 @@
 /backend/.gradle/
 /backend/build/
 /backend/.idea/
-/backend/gradle/
 /backend/logs/
 /backend/*.log
 /backend/.DS_Store

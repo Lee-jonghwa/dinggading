@@ -29,8 +29,13 @@ default:
 test:mr:
   stage: test
   image: openjdk:17-slim
+  variables:
+    HELLO: "$HELLO"
+  services:
+    - docker:dind # Docker-in-Docker service
   before_script:
     # Install Node.js and npm
+    - docker-compose up -d
     - apt-get update
     - apt-get install -y curl
     - curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
@@ -38,10 +43,7 @@ test:mr:
     - node --version
     - npm --version
     
-  variables:
-    HELLO: "$HELLO"
-  services:
-    - docker:dind # Docker-in-Docker service
+
   script:
     # Next.js tests
     - cd frontend
@@ -73,6 +75,7 @@ build:mr:
     - name: docker:dind
   script:
     # docker-compose.prod.local.yaml 사용하여 빌드
+    - docker-compose up
     - docker-compose -f docker-compose.prod.local.yaml build --build-arg PLATFORM=linux/amd64
     # 빌드된 이미지 태그 설정
     - docker tag ${PROJECT_NAME}-spring $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest
@@ -95,6 +98,7 @@ build:develop:
     - name: docker:dind
   script:
     # docker-compose.prod.local.yaml 사용하여 빌드
+    - docker-compose up
     - docker-compose -f docker-compose.prod.local.yaml build --build-arg PLATFORM=linux/amd64
     # 빌드된 이미지 태그 설정
     - docker tag ${PROJECT_NAME}-spring $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest

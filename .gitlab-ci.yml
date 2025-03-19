@@ -92,8 +92,8 @@ build:mr:
   tags:
     - ci
 
-# 2-B. develop 브랜치용 빌드 단계 --------------------------------
-build:develop:
+# 2-B와 3을 병합: develop 브랜치용 빌드 및 푸시 단계
+build-and-push:develop:
   stage: build
   image: docker:latest
   services:
@@ -105,6 +105,10 @@ build:develop:
     - docker tag ${PROJECT_NAME}-spring $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest
     - docker tag ${PROJECT_NAME}-next $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest
     - docker tag ${PROJECT_NAME}-nginx $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest
+    # 바로 푸시
+    - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest
+    - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest
+    - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest
   artifacts:
     paths:
       - docker-compose.prod.yaml
@@ -114,25 +118,11 @@ build:develop:
   tags:
     - ci
 
-# 3. 푸시 단계 (develop 브랜치에서만) -------------------------------
-push:
-  stage: push
-  needs:
-    - build:develop
-  tags:
-    - ci
-  script:
-    - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest
-    - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest
-    - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest
-  rules:
-    - if: $CI_COMMIT_BRANCH == 'develop'
-
 # 4. 서버에 배포
 deploy:
   stage: deploy
   needs:
-    - push
+    - build-and-push:develop
   image: alpine:latest
   before_script:
     - apk add --no-cache openssh-client bash

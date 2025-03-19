@@ -8,6 +8,10 @@ COPY ./build.gradle .
 COPY ./settings.gradle .
 COPY ./src src
 COPY ./generated .
+
+# gradlew에 실행 권한 부여
+RUN chmod +x ./gradlew
+
 RUN ./gradlew build -x test
 
 # 실행 스테이지

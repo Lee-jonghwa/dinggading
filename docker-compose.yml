@@ -18,7 +18,8 @@ services:
       - "-c"
       - "spring-custom-generator/config.json"
     restart: "no"
-  react-generator:
+    
+  axios-generator:
     build:
       context: .
       dockerfile: infra/dockerfiles/generator.Dockerfile

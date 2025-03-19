@@ -1,8 +1,10 @@
+import { OwnerApi } from '@generated/api';
 import { NextResponse } from 'next/server';
+
 //src/app/api/hello/route.ts
 export async function GET() {
   try {
-    const apiUrl = process.env.API_URL;
+    const apiUrl = process.env.API_BASE_URL;
     // 외부 서버로 GET 요청 보내기
     console.log(`http://${apiUrl}:8080/hello`);
     const apiResponse = await fetch(`http://${apiUrl}:8080/hello`);

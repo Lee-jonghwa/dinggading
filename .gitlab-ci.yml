@@ -37,7 +37,6 @@ build:
     # 빌드된 이미지 태그 설정
     - docker tag ${PROJECT_NAME}-spring $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest
     - docker tag ${PROJECT_NAME}-next $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest
-    - docker tag ${PROJECT_NAME}-mysql $DOCKER_HUB_USERNAME/${PROJECT_NAME}-mysql:latest
     - docker tag ${PROJECT_NAME}-nginx $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest
   artifacts:
     paths:
@@ -59,7 +58,6 @@ push:
   script:
     - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest
     - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest
-    - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-mysql:latest
     - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest
   only:
     - merge_request
@@ -93,7 +91,6 @@ deploy:
         echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin &&
         docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest &&
         docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest &&
-        docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-mysql:latest &&
         docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest &&
         docker-compose -f docker-compose.prod.yaml down &&
         docker-compose -f docker-compose.prod.yaml up -d"

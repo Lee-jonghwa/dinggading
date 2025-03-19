@@ -3,7 +3,7 @@
 services:
   spring:
     platform: linux/amd64
-    image: wnsgh712/ding-ga-ding-spring:latest
+    image: wnsgh712/s12p21e107-spring:latest
     env_file: ./infra/env/.env.production
     depends_on:
       mysql:
@@ -11,12 +11,12 @@ services:
     
   next:
     platform: linux/amd64
-    image: wnsgh712/ding-ga-ding-next:latest
+    image: wnsgh712/s12p21e107-next:latest
 
 
   mysql:
     platform: linux/amd64
-    image: wnsgh712/ding-ga-ding-mysql:latest
+    image: mysql:8.0
     env_file: ./infra/env/.env.production
 
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
@@ -29,7 +29,7 @@ services:
 
   nginx:
     platform: linux/amd64
-    image: wnsgh712/ding-ga-ding-nginx:latest
+    image: wnsgh712/s12p21e107-nginx:latest
     ports:
       - "80:80"
     depends_on: 

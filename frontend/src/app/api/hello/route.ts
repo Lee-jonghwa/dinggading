@@ -1,4 +1,3 @@
-import { OwnerApi } from '@generated/api';
 import { NextResponse } from 'next/server';
 
 //src/app/api/hello/route.ts

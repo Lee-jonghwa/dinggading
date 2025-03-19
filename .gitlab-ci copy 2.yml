@@ -5,8 +5,7 @@ stages:
   - deploy
 
 variables:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
+  DOCKER_TLS_CERTDIR: "/certs"
   DOCKER_HUB_USERNAME: $DOCKER_HUB_USERNAME
   DOCKER_HUB_PASSWORD: $DOCKER_HUB_PASSWORD
   DOCKER_REGISTRY: docker.io
@@ -32,33 +31,27 @@ test:mr:
   image: openjdk:17-slim
   variables:
     HELLO: "$HELLO"
-  services:
-    - docker:dind # Docker-in-Docker service
   before_script:
-    - apt-get update
-    - apt-get install -y curl
-    # Install Node.js and npm
-
-    - apt-get update
-    - apt-get install -y curl
-    - curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-    - apt-get install -y nodejs
-    - node --version
-    - npm --version
+  # 필요한 패키지 설치 (간소화)
+  - apt-get update -qq && apt-get install -y -qq curl wget
+  
+  # Node.js 18 설치 (출력 최소화)
+  - curl -fsSL https://deb.nodesource.com/setup_18.x | bash - > /dev/null
+  - apt-get install -y -qq nodejs
+  
+  # OpenAPI Generator JAR 다운로드 (출력 최소화)
+  - wget -q https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/7.9.0/openapi-generator-cli-7.9.0.jar -O openapi-generator-cli.jar
     
-
   script:
-    # Next.js tests
-    - cd frontend
-    - npm install
-    - npm run test
-    - cd ..
+    # 코드 생성
+    - echo "백엔드 코드 생성 중..." && java -jar openapi-generator-cli.jar generate -i ./docs/dinggading-api.yaml -g spring -o ./backend/generated -t ./generator/spring-custom-generator/custom-codegen -c ./generator/spring-custom-generator/config.json
+    - echo "프론트엔드 코드 생성 중..." && java -jar openapi-generator-cli.jar generate -i ./docs/dinggading-api.yaml -g typescript-axios -o ./frontend/generated -t ./generator/axios-custom-generator/custom-codegen -c ./generator/axios-custom-generator/config.json
     
-    # Spring tests
-    - cd backend
-    - chmod +x gradlew
-    - ./gradlew test -i
-    - cd ..
+    # 프론트엔드 테스트
+    - echo "프론트엔드 테스트 실행 중..." && cd frontend && npm ci --quiet && npm run test && cd ..
+    
+    # 백엔드 테스트
+    - echo "백엔드 테스트 실행 중..." && cd backend && chmod +x gradlew && ./gradlew test -i && cd ..
   cache:
     paths:
       - frontend/node_modules/
@@ -78,6 +71,7 @@ build:mr:
     - name: docker:dind
   script:
     # docker-compose.prod.local.yaml 사용하여 빌드
+    - docker-compose up
     - docker-compose -f docker-compose.prod.local.yaml build --build-arg PLATFORM=linux/amd64
     # 빌드된 이미지 태그 설정
     - docker tag ${PROJECT_NAME}-spring $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest

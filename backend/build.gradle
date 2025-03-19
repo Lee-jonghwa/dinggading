@@ -88,7 +88,7 @@ dependencies {
 sourceSets {
 	main {
 		java {
-			srcDir("/generated/src/main/java")
+			srcDir "${projectDir}/generated/src/main/java"
 		}
 	}
 	test {

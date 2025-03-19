@@ -31,27 +31,34 @@ test:mr:
   image: openjdk:17-slim
   variables:
     HELLO: "$HELLO"
-  services:
-    - docker:dind # Docker-in-Docker service
   before_script:
-    # Install Node.js and npm
-    - docker-compose up -d
+    # 기본 도구 설치
     - apt-get update
-    - apt-get install -y curl
-    - curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-    - apt-get install -y nodejs
+    - apt-get install -y curl nodejs npm
     - node --version
     - npm --version
     
-
+    # OpenAPI Generator CLI 설치
+    - npm install @openapitools/openapi-generator-cli -g
+    - openapi-generator-cli version
+    
   script:
-    # Next.js tests
+    # API 명세 파일 준비 (필요한 경우)
+    # - curl -o dinggading-api.yaml https://your-api-spec-url.com/dinggading-api.yaml
+    
+    # 백엔드 코드 생성
+    - openapi-generator-cli generate -i dinggading-api.yaml -g spring -o ./backend/generated -t spring-custom-generator/custom-codegen -c spring-custom-generator/config.json
+    
+    # 프론트엔드 코드 생성
+    - openapi-generator-cli generate -i dinggading-api.yaml -g typescript-axios -o ./frontend/generated -t axios-custom-generator/custom-codegen -c axios-custom-generator/config.json
+    
+    # 프론트엔드 테스트
     - cd frontend
     - npm install
     - npm run test
     - cd ..
     
-    # Spring tests
+    # 백엔드 테스트
     - cd backend
     - chmod +x gradlew
     - ./gradlew test -i

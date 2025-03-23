@@ -1,0 +1,20 @@
+{
+  "inputs": [
+    {
+      "inputFile": "./instrument-api.yaml"
+    },
+    {
+      "inputFile": "./member-api.yaml"
+    },
+    {
+      "inputFile": "./notification-api.yaml"
+    },
+    {
+      "inputFile": "./challenge-api.yaml"
+    },
+    {
+      "inputFile": "./follow-api.yaml"
+    }
+  ],
+  "output": "./output/openapi.yaml"
+}

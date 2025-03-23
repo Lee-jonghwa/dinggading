@@ -3,10 +3,12 @@ import { NextResponse } from 'next/server';
 //src/app/api/hello/route.ts
 export async function GET() {
   try {
-    const apiUrl = process.env.API_BASE_URL;
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const envMode = process.env.NEXT_PUBLIC_ENV_MODE;
     // 외부 서버로 GET 요청 보내기
-    console.log(`http://${apiUrl}:8080/hello`);
-    const apiResponse = await fetch(`http://${apiUrl}:8080/hello`);
+    console.log('route.js ', `http://${apiUrl}/api/hello`);
+    console.log('route.js', envMode);
+    const apiResponse = await fetch(`http://${apiUrl}/api/hello`);
     
     // 외부 서버에서 받은 응답 처리
     if (!apiResponse.ok) {

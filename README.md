@@ -9,10 +9,19 @@ docker-compose 파일이 여러개 구성되어있는데 각각에 대해서 설
 development 환경: 개발환경 (포트가 모두 개방, )
 
 
+### 생성된 코드 정리하기
+``` bash
+
+./cleanup.sh
+
+```
+
+
 ### 개발 환경 (Development) ⚙️
 
 **`docker-compose.dev.yaml`**
 ```bash
+
 docker-compose -f docker-compose.dev.yaml up --build --force-recreate
 ```
 
@@ -27,6 +36,7 @@ docker-compose -f docker-compose.dev.yaml up --build --force-recreate
 
 **`docker-compose.prod.local.yaml`**
 ```bash
+
 docker-compose -f docker-compose.prod.local.yaml up --build --force-recreate
 ```
 
@@ -39,6 +49,7 @@ docker-compose -f docker-compose.prod.local.yaml up --build --force-recreate
 
 **`docker-compose.prod.yaml`**
 ```bash
+
 docker-compose -f docker-compose.prod.yaml up --build --force-recreate
 ```
 
@@ -52,18 +63,21 @@ docker-compose -f docker-compose.prod.yaml up --build --force-recreate
 ### 서비스 시작 시 추천 플래그
 
 ```bash
+
 --build          # 컨테이너 시작 전 이미지 다시 빌드
 --force-recreate # 컨테이너를 강제로 다시 생성
 --no-cache       # 캐시 없이 새롭게 빌드
 ```
 ### 여러 개의 특정 서비스 빌드
 ``` bash
+
 docker-compose build next
 ```
 
 ### 서비스 종료하기
 
 ```bash
+
 docker-compose down
 ```
 
@@ -72,6 +86,7 @@ docker-compose down
 CodeGen 프로젝트는 OpenAPI 명세서를 기반으로 코드를 자동 생성합니다.
 
 ```bash
+
 docker-compose up
 ```
 

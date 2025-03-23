@@ -1,0 +1,331 @@
+openapi: 3.0.0
+info:
+  title: Band API
+  description: 밴드 관련 API
+  version: 1.0.0
+  contact:
+    name: 딩가딩
+servers:
+  - url: http://localhost:8080/api/
+    description: Local development server
+
+tags:
+  - name: Member
+    description: 멤버 관련 API
+
+paths:
+  ### OAUTH
+  # get: 로그인 시작
+  /auth/google:
+    get:
+      summary: Google OAuth 로그인 시작
+      description: Google OAuth 인증 프로세스를 시작합니다
+      operationId: initiateGoogleAuth
+      tags:
+        - Authentication
+      parameters:
+        - name: redirect_uri
+          in: query
+          description: 인증 후 리다이렉트할 URI
+          required: false
+          schema:
+            type: string
+            format: uri
+      responses:
+        '302':
+          description: Google 로그인 페이지로 리다이렉트
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: Google 인증 페이지 URL
+  # get: 콜백 처리
+  /auth/google/callback:
+    get:
+      summary: Google OAuth 콜백 처리
+      description: Google OAuth 인증 후 콜백을 처리하고 JWT 토큰을 발급합니다
+      operationId: handleGoogleCallback
+      tags:
+        - Authentication
+      parameters:
+        - $ref: '#/components/parameters/AuthCode'
+        - $ref: '#/components/parameters/AuthState'
+
+      responses:
+        '200':
+          description: 인증 성공 및 JWT 토큰 발급
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '401':
+          description: 인증 실패
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '500':
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  ### Member
+  # get: 회원 조회, post: 회원가입, patch: 정보 수정, delete: 회원 삭제
+  /members/{memberId}:
+    get:
+      tags:
+        - Member
+      deprecated: false
+      operationId: getMemberInfo
+      summary: 멤버 조회
+      description: 멤버의 마이페이지를 조회합니다.
+      parameters:
+        - $ref: '#/components/parameters/MemberId'
+      responses:
+        '200':
+          description: temp
+        '500':
+          description: 서버 오류
+    post:
+      tags:
+        - Member
+      deprecated: false
+      operationId: memberRegister
+      summary: 멤버 회원가입
+      description: 회원가입
+      parameters:
+        - $ref: '#/components/parameters/MemberId'
+
+      responses:
+        '200':
+          description: temp
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberInfoResponse'
+
+        '500':
+          description: 서버 오류
+    patch:
+      tags:
+        - Member
+      operationId: memberUpdate
+      deprecated: true
+      summary: 멤버 정보 수정
+      description: 회원가입
+      parameters:
+        - $ref: '#/components/parameters/MemberId'
+      responses:
+        '204':
+          description: Update successful.
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: Pet not found for this owner.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+    delete:
+      deprecated: true
+      operationId: memberDelete
+      summary: 멤버 정보 수정
+      description: 회원가입
+
+      parameters:
+        - $ref: '#/components/parameters/MemberId'
+      tags:
+        - Member
+      responses:
+        '200':
+          description: temp
+        '500':
+          description: 서버 오류
+
+
+  ### Instrument
+#  /members/{memberId}/instruments:
+
+
+
+
+
+components:
+  schemas:
+    ProblemDetail:
+      title: Problem Detail
+      description: The schema for all error responses.
+      type: object
+      properties:
+        type:
+          title: Type
+          description: Full URL that originated the error response.
+          type: string
+          format: uri
+          example: 'http://localhost:9966/petclinic/api/owner'
+          readOnly: true
+        title:
+          title: Title
+          description: The short error title.
+          type: string
+          example: NoResourceFoundException
+          readOnly: true
+        status:
+          title: Status
+          description: HTTP status code
+          type: integer
+          format: int32
+          minimum: 400
+          maximum: 600
+          exclusiveMaximum: true
+          example: 500
+          readOnly: true
+        detail:
+          title: Detail
+          description: The long error message.
+          type: string
+          example: 'No static resource api/owner.'
+          readOnly: true
+        timestamp:
+          title: Timestamp
+          description: The time the error occurred.
+          type: string
+          format: date-time
+          example: '2024-11-23T13:59:21.3820407Z'
+          readOnly: true
+        schemaValidationErrors:
+          title: Schema validation errors
+          description: Validation errors against the OpenAPI schema.
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationMessage'
+      required:
+        - type
+        - title
+        - status
+        - detail
+        - timestamp
+        - schemaValidationErrors
+    ValidationMessage:
+      title: Validation message
+      description: Messages describing a validation error.
+      type: object
+      properties:
+        message:
+          title: Message
+          description: The validation message.
+          type: string
+          example: "[Path '/lastName'] Instance type (null) does not match any allowed primitive type (allowed: ['string'])"
+          readOnly: true
+      required:
+        - message
+      additionalProperties: true
+    TokenResponse:
+      type: object
+      required:
+        - access_token
+        - token_type
+        - expires_in
+        - refresh_token
+      properties:
+        access_token:
+          type: string
+          description: JWT 액세스 토큰
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        token_type:
+          type: string
+          description: 토큰 타입
+          example: "Bearer"
+        expires_in:
+          type: integer
+          description: 액세스 토큰 만료 시간(초)
+          example: 3600
+
+
+    MemberInfoResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 사용자 ID
+          example: "123456789012345678901"
+        username:
+          type: string
+          description: 로그인 아이디
+        password:
+          type: string
+          description: 로그인 패스워드
+        age:
+          description: 멤버 나이
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 100
+          example: 32
+        nickname:
+          type: string
+          description: 사용자 이름
+          example: "씩씩한호랑이3"
+        profileImgUrl:
+          type: string
+          format: uri
+          description: 사용자 프로필 이미지 URL
+          example: "https://lh3.googleusercontent.com/a/ACg8ocLm2QoHsS..."
+        email:
+          type: string
+          format: email
+          description: 사용자 이메일
+          example: "user@example.com"
+      required:
+        - username
+        - password
+
+  parameters:
+    AuthCode:
+      name: code
+      in: query
+      description: Google에서 제공하는 인증 코드
+      required: true
+      schema:
+        type: string
+    AuthState:
+      name: state
+      in: query
+      description: 상태 확인을 위한 값
+      required: false
+      schema:
+        type: string
+    MemberId:
+      name: memberId
+      in: path
+      description: UUID 형식의 멤버 아이디
+      required: true
+      schema:
+        type: string
+        example: "7466B6F3-5192-44D1-AA80-375767C166C5"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT 토큰을 Authorization 헤더에 Bearer 스키마로 전달

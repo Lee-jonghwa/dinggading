@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloController {
 
 //
-    @Value("${HELLO}")
-    private String hello;
+    @Value("${SPRING_ENV_MODE}")
+    private String springEnvMode;
 
-    @GetMapping("/hello")
+    @GetMapping("/api/hello")
     public String hello() {
-        System.out.println(hello);
-        return hello;
+        System.out.println(springEnvMode);
+        return springEnvMode;
     }
 }

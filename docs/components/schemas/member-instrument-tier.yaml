@@ -1,0 +1,25 @@
+
+MemberInstrumentTier:
+  type: object
+  properties:
+    instrument:
+      type: string
+      enum: [VOCAL, GUITAR, DRUM, BASS]
+      description: 악기 종류
+    tier:
+      type: string
+      enum: [UNRANKED, IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND]
+      description: 해당 악기의 티어 등급
+    lastChallenged:
+      type: string
+      format: date
+      description: 마지막 챌린지 날짜
+    challengeCount:
+      type: integer
+      description: 남은 챌린지 횟수
+    successCount:
+      type: integer
+      description: 성공한 챌린지 횟수
+  required:
+    - instrument
+    - tier

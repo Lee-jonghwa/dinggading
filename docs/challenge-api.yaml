@@ -1,0 +1,47 @@
+openapi: 3.0.0
+info:
+  title: Band API
+  description: 밴드 관련 API
+  version: 1.0.0
+  contact:
+    name: 딩가딩
+servers:
+  - url: http://localhost:8080/api/
+    description: Local development server
+
+tags:
+  - name: Challenge
+    description: 도전 관련 API
+
+paths:
+  /members/{memberId}/challenges:
+    post:
+      tags:
+        - Challenge
+      operationId: createChallenge
+      summary: 새로운 도전 생성
+      description: 새로운 도전(배치고사/연습/티어 도전/방어전)을 생성합니다.
+      parameters:
+        - $ref: './components/parameters/member-id.yaml#/MemberId'
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas/challenge-request.yaml#/ChallengeRequest'
+      responses:
+        '201':
+          description: 도전 생성 성공
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/challenge-response.yaml#/ChallengeResponse'
+        '400':
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas/problem-detail.yaml#/ProblemDetail'
+

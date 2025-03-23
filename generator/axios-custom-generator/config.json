@@ -1,13 +1,12 @@
 {
     "supportsES6": true,
-    "npmName": "@example/api-client",
-    "npmVersion": "1.0.0",
     "withSeparateModelsAndApi": true,
     "withInterfaces": true,
-    "withoutPrefixEnums": true,
+    "withoutPrefixEnums": false,
     "useSingleRequestParameter": true,
     "enumPropertyNaming": "UPPERCASE",
     "modelPropertyNaming": "camelCase",
     "apiPackage": "api",
-    "modelPackage": "model"
+    "modelPackage": "model",
+    "prefixParameterInterfaces": false
   }

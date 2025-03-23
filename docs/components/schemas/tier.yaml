@@ -1,0 +1,7 @@
+
+Tier:
+  type: string
+  enum: [UNRANKED, IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND]
+  description: 티어 등급
+  default: UNRANKED
+  

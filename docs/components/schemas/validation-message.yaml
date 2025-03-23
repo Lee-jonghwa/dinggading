@@ -1,0 +1,15 @@
+
+ValidationMessage:
+  title: Validation message
+  description: Messages describing a validation error.
+  type: object
+  properties:
+    message:
+      title: Message
+      description: The validation message.
+      type: string
+      example: "[Path '/lastName'] Instance type (null) does not match any allowed primitive type (allowed: ['string'])"
+      readOnly: true
+  required:
+    - message
+  additionalProperties: true

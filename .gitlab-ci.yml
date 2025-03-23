@@ -1,7 +1,7 @@
 stages:
+  - prepare
   - test
   - build
-  - push
   - deploy
 
 variables:
@@ -14,115 +14,144 @@ variables:
   SERVER_HOST: j12e107.p.ssafy.io
   PEM_FILE: J12E107T.pem
   PROJECT_NAME: s12p21e107
+  # next.js 환경 설정
+  NEXT_PUBLIC_API_BASE_URL: $NEXT_PUBLIC_API_BASE_URL
+  NEXT_PUBLIC_ENV_MODE: $NEXT_PUBLIC_ENV_MODE
 
-# 필요한 서비스 정의
-services:
-  - docker:dind
-
-# 모든 작업에 적용되는 기본 설정
-default:
-  image: docker:latest
-  before_script:
-    - docker info
-    - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD $DOCKER_REGISTRY
-
-# 1. MR용 테스트 --------------------------------------
-test:mr:
-  stage: test
-  image: openjdk:17-slim
+# Common configuration for Docker services
+.docker:
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
   variables:
-    HELLO: "$HELLO"
-  services:
-    - docker:dind # Docker-in-Docker service
+    PLATFORM: linux/amd64
+
+# Generate OpenAPI code for both frontend and backend
+prepare_job:
+  extends: .docker
+  stage: prepare  # 이 부분이 중요합니다 - prepare 스테이지에 속함을 명시
   before_script:
-    - apt-get update
-    - apt-get install -y curl
-    # Install Node.js and npm
-
-    - apt-get update
-    - apt-get install -y curl
-    - curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-    - apt-get install -y nodejs
-    - node --version
-    - npm --version
-    
-
+    - ls -al
   script:
-    # Next.js tests
-    - cd frontend
-    - npm install
-    - npm run test
-    - cd ..
-    
-    # Spring tests
-    - cd backend
-    - chmod +x gradlew
-    - ./gradlew test -i
-    - cd ..
-  cache:
-    paths:
-      - frontend/node_modules/
-      - backend/.gradle/
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-  tags:
-    - ci
+    - docker-compose up --build
 
-# 2-A. MR용 빌드 단계 --------------------------------
-build:mr:
-  stage: build
-  needs: 
-    - test:mr
-  image: docker:latest
-  services:
-    - name: docker:dind
-  script:
-    # docker-compose.prod.local.yaml 사용하여 빌드
-    - docker-compose -f docker-compose.prod.local.yaml build --build-arg PLATFORM=linux/amd64
-    # 빌드된 이미지 태그 설정
-    - docker tag ${PROJECT_NAME}-spring $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest
-    - docker tag ${PROJECT_NAME}-next $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest
-    - docker tag ${PROJECT_NAME}-nginx $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest
   artifacts:
     paths:
-      - docker-compose.prod.yaml
-    expire_in: 1 hour
+      - backend/generated/
+      - frontend/generated/
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
   tags:
-    - ci
-
-# 2-B와 3을 병합: develop 브랜치용 빌드 및 푸시 단계
-build-and-push:develop:
-  stage: build
-  image: docker:latest
-  services:
-    - name: docker:dind
+    - cicd
+# Test backend
+test_backend:
+  extends: .docker
+  stage: test
+  needs: ["prepare_job"]
+  before_script:
+    - ls -la ./backend/generated
   script:
-    # docker-compose.prod.local.yaml 사용하여 빌드
-    - docker-compose -f docker-compose.prod.local.yaml build --build-arg PLATFORM=linux/amd64
-    # 빌드된 이미지 태그 설정
-    - docker tag ${PROJECT_NAME}-spring $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest
-    - docker tag ${PROJECT_NAME}-next $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest
-    - docker tag ${PROJECT_NAME}-nginx $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest
-    # 바로 푸시
-    - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest
-    - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest
-    - docker push $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest
+    - docker buildx build -t ${PROJECT_NAME}-spring-test --target test -f ./infra/dockerfiles/backend.Dockerfile --build-arg PLATFORM=linux/amd64 --platform linux/amd64 .
+    - docker run --rm ${PROJECT_NAME}-spring-test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      when: always
+      allow_failure: false
   artifacts:
     paths:
-      - docker-compose.prod.yaml
-    expire_in: 1 hour
-  rules:
-    - if: $CI_COMMIT_BRANCH == 'develop'
+      - backend/generated/
+      - frontend/generated/
   tags:
-    - ci
+    - cicd
 
-# 4. 서버에 배포
+# Test frontend
+test_frontend:
+  extends: .docker
+  stage: test
+  needs: ["prepare_job"]
+  before_script:
+    - ls -la ./frontend/generated
+  script:
+    - docker buildx build -t ${PROJECT_NAME}-next-test --target test -f ./infra/dockerfiles/frontend.Dockerfile --build-arg PLATFORM=linux/amd64 --build-arg NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL} --build-arg NEXT_PUBLIC_ENV_MODE=${NEXT_PUBLIC_ENV_MODE} --platform linux/amd64 .
+    - docker run --rm ${PROJECT_NAME}-next-test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      when: always
+      allow_failure: false
+  artifacts:
+    paths:
+      - backend/generated/
+      - frontend/generated/
+  tags:
+    - cicd
+
+# Build and push backend image
+build_backend:
+  extends: .docker
+  stage: build
+  needs: ["test_backend"]
+  before_script:
+    - ls -la ./backend/generated
+    - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+  script:
+    - docker buildx build -t ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-spring:latest --target production -f ./infra/dockerfiles/backend.Dockerfile --build-arg PLATFORM=linux/amd64 --platform linux/amd64 .
+    - docker push ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-spring:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      when: on_success
+      allow_failure: false
+  tags:
+    - cicd
+
+# Build and push frontend image
+build_frontend:
+  extends: .docker
+  stage: build
+  needs: ["test_frontend"]
+  before_script:
+    - ls -la ./frontend/generated
+    - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+  script:
+    - docker buildx build -t ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-next:latest --target production -f ./infra/dockerfiles/frontend.Dockerfile --build-arg PLATFORM=linux/amd64 --build-arg NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL} --build-arg NEXT_PUBLIC_ENV_MODE=${NEXT_PUBLIC_ENV_MODE} --platform linux/amd64 .
+    - docker push ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-next:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      when: on_success
+      allow_failure: false
+  tags:
+    - cicd
+
+# Build and push Nginx image
+build_nginx:
+  extends: .docker
+  stage: prepare
+  script:
+    - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+    - docker buildx build -t ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-nginx:latest -f ./infra/dockerfiles/nginx.Dockerfile --build-arg PLATFORM=linux/amd64 --platform linux/amd64 ./nginx
+    - docker push ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-nginx:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      when: on_success
+      allow_failure: false
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+      when: on_success
+      allow_failure: false
+  tags:
+    - cicd
+
+# Deploy to production server
 deploy:
   stage: deploy
   needs:
-    - build-and-push:develop
+    - job: build_frontend
+      optional: true
+    - job: build_backend
+      optional: true
+    - job: build_nginx
+      optional: true
+
+
   image: alpine:latest
   before_script:
     - apk add --no-cache openssh-client bash
@@ -142,18 +171,16 @@ deploy:
     - ssh -i $PEM_FILE ubuntu@$SERVER_HOST "sudo usermod -aG docker ubuntu && newgrp docker"
     - cat docker-compose.prod.yaml
     - ssh -i $PEM_FILE ubuntu@$SERVER_HOST "
-        cd /home/ubuntu/${PROJECT_NAME} &&
-        echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin &&
-        docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest &&
-        docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest &&
-        docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest &&
-        docker-compose -f docker-compose.prod.yaml down &&
-        docker-compose -f docker-compose.prod.yaml up -d"
-    
-  environment:
-    name: production
-    url: http://$SERVER_HOST:3000
+      cd /home/ubuntu/${PROJECT_NAME} &&
+      echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin &&
+      docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest &&
+      docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest &&
+      docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest &&
+      docker-compose -f docker-compose.prod.yaml down &&
+      docker-compose -f docker-compose.prod.yaml up -d"
   rules:
-    - if: $CI_COMMIT_BRANCH == 'develop'
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+      when: on_success
+      allow_failure: false
   tags:
-    - ci
+    - cicd

@@ -1,60 +1,70 @@
-# syntax=docker.io/docker/dockerfile:1
-
+# Multi-stage build for Next.js application
 FROM node:18-alpine AS base
 
-FROM base AS deps
-
-RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
+# Development stage for local development
+FROM base AS development
+WORKDIR /app/frontend
 
-ENV NODE_ENV=development
+# Copy package.json and package-lock.json
+COPY ./frontend/package*.json ./
 
-# RUN \
-#   if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-#   elif [ -f package-lock.json ]; then npm ci; \
-#   elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
-#   else echo "Lockfile not found." && exit 1; \
-#   fi
+# Install dependencies
+RUN npm install
+ARG NEXT_PUBLIC_API_BASE_URL=https://defaultvalue.example.com
+ARG NEXT_PUBLIC_ENV_MODE=DOCKER_FILE
 
-RUN npm ci;
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_ENV_MODE=$NEXT_PUBLIC_ENV_MODE
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
+# Copy OpenAPI generated code if it exists
+COPY ./frontend/generated /app/generated
 
-COPY --from=deps /app/node_modules ./node_modules
+# Set the working directory
+WORKDIR /app/frontend
 
-COPY . .
+# Command to run development server
+CMD ["npm", "run", "dev"]
 
+# Test stage for running tests
+FROM development AS test
+WORKDIR /app/frontend
+
+# Copy source code
+COPY ./frontend .
+
+# Run tests
+CMD ["npm", "run", "test"]
+
+# Build stage for creating optimized production build
+FROM development AS build
+WORKDIR /app/frontend
+
+# Copy source code
+COPY ./frontend .
+
+# Build Next.js app
 RUN npm run build
 
-# Production image, copy all the files and run next
-FROM base AS runner
+# Production stage with minimal footprint
+FROM base AS production
 WORKDIR /app
 
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED=1
+# Install production dependencies only
+COPY ./frontend/package*.json ./
+RUN npm install --production
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+ARG NEXT_PUBLIC_API_BASE_URL=https://defaultvalue.example.com
+ARG NEXT_PUBLIC_ENV_MODE=DOCKER_FILE
 
-COPY --from=builder /app/public ./public
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_ENV_MODE=$NEXT_PUBLIC_ENV_MODE
+# Copy built assets from build stage
+COPY --from=build /app/frontend/.next ./.next
+COPY --from=build /app/frontend/public ./public
+COPY --from=build /app/frontend/node_modules ./node_modules
+COPY --from=build /app/frontend/package.json ./package.json
 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
-
-EXPOSE 3000
-
-ENV PORT=3000
-
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
-ENV HOSTNAME="0.0.0.0"
-CMD ["node", "server.js"]
+# Start the application
+CMD ["npm", "start"]

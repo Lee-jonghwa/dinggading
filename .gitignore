@@ -13,8 +13,14 @@
 /frontend/.vite-temp/
 /frontend/.DS_Store
 
+.idea
+
 # OS 관련 파일
 .DS_Store
 Thumbs.db
 
 /infra/env/.env.*
+
+package.json
+package-lock.json
+node_modules

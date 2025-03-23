@@ -41,5 +41,7 @@ out/
 /env/.env
 /env/.env.*
 
+generated
+!generated/**/.gitkeep
 
 

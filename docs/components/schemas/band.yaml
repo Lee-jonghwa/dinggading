@@ -1,0 +1,29 @@
+
+Band:
+  type: object
+  description: 회원이 선호하는 밴드 정보
+  properties:
+    bandId:
+      type: integer
+      format: int64
+      description: 밴드 고유 식별자
+    name:
+      type: string
+      description: 밴드명
+    description:
+      type: string
+      description: 밴드 소개
+    genre:
+      type: string
+      enum: [ROCK, JAZZ, DANCE, HIPHOP, POP]
+      description: 밴드 장르
+    sigun:
+      type: string
+      description: 활동 지역(시/군)
+    profileUrl:
+      type: string
+      description: 밴드 프로필 이미지 URL
+  required:
+    - bandId
+    - name
+    - sigun

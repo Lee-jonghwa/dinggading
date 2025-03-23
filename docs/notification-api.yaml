@@ -1,0 +1,337 @@
+openapi: 3.0.0
+info:
+  title: Band API
+  description: 밴드 관련 API
+  version: 1.0.0
+  contact:
+    name: 딩가딩
+servers:
+  - url: http://localhost:8080/api/
+    description: Local development server
+
+tags:
+  - name: Notification
+    description: 알림 관련 API
+
+components:
+  schemas:
+    Notification:
+      type: object
+      properties:
+        notificationId:
+          type: integer
+          format: int64
+          description: 알림 고유 식별자
+          example: 42
+        receiverId:
+          type: string
+          format: uuid
+          description: 알림 수신자의 회원 ID
+          example: "7466B6F3519244D1AA80375767C166C5"
+        message:
+          type: string
+          description: 알림 메시지 내용
+          example: "새로운 밴드 초대가 도착했습니다."
+        readOrNot:
+          type: boolean
+          description: 알림 읽음 여부
+          example: false
+        type:
+          type: string
+          enum: [chat, band, challenge, live, follow]
+          description: 알림 타입
+          example: "chat"
+        createdAt:
+          type: string
+          format: date-time
+          description: 알림 생성 시간
+          example: "2024-03-21T14:59:21.3820407Z"
+      required:
+        - notificationId
+        - receiverId
+        - message
+        - readOrNot
+        - type
+        - createdAt
+
+    NotificationList:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+        pageable:
+          type: object
+          properties:
+            page:
+              type: integer
+              description: 현재 페이지 번호
+              example: 0
+            size:
+              type: integer
+              description: 페이지 크기
+              example: 20
+            totalElements:
+              type: integer
+              description: 전체 요소 수
+              example: 42
+            totalPages:
+              type: integer
+              description: 전체 페이지 수
+              example: 3
+          required:
+            - page
+            - size
+            - totalElements
+            - totalPages
+      required:
+        - content
+        - pageable
+
+    ProblemDetail:
+      title: Problem Detail
+      description: 모든 에러 응답에 대한 스키마
+      type: object
+      properties:
+        type:
+          title: Type
+          description: 에러 응답을 발생시킨 전체 URL
+          type: string
+          format: uri
+          example: 'http://localhost:8080/api/members/123/notifications'
+        title:
+          title: Title
+          description: 짧은 에러 제목
+          type: string
+          example: 'ResourceNotFoundException'
+        status:
+          title: Status
+          description: HTTP 상태 코드
+          type: integer
+          format: int32
+          minimum: 400
+          maximum: 600
+          exclusiveMaximum: true
+          example: 404
+        detail:
+          title: Detail
+          description: 상세 에러 메시지
+          type: string
+          example: 'Notification with ID 42 not found'
+        timestamp:
+          title: Timestamp
+          description: 에러 발생 시간
+          type: string
+          format: date-time
+          example: '2024-03-21T14:59:21.3820407Z'
+        schemaValidationErrors:
+          title: Schema validation errors
+          description: OpenAPI 스키마에 대한 유효성 검사 오류
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationMessage'
+      required:
+        - type
+        - title
+        - status
+        - detail
+        - timestamp
+
+    ValidationMessage:
+      title: Validation message
+      description: 유효성 검사 오류를 설명하는 메시지
+      type: object
+      properties:
+        message:
+          title: Message
+          description: 유효성 검사 메시지
+          type: string
+          example: "[Path '/message'] Instance type (null) does not match any allowed primitive type (allowed: ['string'])"
+      required:
+        - message
+
+  parameters:
+    MemberId:
+      name: memberId
+      in: path
+      description: 회원 ID
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: "7466B6F3519244D1AA80375767C166C5"
+
+    NotificationId:
+      name: notificationId
+      in: path
+      description: 알림 ID
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 42
+
+    PageParam:
+      name: page
+      in: query
+      description: 페이지 번호 (0부터 시작)
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+
+    SizeParam:
+      name: size
+      in: query
+      description: 페이지 크기
+      required: false
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+        maximum: 100
+
+    SortParam:
+      name: sort
+      in: query
+      description: "정렬 기준 (형식: property,asc|desc)"
+      required: false
+      schema:
+        type: string
+        example: 'createdAt,desc'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'JWT 인증 토큰을 사용합니다. 예: Bearer {token}'
+
+paths:
+  /members/{memberId}/notifications:
+    get:
+      tags:
+        - Notification
+      operationId: getMemberNotifications
+      summary: 회원의 알림 목록 조회
+      description: 특정 회원의 알림 목록을 페이지네이션을 적용하여 조회합니다.
+      parameters:
+        - $ref: '#/components/parameters/MemberId'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - $ref: '#/components/parameters/SortParam'
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 알림 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationList'
+        '401':
+          description: 인증 실패
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '403':
+          description: 권한 부족
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: 회원을 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '500':
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /members/{memberId}/notifications/{notificationId}/read:
+    put:
+      tags:
+        - Notification
+      operationId: markNotificationAsRead
+      summary: 알림 읽음 처리
+      description: 특정 알림을 읽음 상태로 변경합니다.
+      parameters:
+        - $ref: '#/components/parameters/MemberId'
+        - $ref: '#/components/parameters/NotificationId'
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: 알림 읽음 처리 성공
+        '401':
+          description: 인증 실패
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '403':
+          description: 권한 부족
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: 알림을 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '500':
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /members/{memberId}/notifications/{notificationId}:
+    delete:
+      tags:
+        - Notification
+      operationId: deleteNotification
+      summary: 알림 삭제
+      description: 특정 알림을 삭제합니다.
+      parameters:
+        - $ref: '#/components/parameters/MemberId'
+        - $ref: '#/components/parameters/NotificationId'
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: 알림 삭제 성공
+        '401':
+          description: 인증 실패
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '403':
+          description: 권한 부족
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: 알림을 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '500':
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'

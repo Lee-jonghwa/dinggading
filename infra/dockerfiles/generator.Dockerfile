@@ -6,6 +6,8 @@ COPY ./generator .
 
 COPY ./docs .
 
+RUN mkdir input
+
 RUN mkdir backend
 
 RUN mkdir frontend

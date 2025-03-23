@@ -1,0 +1,55 @@
+
+ProblemDetail:
+  title: Problem Detail
+  description: The schema for all error responses.
+  type: object
+  properties:
+    type:
+      title: Type
+      description: Full URL that originated the error response.
+      type: string
+      format: uri
+      example: 'http://localhost:9966/petclinic/api/owner'
+      readOnly: true
+    title:
+      title: Title
+      description: The short error title.
+      type: string
+      example: NoResourceFoundException
+      readOnly: true
+    status:
+      title: Status
+      description: HTTP status code
+      type: integer
+      format: int32
+      minimum: 400
+      maximum: 600
+      exclusiveMaximum: true
+      example: 500
+      readOnly: true
+    detail:
+      title: Detail
+      description: The long error message.
+      type: string
+      example: 'No static resource api/owner.'
+      readOnly: true
+    timestamp:
+      title: Timestamp
+      description: The time the error occurred.
+      type: string
+      format: date-time
+      example: '2024-11-23T13:59:21.3820407Z'
+      readOnly: true
+    schemaValidationErrors:
+      title: Schema validation errors
+      description: Validation errors against the OpenAPI schema.
+      type: array
+      items:
+        $ref: './validation-message.yaml#/ValidationMessage'
+  required:
+    - type
+    - title
+    - status
+    - detail
+    - timestamp
+    - schemaValidationErrors

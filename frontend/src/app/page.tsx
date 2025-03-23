@@ -1,13 +1,17 @@
 "use client";
 import { useState } from 'react';
 import type { NextPage } from 'next';
-import { OwnerApi } from '@generated/api';
 
 const Home: NextPage = () => {
   const [response, setResponse] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const s = new OwnerApi();
-  console.log(s);
+  const mode = process.env.NEXT_PUBLIC_ENV_MODE;
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL;
+  console.log("page.tsx", mode);
+  console.log("page.tsx", url);
+
+
+
   // /src/app/page.tsx
 
   const testApi = async () => {
@@ -30,6 +34,8 @@ const Home: NextPage = () => {
   return (
     <div style={{ padding: '20px' }}>
       <h1>API 테스트</h1>
+
+      <h1>현재 환경 {mode}</h1>
       <button 
         onClick={testApi}
         disabled={loading}

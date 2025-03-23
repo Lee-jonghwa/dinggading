@@ -1,0 +1,19 @@
+
+ChallengeRequest:
+  type: object
+  properties:
+    ChallengeType:
+      $ref: './challenge-type.yaml#/ChallengeType'
+    Instrument:
+      $ref: './instrument.yaml#/Instrument'
+    Tier:
+      $ref: './tier.yaml#/Tier'
+    SongByInstrumentId:
+      type: integer
+      format: int64
+      description: 악기별 선택한 노래 식별자
+  required:
+    - challengeType
+    - instrument
+    - tier
+    - songByInstrumentId

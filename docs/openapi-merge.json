@@ -1,9 +1,6 @@
 {
   "inputs": [
     {
-      "inputFile": "./instrument-api.yaml"
-    },
-    {
       "inputFile": "./member-api.yaml"
     },
     {
@@ -13,7 +10,10 @@
       "inputFile": "./challenge-api.yaml"
     },
     {
-      "inputFile": "./follow-api.yaml"
+      "inputFile": "./record-api.yaml"
+    },
+    {
+      "inputFile": "./song-api.yaml"
     }
   ],
   "output": "./output/openapi.yaml"

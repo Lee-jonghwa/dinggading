@@ -14,21 +14,23 @@ const Main: NextPage = () => {
       <h1> Main </h1>
       <Button></Button>
       <div className="GLBModel">
-        <Canvas style={{width : "700px" , height : "700px"}} camera={{position : [0, 0, 5]}}>
+        <Canvas camera={{position : [0, 0, 5]}}>
           <ambientLight color={"#FFFFFF"} intensity={2.5} />
-          <directionalLight position={[10, 11.5, 20]} color={"#FFFFFF"} intensity={5} />
-          {/* <Model glbPath="/models/Platinum.glb" scale={2} /> */}
-          <Model glbPath="/models/Iron.glb" rotation={[2, 0, 3]} scale={2} />
-          {/* <Model glbPath="/models/Platinum.glb" position={[0, 0, -1]} rotation={[2, Math.PI, 0]} scale={2} /> */}
+          <directionalLight position={[1, 1, 1]} color={"#FFFFFF"} intensity={5} />
+          {/* <Model glbPath="/models/Iron.glb" scale={2}/> */}
+          {/* <Model glbPath="/models/Bronze.glb" scale={2}/> */}
+          <Model glbPath="/models/Silver.glb" position={[0, 0, 2]} rotation={[0, Math.PI, 0]} scale={4} />
+          {/* <Model glbPath="/models/Gold.glb" scale={2}/> */}
         </Canvas>
       </div>
 
 
       <div className="count border-1">
+        <p> store 테스트 코드  </p>
         <p>count : {count}</p>
-        <button onClick={increment}>+</button>
-        <button onClick={decrement}>-</button>
-        <button onClick={reset}>RESET</button>
+        <div onClick={increment}>+</div> 
+        <div onClick={decrement}>-</div> 
+        <div onClick={reset}>RESET</div> 
       </div>
     </div>
   )

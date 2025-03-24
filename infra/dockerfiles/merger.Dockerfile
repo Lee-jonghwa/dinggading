@@ -13,4 +13,4 @@ COPY ./docs .
 RUN mkdir output
 
 # openapi-merge-cli 명령어 실행
-CMD npx openapi-merge-cli --config /merged/openapi-merge.json && cp -r /merged/components /merged/output
+CMD npx openapi-merge-cli --config /merged/openapi-merge.json

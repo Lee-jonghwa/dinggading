@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import type { NextPage } from 'next';
 
+
 const Home: NextPage = () => {
   const [response, setResponse] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);

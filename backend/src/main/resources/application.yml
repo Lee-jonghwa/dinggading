@@ -5,6 +5,12 @@ spring:
 #  profiles:
 #    include: oauth,python,minio
 
+  config:
+    import:
+      - optional:file:../infra/env/.env.production[.properties]
+      - optional:file:../infra/env/.env.production.local[.properties]
+      - optional:file:../infra/env/.env.development.local[.properties]
+
   jackson:
     time-zone: Asia/Seoul
 

@@ -67,7 +67,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String nickname = GenerateRandomNickname.generateRandomNickname();
 
         Member member = Member.builder()
-                .id(UUID.randomUUID())
+                .memberId(UUID.randomUUID())
                 .username(oAuth2UserInfo.getEmail())
                 .nickname(nickname) // 자동 생성
                 .profileImgUrl(oAuth2UserInfo.getImageUrl())
@@ -77,7 +77,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private Member updateMember(Member existingMember, GoogleOAuth2UserInfo oAuth2UserInfo) {
         log.info("updateMember: {}", existingMember);
-        existingMember.setProfileImgUrl(oAuth2UserInfo.getImageUrl());
+        existingMember.updateProfileImgUrl(oAuth2UserInfo.getImageUrl());
         return memberRepository.save(existingMember);
     }
 }

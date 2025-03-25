@@ -1,6 +1,5 @@
 package com.mickey.dinggading.util;
 
-
 import com.mickey.dinggading.base.status.ErrorStatus;
 import com.mickey.dinggading.domain.member.model.entity.Member;
 import com.mickey.dinggading.domain.member.model.entity.Token;
@@ -10,12 +9,16 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.UUID;
+import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
-import java.util.*;
 
 @Component
 @Slf4j
@@ -85,7 +88,7 @@ public class JWTUtil {
                 .and()
                 .subject("accessToken")
                 .claim("username", member.getUsername()) // 이메일 정보 = 로그인 아이디 를 토큰에 저장
-                .claim("id", member.getId().toString()) // 사용자 ID 를 토큰에 저장
+                .claim("id", member.getMemberId().toString()) // 사용자 ID 를 토큰에 저장
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expireTime))
                 .signWith(key, Jwts.SIG.HS256)

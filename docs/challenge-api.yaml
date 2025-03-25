@@ -7,9 +7,9 @@ info:
     email: qkrwnsgh71w@gmail.com
 
 servers:
-  - url: https://localhost:8080
+  - url: http://localhost:8080
     description: 스프링 서버
-  - url: https://localhost:8081
+  - url: http://localhost:8081
     description: 목 서버
 components:
   schemas:
@@ -1260,7 +1260,7 @@ components:
             rankMatchingId: 789
             gameType: "RANK"
 paths:
-  /api/members/{member_id}/ranks:
+  /api/members/{memberId}/ranks:
     get:
       tags:
         - MemberRank
@@ -1316,7 +1316,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
 
-  /api/members/{member_id}/tier-history:
+  /api/members/{memberId}/tier-history:
     get:
       tags:
         - MemberTierLog

@@ -1,7 +1,0 @@
-components:
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: 'JWT 인증 토큰을 사용합니다. 예: Bearer {token}'

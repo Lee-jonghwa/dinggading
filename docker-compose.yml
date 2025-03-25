@@ -4,8 +4,8 @@ services:
       context: .
       dockerfile: ./infra/dockerfiles/merger.Dockerfile
     volumes:
-      #- ./docs:/merged
       - shared-data:/merged/output
+      - ./docs:/merged/local
     restart: "no"
 
   spring-generator:

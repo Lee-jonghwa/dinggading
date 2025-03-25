@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # 파일 삭제 명령어
 echo "Deleting .java files in backend..."

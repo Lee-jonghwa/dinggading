@@ -3,6 +3,14 @@ info:
   title: 딩가딩 Record API
   version: 1.0.0
   description: "딩가딩 서비스의 Record Aggregate와 관련된 API를 정의합니다. 연주 기록, 녹음 데이터, 도전 결과 등을 관리하는 API를 포함합니다."
+  contact:
+    email: qkrwnsgh71w@gmail.com
+
+servers:
+  - url: https://localhost:8080
+    description: 스프링 서버
+  - url: https://localhost:8081
+    description: 목 서버
 
 components:
   securitySchemes:
@@ -54,49 +62,8 @@ components:
         - title
         - recordUrl
         - createdAt
-
-    RecordDetailDTO:
-      allOf:
-        - $ref: '#/components/schemas/RecordDTO'
-        - type: object
-          properties:
-            songTitle:
-              type: string
-              description: "녹음한 곡 제목"
-              example: "Bohemian Rhapsody"
-            instrument:
-              type: string
-              enum: [VOCAL, GUITAR, DRUM, BASS]
-              description: "연주 악기"
-              example: "VOCAL"
-            score:
-              type: object
-              properties:
-                beat:
-                  type: integer
-                  description: "박자 점수 (0-100)"
-                  example: 85
-                tune:
-                  type: integer
-                  description: "음정 점수 (0-100)"
-                  example: 78
-                tone:
-                  type: integer
-                  description: "음색 점수 (0-100)"
-                  example: 92
-                total:
-                  type: integer
-                  description: "종합 점수 (0-100)"
-                  example: 85
-              required:
-                - beat
-                - tune
-                - tone
-                - total
-          required:
-            - songTitle
-            - instrument
-
+  
+    # AI 파트에 물어보고 정확하게 수정하기
     RecordAnalysisDTO:
       type: object
       properties:
@@ -354,24 +321,24 @@ components:
               - title
               - recordFile
 
-    UpdateRecordRequest:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              title:
-                type: string
-                description: "녹음 제목"
-                example: "3월 15일 기타 연습 - 수정됨"
-              dtype:
-                type: string
-                enum: [FIRST, PRACTICE, CHALLENGE, DEFENSE]
-                description: "녹음 유형"
-                example: "PRACTICE"
-            required:
-              - title
+#    UpdateRecordRequest:
+#      required: true
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              title:
+#                type: string
+#                description: "녹음 제목"
+#                example: "3월 15일 기타 연습 - 수정됨"
+#              dtype:
+#                type: string
+#                enum: [FIRST, PRACTICE, CHALLENGE, DEFENSE]
+#                description: "녹음 유형"
+#                example: "PRACTICE"
+#            required:
+#              - title
 
     ChallengeRecordRequest:
       required: true
@@ -410,7 +377,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/RecordDetailDTO'
+            $ref: '#/components/schemas/RecordDTO'
 
     RecordListResponse:
       description: "녹음 기록 목록 응답"
@@ -566,7 +533,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/RecordDetailDTO'
+                  - $ref: '#/components/schemas/RecordDTO'
                   - type: object
                     example:
                       recordId: 12345
@@ -715,7 +682,7 @@ paths:
                     type: array
                     items:
                       allOf:
-                        - $ref: '#/components/schemas/RecordDetailDTO'
+                        - $ref: '#/components/schemas/RecordDTO'
                         - type: object
                           example:
                             recordId: 12345
@@ -759,44 +726,3 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
-  # ==================== 중요도: 하 (부가 기능) ====================
-
-  /challenges/{challengeId}/submit-record:
-    post:
-      tags:
-        - Record
-      operationId: submitChallengeRecord
-      summary: "도전 결과 녹음 제출"
-      description: "티어 도전 결과의 녹음을 제출합니다."
-      deprecated: true
-      parameters:
-        - $ref: '#/components/parameters/ChallengeId'
-      responses:
-        '201':
-          description: "도전 결과 녹음 제출 성공"
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-
-  /records/{recordId}/analysis:
-    get:
-      tags:
-        - Record
-      operationId: getRecordAnalysis
-      summary: "녹음 분석 결과 조회"
-      description: "특정 녹음의 상세 분석 결과를 조회합니다."
-      parameters:
-        - $ref: '#/components/parameters/RecordId'
-      deprecated: true
-      responses:
-        '200':
-          description: "녹음 분석 결과 조회 성공"
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-

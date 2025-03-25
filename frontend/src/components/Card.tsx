@@ -1,6 +1,6 @@
 'use client'
 import { colors } from "@/constants/colors"
-import "@/styles/components/Card.css"
+import "@/styles/components/card.css"
 import { useRouter } from "next/navigation"
 import React from "react"
 

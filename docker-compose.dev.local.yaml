@@ -1,74 +1,4 @@
 services:
-  openapi-merger:
-    build:
-      context: .
-      dockerfile: ./infra/dockerfiles/merger.Dockerfile
-    volumes:
-      - shared-data:/merged/output
-      - ./docs:/merged/local
-    restart: "no"
-
-  mock:
-    platform: linux/amd64
-    image: stoplight/prism:4
-    volumes:
-      - shared-data:/tmp:ro
-    ports:
-      - "8081:4010"
-    command: 'mock -h 0.0.0.0 /tmp/openapi.yaml'
-
-    depends_on:
-      openapi-merger:
-        condition: service_completed_successfully
-
-  spring-generator:
-    build:
-      context: .
-      dockerfile: ./infra/dockerfiles/generator.Dockerfile
-    volumes:
-      - shared-data:/openapi/input
-      - ./backend/generated:/backend
-    command:
-      - "generate"
-      - "-i"
-      - "./input/openapi.yaml"
-      - "-g"
-      - "spring"
-      - "-o"
-      - "/backend"
-      - "-t"
-      - "spring-custom-generator/custom-codegen"
-      - "-c"
-      - "spring-custom-generator/config.json"
-    depends_on:
-      openapi-merger:
-        condition: service_completed_successfully
-    restart: "no"
-
-  axios-generator:
-    build:
-      context: .
-      dockerfile: ./infra/dockerfiles/generator.Dockerfile
-    volumes:
-      - shared-data:/openapi/input
-      - ./frontend/generated:/frontend
-    command:
-      - "generate"
-      - "-i"
-      - "./input/openapi.yaml"
-      - "-g"
-      - "typescript-axios"
-      - "-o"
-      - "/frontend"
-      - "-t"
-      - "axios-custom-generator/custom-codegen"
-      - "-c"
-      - "axios-custom-generator/config.json"
-    restart: "no"
-    depends_on:
-      openapi-merger:
-        condition: service_completed_successfully
-
   next:
     platform: linux/amd64
     build:
@@ -79,9 +9,6 @@ services:
         - NEXT_PUBLIC_API_BASE_URL=spring:8080
         - NEXT_PUBLIC_ENV_MODE=DEVELOP_LOCAL
 
-    depends_on:
-      spring-generator:
-        condition: service_completed_successfully
     ports:
       - "3000:3000"
 
@@ -95,8 +22,6 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-      spring-generator:
-        condition: service_completed_successfully
     env_file:
       - ./infra/env/.env.development.local
     ports:
@@ -114,7 +39,7 @@ services:
       retries: 3
       start_period: 30s
     restart: always
-    
+
   nginx:
     platform: linux/amd64
     build:

@@ -36,12 +36,12 @@ else
   exit 1
 fi
 
-# 백엔드 .java 파일 삭제
-echo -e "\e[1;34m🔧 Cleaning: 자동으로 생성된 .java, .ts파일을 정리합니다. 🔧\e[0m"  # 파란색, 볼드 텍스트
-./cleanup.sh
+echo -e "\e[1;34m🔧 Codegen을 실행합니다. 🔧\e[0m"  # 파란색, 볼드 텍스트
+./codegen.sh
 
 echo -e "\e[1;32m✅ Building: 프론트 엔드 파일을 빌드하는 중 입니다...✅\e[0m"  # 초록색, 볼드 텍스트
 docker-compose -f docker-compose.dev.local.yaml build next
+
 # 클린업 완료 및 빌드 시작
 echo -e "\e[1;32m✅ Building: 개발 환경을 구성하는 중 입니다...✅\e[0m"  # 초록색, 볼드 텍스트
 docker-compose -f docker-compose.dev.local.yaml up --no-build

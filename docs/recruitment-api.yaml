@@ -3,7 +3,14 @@ info:
   title: 딩가딩 Recruitment API
   version: 1.0.0
   description: "밴드 구인 공고 관련 API 명세서"
+  contact:
+    email: nykim.ssafy2024@gmail.com
 
+servers:
+  - url: https://localhost:8080
+    description: 스프링 서버
+  - url: https://localhost:8081
+    description: 목 서버
 components:
   securitySchemes:
     BearerAuth:
@@ -251,21 +258,6 @@ components:
         - totalElements
         - totalPages
 
-    # 페이지네이션된 응답 스키마
-    PageRecruitmentDTO:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/RecruitmentDTO'
-        pageable:
-          $ref: '#/components/schemas/PageableDTO'
-      required:
-        - content
-        - pageable
-      x-spring-paginated: true
-
   # 요청 본문 정의
   requestBodies:
     CreateRecruitmentRequest:
@@ -380,13 +372,6 @@ components:
           schema:
             $ref: '#/components/schemas/RecruitmentDTO'
 
-    RecruitmentListResponse:
-      description: "구인 공고 목록"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/PageRecruitmentDTO'
-
     RecruitmentInstrumentResponse:
       description: "모집 악기 정보"
       content:
@@ -497,6 +482,8 @@ paths:
       operationId: createBandRecruitment
       summary: "밴드 구인 공고 등록"
       description: "밴드에 새로운 구인 공고를 등록합니다. 제목, 설명, 오디션 날짜, 오디션 곡 등 포함"
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/BandId'
       requestBody:
@@ -518,6 +505,8 @@ paths:
       operationId: updateBandRecruitment
       summary: "밴드 구인 공고 수정"
       description: "특정 구인 공고 정보를 수정합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/BandId'
         - $ref: '#/components/parameters/RecruitmentId'
@@ -539,6 +528,8 @@ paths:
       operationId: deleteBandRecruitment
       summary: "밴드 구인 공고 삭제"
       description: "특정 구인 공고를 삭제합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/BandId'
         - $ref: '#/components/parameters/RecruitmentId'
@@ -557,6 +548,8 @@ paths:
       operationId: updateRecruitmentStatus
       summary: "밴드 구인 공고 상태 변경"
       description: "밴드 구인 프로세스 상태를 변경합니다 (모집 중, 모집 완료)"
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/BandId'
         - $ref: '#/components/parameters/RecruitmentId'
@@ -593,6 +586,8 @@ paths:
       operationId: addRecruitmentInstrument
       summary: "구인 공고 악기 포지션 추가"
       description: "구인 공고에 새로운 악기 포지션을 추가합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/BandId'
         - $ref: '#/components/parameters/RecruitmentId'
@@ -615,6 +610,8 @@ paths:
       operationId: removeRecruitmentInstrument
       summary: "구인 공고 악기 포지션 제거"
       description: "구인 공고에서 특정 악기 포지션을 제거합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/BandId'
         - $ref: '#/components/parameters/RecruitmentId'
@@ -652,6 +649,8 @@ paths:
       operationId: applyRecruitment
       summary: "구인 공고 지원"
       description: "구인 공고에 지원합니다. 지원자 ID, 악기 포지션 포함"
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RecruitmentId'
       requestBody:
@@ -671,6 +670,8 @@ paths:
       operationId: cancelRecruitmentApplication
       summary: "구인 공고 지원 취소"
       description: "구인 공고 지원을 취소합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RecruitmentId'
         - $ref: '#/components/parameters/ApplicantId'
@@ -689,6 +690,8 @@ paths:
       operationId: acceptApplicant
       summary: "지원자 승인"
       description: "특정 지원자의 밴드 가입을 승인합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/BandId'
         - $ref: '#/components/parameters/RecruitmentId'
@@ -710,6 +713,8 @@ paths:
       operationId: rejectApplicant
       summary: "지원자 거절"
       description: "특정 지원자의 밴드 가입을 거절합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/BandId'
         - $ref: '#/components/parameters/RecruitmentId'

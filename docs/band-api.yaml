@@ -2,7 +2,15 @@ openapi: 3.0.0
 info:
   title: 딩가딩 Band API
   version: 1.0.0
-  description: "밴드 관련 API 명세서"
+  description: "밴드 API 명세서"
+  contact:
+    email: nykim.ssafy2024@gmail.com
+
+servers:
+  - url: http://localhost:8080
+    description: 스프링 서버
+  - url: http://localhost:8081
+    description: 목 서버
 
 components:
   securitySchemes:
@@ -41,15 +49,6 @@ components:
         type: integer
         format: int64
 
-    GenreId:
-      name: genreId
-      in: path
-      description: "장르 ID"
-      required: true
-      schema:
-        type: integer
-        format: int64
-
     # 쿼리 파라미터 모음
     SearchParam:
       name: keyword
@@ -73,7 +72,7 @@ components:
       description: "장르"
       required: false
       schema:
-        $ref: '#/components/schemas/GenreEnum'
+        $ref: '#/components/schemas/Genre'
 
     JobOpeningParam:
       name: jobOpening
@@ -117,17 +116,17 @@ components:
           type: string
 
     # 열거형 정의
-    InstrumentEnum:
+    Instrument:
       type: string
       enum: [VOCAL, GUITAR, DRUM, BASS]
       description: "악기 유형"
 
-    GenreEnum:
+    Genre:
       type: string
       enum: [ROCK, JAZZ, DANCE, HIPHOP, POP]
       description: "밴드 장르"
 
-    SnsEnum:
+    Sns:
       type: string
       enum: [GITHUB, MATTERMOST, INSTAGRAM, FACEBOOK, YOUTUBE, X, CUSTOM]
       description: "SNS 유형"
@@ -172,10 +171,11 @@ components:
         description:
           type: string
           description: "밴드 소개"
-        genreId:
-          type: integer
-          format: int64
-          description: "장르 ID"
+        genres:
+          type: array
+          items:
+            $ref: '#/components/schemas/Genre'
+          description: "밴드 장르 목록"
         sigun:
           type: string
           description: "활동 지역(시군)"
@@ -194,14 +194,11 @@ components:
         memberCount:
           type: integer
           description: "현재 멤버 수"
-        bandMemberId:
-          type: integer
-          format: int64
-          description: "밴드 멤버 ID"
       required:
         - bandId
         - name
         - bandMasterId
+        - genres
 
     BandMemberDTO:
       type: object
@@ -219,7 +216,7 @@ components:
           format: uuid
           description: "회원 ID"
         instrument:
-          $ref: '#/components/schemas/InstrumentEnum'
+          $ref: '#/components/schemas/Instrument'
       required:
         - bandMemberId
         - bandId
@@ -238,7 +235,7 @@ components:
           format: int64
           description: "밴드 ID"
         sns:
-          $ref: '#/components/schemas/SnsEnum'
+          $ref: '#/components/schemas/Sns'
         title:
           type: string
           description: "Custom SNS 제목 (CUSTOM 유형인 경우에만)"
@@ -250,24 +247,6 @@ components:
         - bandId
         - sns
         - url
-
-    GenreDTO:
-      type: object
-      properties:
-        bandGenreId:
-          type: integer
-          format: int64
-          description: "밴드 장르 ID"
-        bandId:
-          type: integer
-          format: int64
-          description: "밴드 ID"
-        genre:
-          $ref: '#/components/schemas/GenreEnum'
-      required:
-        - bandGenreId
-        - bandId
-        - genre
 
     # 페이지네이션된 응답 스키마
     PageBandDTO:
@@ -303,10 +282,11 @@ components:
               description:
                 type: string
                 description: "밴드 소개"
-              genreId:
-                type: integer
-                format: int64
-                description: "밴드 장르 ID"
+              genres:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Genre"
+                description: "밴드 장르 목록"
               sigun:
                 type: string
                 description: "활동 지역(시군)"
@@ -325,7 +305,7 @@ components:
             required:
               - name
               - bandMasterId
-              - genreId
+              - genres
 
     UpdateBandRequest:
       required: true
@@ -340,10 +320,11 @@ components:
               description:
                 type: string
                 description: "밴드 소개"
-              genreId:
-                type: integer
-                format: int64
-                description: "장르 ID"
+              genres:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Genre"
+                description: "밴드 장르 목록"
               sigun:
                 type: string
                 description: "활동 지역(시군)"
@@ -374,7 +355,7 @@ components:
                 format: uuid
                 description: "추가할 회원 ID"
               instrument:
-                $ref: '#/components/schemas/InstrumentEnum'
+                $ref: '#/components/schemas/Instrument'
             required:
               - memberId
               - instrument
@@ -387,7 +368,7 @@ components:
             type: object
             properties:
               instrument:
-                $ref: '#/components/schemas/InstrumentEnum'
+                $ref: '#/components/schemas/Instrument'
             required:
               - instrument
 
@@ -413,7 +394,7 @@ components:
             type: object
             properties:
               sns:
-                $ref: '#/components/schemas/SnsEnum'
+                $ref: '#/components/schemas/Sns'
               title:
                 type: string
                 description: "Custom SNS 제목 (CUSTOM 유형인 경우에만)"
@@ -432,7 +413,7 @@ components:
             type: object
             properties:
               sns:
-                $ref: '#/components/schemas/SnsEnum'
+                $ref: '#/components/schemas/Sns'
               title:
                 type: string
                 description: "Custom SNS 제목 (CUSTOM 유형인 경우에만)"
@@ -442,18 +423,6 @@ components:
             required:
               - sns
               - url
-
-    AddGenreRequest:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              genre:
-                $ref: '#/components/schemas/GenreEnum'
-            required:
-              - genre
 
   # 응답 정의
   responses:
@@ -565,22 +534,6 @@ components:
             items:
               $ref: '#/components/schemas/ContactDTO'
 
-    GenreResponse:
-      description: "장르 정보"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/GenreDTO'
-
-    GenreListResponse:
-      description: "장르 목록"
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/GenreDTO'
-
 security:
   - BearerAuth: []
 
@@ -654,6 +607,8 @@ paths:
       operationId: createBand
       summary: "밴드 생성"
       description: "새로운 밴드를 생성합니다. 밴드 마스터 정보, 이름, 설명 등 필수 정보 설정"
+      security:
+        - BearerAuth: []
       requestBody:
         $ref: '#/components/requestBodies/CreateBandRequest'
       responses:
@@ -840,59 +795,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/BandId'
         - $ref: '#/components/parameters/ContactId'
-      responses:
-        '204':
-          $ref: '#/components/responses/SuccessNoContent'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
-
-  /bands/{bandId}/genres:
-    get:
-      tags:
-        - Genre
-      operationId: getBandGenres
-      summary: "밴드 장르 조회"
-      description: "밴드의 장르 정보를 조회합니다."
-      parameters:
-        - $ref: '#/components/parameters/BandId'
-      responses:
-        '200':
-          $ref: '#/components/responses/GenreListResponse'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
-
-    post:
-      tags:
-        - Genre
-      operationId: addBandGenre
-      summary: "밴드 장르 추가"
-      description: "밴드에 새로운 장르를 추가합니다."
-      parameters:
-        - $ref: '#/components/parameters/BandId'
-      requestBody:
-        $ref: '#/components/requestBodies/AddGenreRequest'
-      responses:
-        '201':
-          $ref: '#/components/responses/GenreResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestException'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
-
-  /bands/{bandId}/genres/{genreId}:
-    delete:
-      tags:
-        - Genre
-      operationId: removeBandGenre
-      summary: "밴드 장르 제거"
-      description: "밴드에서 특정 장르를 제거합니다."
-      parameters:
-        - $ref: '#/components/parameters/BandId'
-        - $ref: '#/components/parameters/GenreId'
       responses:
         '204':
           $ref: '#/components/responses/SuccessNoContent'

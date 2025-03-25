@@ -3,6 +3,14 @@ info:
   title: 딩가딩 Chatroom API
   version: 1.0.0
   description: "채팅방 및 메시지 관련 API 명세서"
+  contact:
+    email: nykim.ssafy2024@gmail.com
+
+servers:
+  - url: https://localhost:8080
+    description: 스프링 서버
+  - url: https://localhost:8081
+    description: 목 서버
 
 components:
   securitySchemes:
@@ -773,6 +781,8 @@ paths:
       operationId: getChatRooms
       summary: "채팅방 목록 조회"
       description: "사용자의 모든 채팅방 목록을 조회합니다. 유형별 필터링이 가능합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/TypeParam'
       responses:
@@ -786,6 +796,8 @@ paths:
       operationId: getChatRoom
       summary: "채팅방 정보 조회"
       description: "특정 채팅방의 정보를 조회합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       responses:
@@ -802,6 +814,8 @@ paths:
       operationId: deleteChatRoom
       summary: "채팅방 삭제"
       description: "채팅방을 삭제합니다. 관리자 또는 생성자만 가능합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       responses:
@@ -834,6 +848,8 @@ paths:
       operationId: createPersonalChatRoom
       summary: "1:1 DM 생성/조회"
       description: "특정 회원과의 1:1 DM을 생성하거나 기존 채팅방을 조회합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/MemberId'
       responses:
@@ -851,6 +867,8 @@ paths:
       operationId: createGroupChatRoom
       summary: "그룹 채팅방 생성"
       description: "새로운 그룹 채팅방을 생성합니다. 여러 참가자를 지정할 수 있습니다."
+      security:
+        - BearerAuth: [ ]
       requestBody:
         $ref: '#/components/requestBodies/CreateGroupChatRequest'
       responses:
@@ -866,6 +884,8 @@ paths:
       operationId: createBandChatRoom
       summary: "밴드 채팅방 생성/조회"
       description: "특정 밴드의 채팅방을 생성하거나 기존 채팅방을 조회합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/BandId'
       responses:
@@ -885,6 +905,8 @@ paths:
       operationId: inviteMembers
       summary: "채팅방에 멤버 초대"
       description: "채팅방에 멤버를 초대합니다. 1:1 채팅방에서 멤버를 초대할 경우, 새 그룹 채팅방을 생성합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       requestBody:
@@ -906,6 +928,8 @@ paths:
       operationId: getChatRoomParticipants
       summary: "채팅방 참가자 목록 조회"
       description: "채팅방의 참가자 목록을 조회합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       responses:
@@ -923,6 +947,8 @@ paths:
       operationId: getChatMessages
       summary: "메시지 히스토리 조회"
       description: "채팅방의 메시지 히스토리를 조회합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
         - $ref: '#/components/parameters/BeforeParam'
@@ -941,6 +967,8 @@ paths:
       operationId: sendMessage
       summary: "메시지 전송"
       description: "채팅방에 메시지를 전송합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       requestBody:
@@ -955,24 +983,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundException'
 
-  /chatrooms/{roomId}/messages/{messageId}:
-    delete:
-      tags:
-        - ChatMessage
-      operationId: deleteMessage
-      summary: "메시지 삭제"
-      description: "채팅방의 특정 메시지를 삭제합니다."
-      parameters:
-        - $ref: '#/components/parameters/RoomId'
-        - $ref: '#/components/parameters/MessageId'
-      responses:
-        '204':
-          $ref: '#/components/responses/SuccessNoContent'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
-
   /chatrooms/{roomId}/settings:
     patch:
       tags:
@@ -980,6 +990,8 @@ paths:
       operationId: updateChatRoomSettings
       summary: "채팅방 설정 변경"
       description: "채팅방 설정을 변경합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       requestBody:
@@ -999,6 +1011,8 @@ paths:
       operationId: markAsRead
       summary: "읽음 상태 업데이트"
       description: "채팅방의 메시지를 읽음 상태로 업데이트합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       responses:
@@ -1014,6 +1028,8 @@ paths:
       operationId: getUnreadCount
       summary: "읽지 않은 메시지 수 조회"
       description: "채팅방의 읽지 않은 메시지 수를 조회합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       responses:
@@ -1029,6 +1045,8 @@ paths:
       operationId: createNotice
       summary: "채팅방 공지 등록"
       description: "채팅방에 공지를 등록합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       requestBody:
@@ -1049,6 +1067,8 @@ paths:
       operationId: getNotices
       summary: "채팅방 공지 목록 조회"
       description: "채팅방의 공지 목록을 조회합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       responses:
@@ -1066,6 +1086,8 @@ paths:
       operationId: updateNotice
       summary: "채팅방 공지 수정"
       description: "채팅방의 특정 공지를 수정합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
         - $ref: '#/components/parameters/NoticeId'
@@ -1087,6 +1109,8 @@ paths:
       operationId: deleteNotice
       summary: "채팅방 공지 삭제"
       description: "채팅방의 특정 공지를 삭제합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
         - $ref: '#/components/parameters/NoticeId'
@@ -1105,6 +1129,8 @@ paths:
       operationId: pinNotice
       summary: "채팅방 공지 고정/해제"
       description: "채팅방의 특정 공지를 고정하거나 고정을 해제합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
         - $ref: '#/components/parameters/NoticeId'
@@ -1127,6 +1153,8 @@ paths:
       operationId: getChatRoomMedia
       summary: "채팅방 미디어 조회"
       description: "채팅방 내 모든 미디어 파일을 조회합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       responses:
@@ -1144,6 +1172,8 @@ paths:
       operationId: getChatRoomImages
       summary: "채팅방 이미지 조회"
       description: "채팅방 내 이미지만 조회합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       responses:
@@ -1161,6 +1191,8 @@ paths:
       operationId: getChatRoomVideos
       summary: "채팅방 동영상 조회"
       description: "채팅방 내 동영상만 조회합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       responses:
@@ -1178,29 +1210,13 @@ paths:
       operationId: getChatRoomFiles
       summary: "채팅방 파일 조회"
       description: "채팅방 내 기타 파일만 조회합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       responses:
         '200':
           $ref: '#/components/responses/ChatMediaListResponse'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
-
-  /chatrooms/{roomId}/media/{mediaId}:
-    delete:
-      tags:
-        - ChatMedia
-      operationId: deleteMedia
-      summary: "미디어 파일 삭제"
-      description: "특정 미디어 파일을 삭제합니다."
-      parameters:
-        - $ref: '#/components/parameters/RoomId'
-        - $ref: '#/components/parameters/MediaId'
-      responses:
-        '204':
-          $ref: '#/components/responses/SuccessNoContent'
         '403':
           $ref: '#/components/responses/ForbiddenException'
         '404':
@@ -1213,6 +1229,8 @@ paths:
       operationId: sendMediaMessage
       summary: "미디어 메시지 전송"
       description: "미디어 파일이 첨부된 메시지를 전송합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/RoomId'
       requestBody:

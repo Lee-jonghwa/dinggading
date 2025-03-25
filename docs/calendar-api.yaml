@@ -3,6 +3,14 @@ info:
   title: 딩가딩 Calendar API
   version: 1.0.0
   description: "일정 관리 및 달력 관련 API 명세서"
+  contact:
+    email: nykim.ssay2024@gmail.com
+
+servers:
+  - url: http://localhost:8080
+    description: 스프링 서버
+  - url: http://localhost:8081
+    description: 목 서버
 
 components:
   securitySchemes:
@@ -14,24 +22,6 @@ components:
 
   parameters:
     # 경로 파라미터 모음
-    MemberId:
-      name: memberId
-      in: path
-      description: "회원 ID"
-      required: true
-      schema:
-        type: string
-        format: uuid
-
-    BandId:
-      name: bandId
-      in: path
-      description: "밴드 ID"
-      required: true
-      schema:
-        type: integer
-        format: int64
-
     CalendarId:
       name: calendarId
       in: path
@@ -86,7 +76,7 @@ components:
           type: string
 
     # 열거형 정의
-    OwnerTypeEnum:
+    OwnerType:
       type: string
       enum: [MEMBER, BAND]
       description: "소유자 유형 (회원 또는 밴드)"
@@ -101,12 +91,12 @@ components:
           description: "달력 ID"
         ownerId:
           type: string
-          format: uuid
-          description: "소유자 ID (회원 또는 밴드)"
+          description: "소유자 ID (회원 UUID 또는 밴드 ID)"
         ownerType:
-          $ref: '#/components/schemas/OwnerTypeEnum'
+          $ref: '#/components/schemas/OwnerType'
         name:
           type: string
+
           description: "달력 이름"
       required:
         - calendarId
@@ -159,77 +149,12 @@ components:
         - title
         - eventTime
 
-    MemberCalendarDTO:
-      type: object
-      properties:
-        memberCalendarId:
-          type: integer
-          format: int64
-          description: "회원 달력 ID"
-        memberId:
-          type: string
-          format: uuid
-          description: "회원 ID"
-        calendarId:
-          type: integer
-          format: int64
-          description: "달력 ID"
-        nickname:
-          type: string
-          description: "회원 닉네임"
-        profileImgUrl:
-          type: string
-          description: "회원 프로필 이미지"
-      required:
-        - memberCalendarId
-        - memberId
-        - calendarId
-
-    BandCalendarDTO:
-      type: object
-      properties:
-        bandCalendarId:
-          type: integer
-          format: int64
-          description: "밴드 달력 ID"
-        bandId:
-          type: integer
-          format: int64
-          description: "밴드 ID"
-        calendarId:
-          type: integer
-          format: int64
-          description: "달력 ID"
-        bandName:
-          type: string
-          description: "밴드 이름"
-        profileImgUrl:
-          type: string
-          description: "밴드 프로필 이미지"
-      required:
-        - bandCalendarId
-        - bandId
-        - calendarId
-
     # 복합 응답 스키마
-    MemberCalendarWithEventsDTO:
+    CalendarWithEventsDTO:
       type: object
       properties:
         calendar:
-          $ref: '#/components/schemas/MemberCalendarDTO'
-        events:
-          type: array
-          items:
-            $ref: '#/components/schemas/ScheduleDTO'
-      required:
-        - calendar
-        - events
-
-    BandCalendarWithEventsDTO:
-      type: object
-      properties:
-        calendar:
-          $ref: '#/components/schemas/BandCalendarDTO'
+          $ref: '#/components/schemas/CalendarDTO'
         events:
           type: array
           items:
@@ -322,33 +247,12 @@ components:
             items:
               $ref: '#/components/schemas/ScheduleDTO'
 
-    MemberCalendarResponse:
-      description: "회원 달력 정보"
+    CalendarWithEventsResponse:
+      description: "달력 및 일정 정보"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/MemberCalendarDTO'
-
-    BandCalendarResponse:
-      description: "밴드 달력 정보"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/BandCalendarDTO'
-
-    MemberCalendarWithEventsResponse:
-      description: "개인 달력 및 일정 정보"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/MemberCalendarWithEventsDTO'
-
-    BandCalendarWithEventsResponse:
-      description: "밴드 달력 및 일정 정보"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/BandCalendarWithEventsDTO'
+            $ref: '#/components/schemas/CalendarWithEventsDTO'
 
     # 에러 응답
     NotFoundException:
@@ -407,39 +311,22 @@ security:
   - BearerAuth: []
 
 paths:
-  /members/{memberId}/calendar:
+  /calendars/{calendarId}:
     get:
       tags:
         - Calendar
-      operationId: getMemberCalendar
-      summary: "개인 달력 조회"
-      description: "회원의 개인 달력 정보와 일정을 조회합니다."
+      operationId: getCalendar
+      summary: "달력 조회"
+      description: "달력 정보와 일정을 조회합니다. JWT 토큰의 사용자가 본인의 달력이거나 속한 밴드의 달력인 경우에만 조회 가능합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
-        - $ref: '#/components/parameters/MemberId'
+        - $ref: '#/components/parameters/CalendarId'
         - $ref: '#/components/parameters/StartDateParam'
         - $ref: '#/components/parameters/EndDateParam'
       responses:
         '200':
-          $ref: '#/components/responses/MemberCalendarWithEventsResponse'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
-
-  /bands/{bandId}/calendar:
-    get:
-      tags:
-        - Calendar
-      operationId: getBandCalendar
-      summary: "밴드 달력 조회"
-      description: "밴드의 달력 정보와 일정을 조회합니다."
-      parameters:
-        - $ref: '#/components/parameters/BandId'
-        - $ref: '#/components/parameters/StartDateParam'
-        - $ref: '#/components/parameters/EndDateParam'
-      responses:
-        '200':
-          $ref: '#/components/responses/BandCalendarWithEventsResponse'
+          $ref: '#/components/responses/CalendarWithEventsResponse'
         '403':
           $ref: '#/components/responses/ForbiddenException'
         '404':
@@ -451,7 +338,9 @@ paths:
         - Event
       operationId: createEvent
       summary: "일정 추가"
-      description: "달력에 새로운 일정을 추가합니다."
+      description: "달력에 새로운 일정을 추가합니다. 본인의 달력이거나 속한 밴드의 달력인 경우에만 추가 가능합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/CalendarId'
       requestBody:
@@ -472,7 +361,9 @@ paths:
         - Event
       operationId: updateEvent
       summary: "일정 수정"
-      description: "달력의 특정 일정을 수정합니다."
+      description: "달력의 특정 일정을 수정합니다. 본인이 작성한 일정이거나 밴드 마스터인 경우에만 수정 가능합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/CalendarId'
         - $ref: '#/components/parameters/EventId'
@@ -493,7 +384,9 @@ paths:
         - Event
       operationId: deleteEvent
       summary: "일정 삭제"
-      description: "달력의 특정 일정을 삭제합니다."
+      description: "달력의 특정 일정을 삭제합니다. 본인이 작성한 일정이거나 밴드 마스터인 경우에만 삭제 가능합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/CalendarId'
         - $ref: '#/components/parameters/EventId'

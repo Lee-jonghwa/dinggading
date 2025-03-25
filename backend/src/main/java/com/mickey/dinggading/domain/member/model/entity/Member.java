@@ -1,5 +1,6 @@
 package com.mickey.dinggading.domain.member.model.entity;
 
+import com.mickey.dinggading.base.BaseEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,20 +17,16 @@ import org.hibernate.annotations.CreationTimestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "Member")
-public class Member {
-
+public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "member_id")
     private UUID memberId;
 
     @Column(name = "username", unique = true, nullable = false)
+    // "Google OAuth 로 받아온 이메일이 로그인 아이디"
     @Comment("사용자 로그인 아이디")
     private String username;
-
-    @Column(name = "password", nullable = false)
-    @Comment("비밀 번호")
-    private String password;
 
     @Column(name = "nickname", nullable = false)
     @Comment("사용자 닉네임 (자동 생성)")

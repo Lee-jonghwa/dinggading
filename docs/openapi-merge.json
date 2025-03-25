@@ -8,6 +8,21 @@
     },
     {
       "inputFile": "./record-api.yaml"
+    },
+    {
+      "inputFile": "./band-api.yaml"
+    },
+    {
+      "inputFile": "./calendar-api.yaml"
+    },
+    {
+      "inputFile": "./chatroom-api.yaml"
+    },
+    {
+      "inputFile": "./livehouse-api.yaml"
+    },
+    {
+      "inputFile": "./recruitment-api.yaml"
     }
   ],
   "output": "./output/openapi.yaml"

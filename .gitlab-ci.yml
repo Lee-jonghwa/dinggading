@@ -95,6 +95,10 @@ build_backend:
   needs:
     - job: test_backend
       optional: true
+  artifacts:
+    paths:
+      - backend/generated/
+      - frontend/generated/
   before_script:
     - ls -la ./backend/generated
     - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
@@ -118,6 +122,10 @@ build_frontend:
   needs:
     - job: test_frontend
       optional: true
+  artifacts:
+    paths:
+      - backend/generated/
+      - frontend/generated/
   before_script:
     - ls -la ./frontend/generated
     - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD

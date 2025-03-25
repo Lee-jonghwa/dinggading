@@ -1,21 +1,19 @@
 package com.mickey.dinggading.config;
 
-import java.util.List;
-
 import com.mickey.dinggading.domain.member.repository.MemberRepository;
 import com.mickey.dinggading.domain.oauth.service.CustomOAuth2UserService;
 import com.mickey.dinggading.domain.oauth.service.OAuth2AuthenticationFailureHandler;
 import com.mickey.dinggading.domain.oauth.service.OAuth2AuthenticationSuccessHandler;
 import com.mickey.dinggading.util.JWTAuthenticationFilter;
 import com.mickey.dinggading.util.JWTUtil;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -44,12 +42,12 @@ public class SecurityConfig {
 
                 // 세션 정책 설정 (JWT는 세션을 사용하지 않음)
                 .sessionManagement(session -> session
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // JWT 필터 추가
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
-            // 엔드포인트 권한 설정
+                // 엔드포인트 권한 설정
                 .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers("/actuator/**").permitAll()  // Actuator 엔드포인트 허용
                         .requestMatchers("/oauth2/**", "/login/**").permitAll()

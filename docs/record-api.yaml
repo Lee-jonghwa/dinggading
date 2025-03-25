@@ -7,9 +7,9 @@ info:
     email: qkrwnsgh71w@gmail.com
 
 servers:
-  - url: https://localhost:8080
+  - url: http://localhost:8080
     description: 스프링 서버
-  - url: https://localhost:8081
+  - url: http://localhost:8081
     description: 목 서버
 
 components:

@@ -785,6 +785,8 @@ paths:
       operationId: createLiveHouse
       summary: "라이브하우스 방 개설"
       description: "라이브하우스 방을 개설합니다. 제목, 설명, 최대 인원, 태그, 프로필 이미지 등을 설정하고, 생성 시 방장 권한이 자동으로 부여됩니다."
+      security:
+        - BearerAuth: [ ]
       requestBody:
         $ref: '#/components/requestBodies/CreateLiveHouseRequest'
       responses:
@@ -829,6 +831,8 @@ paths:
       operationId: updateLiveHouse
       summary: "라이브하우스 설정 변경"
       description: "라이브하우스 설정을 변경합니다. 제목, 설명, 태그, 최대 인원, 공개 여부 등을 수정할 수 있습니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/LivehouseId'
       requestBody:
@@ -888,6 +892,8 @@ paths:
       operationId: kickMember
       summary: "사용자 강퇴"
       description: "사용자를 라이브하우스에서 강퇴합니다. 강퇴 사유를 설정하고 블랙리스트에 추가할 수 있습니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/LivehouseId'
       requestBody:
@@ -909,6 +915,8 @@ paths:
       operationId: updateLiveHouseSettings
       summary: "라이브하우스 권한 설정"
       description: "라이브하우스의 참가자 역할을 설정합니다. 방장, 부방장, 연주자, 일반 참여자 등의 역할을 설정할 수 있습니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/LivehouseId'
       requestBody:
@@ -930,6 +938,8 @@ paths:
       operationId: transferOwner
       summary: "방장 권한 이전"
       description: "다른 참여자에게 방장 권한을 이전합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/LivehouseId'
       requestBody:
@@ -951,6 +961,8 @@ paths:
       operationId: addPerformer
       summary: "연주자 추가"
       description: "특정 참여자에게 연주 권한을 부여합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/LivehouseId'
       requestBody:
@@ -972,6 +984,8 @@ paths:
       operationId: removePerformer
       summary: "연주자 제거"
       description: "특정 참여자의 연주 권한을 제거합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/LivehouseId'
         - $ref: '#/components/parameters/MemberId'
@@ -990,6 +1004,8 @@ paths:
       operationId: startRecording
       summary: "라이브 연주 녹음 시작"
       description: "현재 진행 중인 연주 세션 녹음을 시작합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/LivehouseId'
       requestBody:
@@ -1011,6 +1027,8 @@ paths:
       operationId: stopRecording
       summary: "라이브 연주 녹음 종료"
       description: "녹음을 종료하고 저장합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/LivehouseId'
       responses:
@@ -1030,6 +1048,8 @@ paths:
       operationId: getLiveHouseRecordings
       summary: "라이브하우스 녹음 조회"
       description: "해당 라이브에서 저장된 녹음을 조회합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/LivehouseId'
       responses:
@@ -1085,6 +1105,8 @@ paths:
       operationId: pinMessage
       summary: "메시지 고정"
       description: "중요 공지나 안내사항을 상단에 고정합니다."
+      security:
+        - BearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/LivehouseId'
       requestBody:

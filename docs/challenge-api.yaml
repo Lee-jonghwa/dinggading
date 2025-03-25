@@ -11,6 +11,7 @@ servers:
     description: 스프링 서버
   - url: http://localhost:8081
     description: 목 서버
+
 components:
   schemas:
     ProblemDetail:

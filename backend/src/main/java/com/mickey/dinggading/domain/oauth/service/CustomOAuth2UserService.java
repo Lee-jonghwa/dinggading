@@ -67,7 +67,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String nickname = GenerateRandomNickname.generateRandomNickname();
 
         Member member = Member.builder()
-                .memberId(UUID.randomUUID())
                 .username(oAuth2UserInfo.getEmail())
                 .nickname(nickname) // 자동 생성
                 .profileImgUrl(oAuth2UserInfo.getImageUrl())

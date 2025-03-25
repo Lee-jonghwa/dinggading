@@ -90,7 +90,9 @@ test_frontend:
 build_backend:
   extends: .docker
   stage: build
-  needs: ["test_backend"]
+  needs:
+    - job: test_backend
+      optional: true
   before_script:
     - ls -la ./backend/generated
     - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
@@ -111,7 +113,9 @@ build_backend:
 build_frontend:
   extends: .docker
   stage: build
-  needs: ["test_frontend"]
+  needs:
+    - job: test_frontend
+      optional: true
   before_script:
     - ls -la ./frontend/generated
     - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD

@@ -1,0 +1,51 @@
+.navbar {
+  border: 5px solid skyblue;
+  background-color: #22252D;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 50vh;
+  display: flex;
+  flex-direction: row;
+  /* width: 5rem; */
+}
+
+.navbar {
+  border: 5px solid skyblue;
+  display: flex;
+  flex-direction: row;
+}
+
+.hamburger-button {
+  /* border: 5px solid red; */
+  width: 48px;
+  height: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.navbar-container-small {
+  /* border: 5px solid brown; */
+  width: 5rem;
+  height: 100%;
+  display: flex;  
+  flex-direction: column;
+  align-items: center;
+  gap: 4rem;
+}
+
+.navbar-container-middle {
+  border: 5px solid springgreen;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 20rem;
+}
+
+.container {
+  border:  5px solid blue;
+  display: flex;
+  flex-direction: row;
+}

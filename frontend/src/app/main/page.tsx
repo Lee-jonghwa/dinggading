@@ -1,6 +1,6 @@
 'use client'
 import { NextPage } from "next"
-import "@/styles/tier.css"
+import "@/styles/main.css"
 import Card from "@/components/card"
 
 const Main: NextPage = () => {

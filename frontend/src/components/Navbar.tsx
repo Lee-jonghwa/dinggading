@@ -1,40 +1,65 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import '@/styles/components/navbar.css'
+import Searchbar from './searchbar'
+import Logo from './logo'
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false) // 메뉴 열림 상태
-  const [isSearchOpen, setIsSearchOpen] = useState(false) // 검색창 열림 상태
 
-  const handleHamburgerClick = () => {
+  const handleHamburgerClick = () => { // 메뉴 열림 상태 조절 
     setIsOpen(!isOpen)
   }
 
+  // 상태 변경 감지 
+  useEffect(() => {
+    console.log("isOpen 현재 상태 : ", isOpen)
+  })
+
+
+  // 조건문 별 들어갈 내용 단순화 위한 컴포넌트 정의 
+  const commonThings = (
+    <div className="navbar-container-small"> 
+      <div className="hamburger-button" onClick={handleHamburgerClick}>=</div>
+      <Logo />
+    </div>
+  )
+
+  const searchbarThings = (
+    <div className="searchbar-navbar-container">
+      <Searchbar/> 
+    </div>
+  )
+
+  const middleThings = (
+    <div className="navbar-container-middle">
+      {searchbarThings}
+      <div className="close-chevron" onClick={handleHamburgerClick}>C</div>
+    </div>
+  )
+
+  const renderNavbarContent = () => {
+    if (!isOpen) {
+      return (
+        <div className='container'>
+          {commonThings}
+        </div>
+      )
+    } else {
+      return (
+        <div className='container'>
+          {commonThings}
+          {middleThings}
+        </div>
+      )
+    }
+  }
 
   return (
-    <nav className="navbar">
-      if (isOpen === false) { // 기본 상태 
-        <div className="default-navbar-container">
-          <div className="hamburger-button" onClick={handleHamburgerClick}>=</div>
-          <div className="logo">DINGADING</div>
-        </div>
-      } else if (isSearchOpen === false) {
-        <div className="opened-navbar-container">
-          <div className="hamburger-button" onClick={handleHamburgerClick}>=</div>
-          <div className="logo">DINGADING</div>
-          <div className="searchbar-navbar-container">
-            
-          </div>
-        </div>
-      } else {
-        <div className="searchbar-navbar-container">
-
-        </div>
-      }
-
-    </nav>
+    <div className="navbar">
+      {renderNavbarContent()}
+    </div>
   )
 }
 

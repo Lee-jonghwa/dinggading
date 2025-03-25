@@ -1,0 +1,17 @@
+.searchbar {
+  background-color: white;
+  display: flex;
+  flex-direction: row;
+  width: 80%;
+  margin: 1rem;
+}
+
+.text-area {
+  display: flex;
+  flex: 1;
+}
+
+.icon {
+  width: 36px;
+  height: 36px;
+}

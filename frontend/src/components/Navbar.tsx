@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import '@/styles/components/navbar.css'
 import Searchbar from './searchbar'
 import Logo from './logo'
@@ -12,12 +12,6 @@ const Navbar: React.FC = () => {
     setIsOpen(!isOpen)
   }
 
-  // 상태 변경 감지 
-  useEffect(() => {
-    console.log("isOpen 현재 상태 : ", isOpen)
-  })
-
-
   // 조건문 별 들어갈 내용 단순화 위한 컴포넌트 정의 
   const commonThings = (
     <div className="navbar-container-small"> 
@@ -27,7 +21,7 @@ const Navbar: React.FC = () => {
   )
 
   const searchbarThings = (
-    <div className="searchbar-navbar-container">
+    <div className="searchbar-container">
       <Searchbar/> 
     </div>
   )

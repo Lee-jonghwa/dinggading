@@ -4,10 +4,16 @@
   position: fixed;
   left: 0;
   top: 0;
-  height: 50vh;
+  height: 100vh;
   display: flex;
   flex-direction: row;
   /* width: 5rem; */
+}
+
+.container {
+  border:  5px solid blue;
+  display: flex;
+  flex-direction: row;
 }
 
 .navbar {
@@ -42,10 +48,4 @@
   flex-direction: column;
   align-items: center;
   width: 20rem;
-}
-
-.container {
-  border:  5px solid blue;
-  display: flex;
-  flex-direction: row;
 }

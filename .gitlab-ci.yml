@@ -95,6 +95,7 @@ build_backend:
   needs:
     - job: test_backend
       optional: true
+    - job: prepare_job
   artifacts:
     paths:
       - backend/generated/
@@ -122,6 +123,7 @@ build_frontend:
   needs:
     - job: test_frontend
       optional: true
+    - job: prepare_job
   artifacts:
     paths:
       - backend/generated/

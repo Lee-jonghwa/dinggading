@@ -1,25 +1,43 @@
-.navbar {
-  border: 5px solid skyblue;
-  background-color: #22252D;
-  position: fixed;
-  left: 0;
-  top: 0;
-  height: 100vh;
+.container {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  height: 100vh;
+  z-index: 1000;
+}
+
+.navbar {
+  /* border: 5px solid skyblue; */
+  background-color: #22252D;
+  position: fixed;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  display: flex;
+  /* align-items: center; */
   /* width: 5rem; */
 }
 
+.right {
+  display: flex;
+  left: 0;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
 .container {
-  border:  5px solid blue;
+  /* border:  5px solid blue; */
   display: flex;
   flex-direction: row;
 }
 
 .navbar {
-  border: 5px solid skyblue;
+  /* border: 5px solid skyblue; */
   display: flex;
   flex-direction: row;
+  align-items: center;
+  padding-top: 1rem;
 }
 
 .hamburger-button {
@@ -43,9 +61,29 @@
 }
 
 .navbar-container-middle {
-  border: 5px solid springgreen;
+  /* border: 5px solid springgreen; */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  /* width: 20rem; */
+}
+
+.columns {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 20rem;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.texts {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.end-line {
+  background-color: white;
+  height: 40vh;
+  width: 0.3vw;
 }

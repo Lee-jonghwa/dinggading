@@ -7,6 +7,10 @@ import search from "@/assets/search.svg"
 
 const Searchbar:React.FC = () => {
 
+  const onClickSearch = () => {
+    alert("검색 기능은 아직 구현 중입니다.")
+  }
+
   return (
     <div className="searchbar">
       <input type="text" className="text-area"/>
@@ -16,6 +20,7 @@ const Searchbar:React.FC = () => {
         className="icon"
         width={20}  // 원하는 크기로 조정
         height={20} // 원하는 크기로 조정
+        onClick={onClickSearch}
       />
     </div>
   )

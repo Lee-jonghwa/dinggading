@@ -7,10 +7,11 @@
   min-height: 855px;
   transition: transform 0.3s ease-in-out;
 }
-.card-container:hover {
-  transform: scale(1.05);
 
-}
+/* hover 시 애니메이션 효과를 주게 되면 navbar를 덮어 버린다. 그래서 임시로 제거 */
+/* .card-container:hover {
+  transform: scale(1.0); 
+} */ 
 
 .image-container {
   /* border: 1px solid red; */

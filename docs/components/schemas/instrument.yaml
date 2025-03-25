@@ -1,6 +1,0 @@
-
-
-Instrument:
-  type: string
-  enum: [VOCAL, GUITAR, DRUM, BASS]
-  description: 악기 종류

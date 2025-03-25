@@ -6,7 +6,21 @@ services:
     volumes:
       #- ./docs:/merged
       - shared-data:/merged/output
+      - ./docs:/merged/local
     restart: "no"
+
+  mock:
+    platform: linux/amd64
+    image: stoplight/prism:4
+    volumes:
+      - shared-data:/tmp:ro
+    ports:
+      - "8081:4010"
+    command: 'mock -h 0.0.0.0 /tmp/openapi.yaml --cors=false'
+
+    depends_on:
+      openapi-merger:
+        condition: service_completed_successfully
 
   spring-generator:
     build:

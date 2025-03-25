@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 
 echo -e "DDDDDDDDDDDDD                     GGGGGGGGGGGGG     DDDDDDDDDDDDD"
 echo -e "D::::::::::::DDD               GGG::::::::::::G     D::::::::::::DDD"

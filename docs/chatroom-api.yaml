@@ -14,23 +14,23 @@ servers:
     
 tags:
   - name: ChatRoom
-    description: 채팅방 관리 관련 API - 개발중
+    description: 채팅방 관리 관련 API - 개발전
   - name: ChatRoomParticipant
-    description: 채팅방 참가자 관리 관련 API - 개발중
+    description: 채팅방 참가자 관리 관련 API - 개발전
   - name: ChatMessage
-    description: 채팅 메시지 관리 관련 API - 개발중
+    description: 채팅 메시지 관리 관련 API - 개발전
   - name: ChatRoomSetting
-    description: 채팅방 설정 관리 관련 API - 개발중
+    description: 채팅방 설정 관리 관련 API - 개발전
   - name: ChatNotice
-    description: 채팅방 공지사항 관련 API - 개발중
+    description: 채팅방 공지사항 관련 API - 개발전
   - name: ChatNotice
-    description: 채팅방 공지사항 관련 API - 개발중
+    description: 채팅방 공지사항 관련 API - 개발전
   - name: ChatMedia
-    description: 채팅 미디어 API - 개발중
+    description: 채팅 미디어 API - 개발전
   - name: ChatRoomMedia
-    description: 채팅방 미디어 관리 관련 API - 개발중
+    description: 채팅방 미디어 관리 관련 API - 개발전
   - name: WebSocket
-    description: 실시간 채팅 통신 관련 API - 개발중
+    description: 실시간 채팅 통신 관련 API - 개발전
 
 components:
   securitySchemes:

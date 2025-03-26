@@ -13,46 +13,26 @@ servers:
     description: 목 서버
     
 tags:
-  - name: Auth
-    description: 사용자 인증 관련 API
   - name: Attempt
-    description: 연주 시도 기록 관련 API
+    description: 연주 시도 기록 관련 API - 개발전
   - name: Analysis
-    description: 연주 분석 관련 API
-  - name: Band
-    description: 밴드 관리 관련 API
-  - name: Calendar
-    description: 일정 관리 및 달력 관련 API
-  - name: ChatRoom
-    description: 채팅방 및 메시지 관련 API
-  - name: Follow
-    description: 사용자 팔로우 관련 API
+    description: 연주 분석 관련 API - 개발전
   - name: Instrument
-    description: 악기 정보 관련 API
-  - name: LiveHouse
-    description: 라이브하우스 관련 API
-  - name: Member
-    description: 회원 관리 관련 API
+    description: 악기 정보 관련 API - 개발전
   - name: MemberRank
-    description: 회원 랭크 정보 관련 API
+    description: 회원 랭크 정보 관련 API - 개발전
   - name: MemberTierLog
-    description: 회원 티어 변동 이력 관련 API
-  - name: Notification
-    description: 알림 관리 관련 API
+    description: 회원 티어 변동 이력 관련 API - 개발전
   - name: RankMatching
-    description: 랭크 매칭 관련 API
-  - name: Record
-    description: 녹음 기록 관련 API
-  - name: Recruitment
-    description: 밴드 구인 공고 관련 API
+    description: 랭크 매칭 관련 API - 개발전
   - name: Song
-    description: 곡 관리 관련 API
+    description: 곡 관리 관련 API - 개발전
   - name: SongByInstrument
-    description: 악기별 곡 관련 API
+    description: 악기별 곡 관련 API - 개발전
   - name: SongInstrumentPack
-    description: 곡 팩 관련 API
+    description: 곡 팩 관련 API - 개발전
   - name: Tier
-    description: 티어 시스템 관련 API
+    description: 티어 시스템 관련 API - 개발전
 
 components:
   schemas:

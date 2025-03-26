@@ -13,46 +13,8 @@ servers:
     description: 목 서버
 
 tags:
-  - name: Auth
-    description: 사용자 인증 관련 API
-  - name: Attempt
-    description: 연주 시도 기록 관련 API
-  - name: Analysis
-    description: 연주 분석 관련 API
   - name: Band
-    description: 밴드 관리 관련 API
-  - name: Calendar
-    description: 일정 관리 및 달력 관련 API
-  - name: ChatRoom
-    description: 채팅방 및 메시지 관련 API
-  - name: Follow
-    description: 사용자 팔로우 관련 API
-  - name: Instrument
-    description: 악기 정보 관련 API
-  - name: LiveHouse
-    description: 라이브하우스 관련 API
-  - name: Member
-    description: 회원 관리 관련 API
-  - name: MemberRank
-    description: 회원 랭크 정보 관련 API
-  - name: MemberTierLog
-    description: 회원 티어 변동 이력 관련 API
-  - name: Notification
-    description: 알림 관리 관련 API
-  - name: RankMatching
-    description: 랭크 매칭 관련 API
-  - name: Record
-    description: 녹음 기록 관련 API
-  - name: Recruitment
-    description: 밴드 구인 공고 관련 API
-  - name: Song
-    description: 곡 관리 관련 API
-  - name: SongByInstrument
-    description: 악기별 곡 관련 API
-  - name: SongInstrumentPack
-    description: 곡 팩 관련 API
-  - name: Tier
-    description: 티어 시스템 관련 API
+    description: 밴드 관리 관련 API - 개발전
     
 components:
   securitySchemes:
@@ -114,7 +76,7 @@ components:
       description: "장르"
       required: false
       schema:
-        $ref: '#/components/schemas/Genre'
+        $ref: "#/components/schemas/Genre"
 
     JobOpeningParam:
       name: jobOpening
@@ -216,7 +178,7 @@ components:
         genres:
           type: array
           items:
-            $ref: '#/components/schemas/Genre'
+            $ref: "#/components/schemas/Genre"
           description: "밴드 장르 목록"
         sigun:
           type: string
@@ -258,7 +220,7 @@ components:
           format: uuid
           description: "회원 ID"
         instrument:
-          $ref: '#/components/schemas/Instrument'
+          $ref: "#/components/schemas/Instrument"
       required:
         - bandMemberId
         - bandId
@@ -277,7 +239,7 @@ components:
           format: int64
           description: "밴드 ID"
         sns:
-          $ref: '#/components/schemas/Sns'
+          $ref: "#/components/schemas/Sns"
         title:
           type: string
           description: "Custom SNS 제목 (CUSTOM 유형인 경우에만)"
@@ -297,9 +259,9 @@ components:
         content:
           type: array
           items:
-            $ref: '#/components/schemas/BandDTO'
+            $ref: "#/components/schemas/BandDTO"
         pageable:
-          $ref: '#/components/schemas/PageableDTO'
+          $ref: "#/components/schemas/PageableDTO"
       required:
         - content
         - pageable
@@ -397,7 +359,7 @@ components:
                 format: uuid
                 description: "추가할 회원 ID"
               instrument:
-                $ref: '#/components/schemas/Instrument'
+                $ref: "#/components/schemas/Instrument"
             required:
               - memberId
               - instrument
@@ -410,7 +372,7 @@ components:
             type: object
             properties:
               instrument:
-                $ref: '#/components/schemas/Instrument'
+                $ref: "#/components/schemas/Instrument"
             required:
               - instrument
 
@@ -436,7 +398,7 @@ components:
             type: object
             properties:
               sns:
-                $ref: '#/components/schemas/Sns'
+                $ref: "#/components/schemas/Sns"
               title:
                 type: string
                 description: "Custom SNS 제목 (CUSTOM 유형인 경우에만)"
@@ -455,7 +417,7 @@ components:
             type: object
             properties:
               sns:
-                $ref: '#/components/schemas/Sns'
+                $ref: "#/components/schemas/Sns"
               title:
                 type: string
                 description: "Custom SNS 제목 (CUSTOM 유형인 경우에만)"
@@ -483,7 +445,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ProblemDetail'
+              - $ref: "#/components/schemas/ProblemDetail"
               - type: object
                 properties:
                   title:
@@ -496,7 +458,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ProblemDetail'
+              - $ref: "#/components/schemas/ProblemDetail"
               - type: object
                 properties:
                   title:
@@ -509,7 +471,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ProblemDetail'
+              - $ref: "#/components/schemas/ProblemDetail"
               - type: object
                 properties:
                   title:
@@ -522,7 +484,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ProblemDetail'
+              - $ref: "#/components/schemas/ProblemDetail"
               - type: object
                 properties:
                   title:
@@ -535,21 +497,21 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/BandDTO'
+            $ref: "#/components/schemas/BandDTO"
 
     BandListResponse:
       description: "밴드 목록"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/PageBandDTO'
+            $ref: "#/components/schemas/PageBandDTO"
 
     BandMemberResponse:
       description: "밴드 멤버 정보"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/BandMemberDTO'
+            $ref: "#/components/schemas/BandMemberDTO"
 
     BandMemberListResponse:
       description: "밴드 멤버 목록"
@@ -558,14 +520,14 @@ components:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/BandMemberDTO'
+              $ref: "#/components/schemas/BandMemberDTO"
 
     ContactResponse:
       description: "연락처 정보"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ContactDTO'
+            $ref: "#/components/schemas/ContactDTO"
 
     ContactListResponse:
       description: "연락처 목록"
@@ -574,7 +536,7 @@ components:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/ContactDTO'
+              $ref: "#/components/schemas/ContactDTO"
 
 security:
   - BearerAuth: []
@@ -588,12 +550,12 @@ paths:
       summary: "밴드 정보 조회"
       description: "밴드 정보를 조회합니다. 이름, 설명, 장르, 태그, 프로필 이미지 등 기본 정보 포함"
       parameters:
-        - $ref: '#/components/parameters/BandId'
+        - $ref: "#/components/parameters/BandId"
       responses:
-        '200':
-          $ref: '#/components/responses/BandResponse'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "200":
+          $ref: "#/components/responses/BandResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
     put:
       tags:
@@ -602,18 +564,18 @@ paths:
       summary: "밴드 정보 수정"
       description: "밴드 정보를 수정합니다. 이름, 설명, 장르, 태그 등 업데이트"
       parameters:
-        - $ref: '#/components/parameters/BandId'
+        - $ref: "#/components/parameters/BandId"
       requestBody:
-        $ref: '#/components/requestBodies/UpdateBandRequest'
+        $ref: "#/components/requestBodies/UpdateBandRequest"
       responses:
-        '200':
-          $ref: '#/components/responses/BandResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestException'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "200":
+          $ref: "#/components/responses/BandResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
     delete:
       tags:
@@ -622,15 +584,14 @@ paths:
       summary: "밴드 삭제"
       description: "밴드를 삭제합니다. 연관된 모든 정보 정리"
       parameters:
-        - $ref: '#/components/parameters/BandId'
+        - $ref: "#/components/parameters/BandId"
       responses:
-        '204':
-          $ref: '#/components/responses/SuccessNoContent'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
-
+        "204":
+          $ref: "#/components/responses/SuccessNoContent"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
   /bands:
     get:
@@ -640,8 +601,8 @@ paths:
       summary: "전체 밴드 목록 조회"
       description: "전체 밴드 목록을 조회합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
       responses:
-        '200':
-          $ref: '#/components/responses/BandListResponse'
+        "200":
+          $ref: "#/components/responses/BandListResponse"
 
     post:
       tags:
@@ -652,12 +613,12 @@ paths:
       security:
         - BearerAuth: []
       requestBody:
-        $ref: '#/components/requestBodies/CreateBandRequest'
+        $ref: "#/components/requestBodies/CreateBandRequest"
       responses:
-        '201':
-          $ref: '#/components/responses/BandResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestException'
+        "201":
+          $ref: "#/components/responses/BandResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
 
   /bands/search:
     get:
@@ -667,88 +628,88 @@ paths:
       summary: "밴드 검색"
       description: "밴드를 검색합니다. 이름, 지역, 장르 등 검색 조건 지원. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
       parameters:
-        - $ref: '#/components/parameters/SearchParam'
-        - $ref: '#/components/parameters/SigunParam'
-        - $ref: '#/components/parameters/GenreParam'
-        - $ref: '#/components/parameters/JobOpeningParam'
+        - $ref: "#/components/parameters/SearchParam"
+        - $ref: "#/components/parameters/SigunParam"
+        - $ref: "#/components/parameters/GenreParam"
+        - $ref: "#/components/parameters/JobOpeningParam"
       responses:
-        '200':
-          $ref: '#/components/responses/BandListResponse'
+        "200":
+          $ref: "#/components/responses/BandListResponse"
 
   /bands/{bandId}/members:
     get:
       tags:
-        - BandMember
+        - Band
       operationId: getBandMembers
       summary: "밴드 멤버 목록 조회"
       description: "밴드 멤버 목록을 조회합니다. 각 멤버의 악기 포지션 정보 포함"
       parameters:
-        - $ref: '#/components/parameters/BandId'
+        - $ref: "#/components/parameters/BandId"
       responses:
-        '200':
-          $ref: '#/components/responses/BandMemberListResponse'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "200":
+          $ref: "#/components/responses/BandMemberListResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
     post:
       tags:
-        - BandMember
+        - Band
       operationId: addBandMember
       summary: "밴드 멤버 추가"
       description: "밴드에 새로운 멤버를 추가합니다. 멤버 ID와 악기 포지션 지정"
       parameters:
-        - $ref: '#/components/parameters/BandId'
+        - $ref: "#/components/parameters/BandId"
       requestBody:
-        $ref: '#/components/requestBodies/AddBandMemberRequest'
+        $ref: "#/components/requestBodies/AddBandMemberRequest"
       responses:
-        '201':
-          $ref: '#/components/responses/BandMemberResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestException'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "201":
+          $ref: "#/components/responses/BandMemberResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
   /bands/{bandId}/members/{memberId}:
     delete:
       tags:
-        - BandMember
+        - Band
       operationId: removeBandMember
       summary: "밴드 멤버 제거"
       description: "밴드에서 특정 멤버를 제거합니다."
       parameters:
-        - $ref: '#/components/parameters/BandId'
-        - $ref: '#/components/parameters/MemberId'
+        - $ref: "#/components/parameters/BandId"
+        - $ref: "#/components/parameters/MemberId"
       responses:
-        '204':
-          $ref: '#/components/responses/SuccessNoContent'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "204":
+          $ref: "#/components/responses/SuccessNoContent"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
   /bands/{bandId}/members/{memberId}/instrument:
     put:
       tags:
-        - BandMember
+        - Band
       operationId: updateBandMemberInstrument
       summary: "밴드 멤버 악기 변경"
       description: "밴드 내 멤버의 악기 포지션을 변경합니다."
       parameters:
-        - $ref: '#/components/parameters/BandId'
-        - $ref: '#/components/parameters/MemberId'
+        - $ref: "#/components/parameters/BandId"
+        - $ref: "#/components/parameters/MemberId"
       requestBody:
-        $ref: '#/components/requestBodies/UpdateBandMemberInstrumentRequest'
+        $ref: "#/components/requestBodies/UpdateBandMemberInstrumentRequest"
       responses:
-        '200':
-          $ref: '#/components/responses/BandMemberResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestException'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "200":
+          $ref: "#/components/responses/BandMemberResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
   /bands/{bandId}/master/transfer:
     post:
@@ -758,89 +719,89 @@ paths:
       summary: "밴드 마스터 권한 이전"
       description: "밴드 마스터 권한을 다른 멤버에게 이전합니다."
       parameters:
-        - $ref: '#/components/parameters/BandId'
+        - $ref: "#/components/parameters/BandId"
       requestBody:
-        $ref: '#/components/requestBodies/TransferBandMasterRequest'
+        $ref: "#/components/requestBodies/TransferBandMasterRequest"
       responses:
-        '200':
-          $ref: '#/components/responses/BandResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestException'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "200":
+          $ref: "#/components/responses/BandResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
   /bands/{bandId}/contacts:
     get:
       tags:
-        - Contact
+        - Band
       operationId: getBandContacts
       summary: "밴드 연락처 목록 조회"
       description: "밴드의 연락처 정보 목록을 조회합니다. SNS 링크 등 포함"
       parameters:
-        - $ref: '#/components/parameters/BandId'
+        - $ref: "#/components/parameters/BandId"
       responses:
-        '200':
-          $ref: '#/components/responses/ContactListResponse'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "200":
+          $ref: "#/components/responses/ContactListResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
     post:
       tags:
-        - Contact
+        - Band
       operationId: createBandContact
       summary: "밴드 연락처 추가"
       description: "밴드에 새로운 연락처 정보를 추가합니다. SNS 유형, URL 등 포함"
       parameters:
-        - $ref: '#/components/parameters/BandId'
+        - $ref: "#/components/parameters/BandId"
       requestBody:
-        $ref: '#/components/requestBodies/CreateContactRequest'
+        $ref: "#/components/requestBodies/CreateContactRequest"
       responses:
-        '201':
-          $ref: '#/components/responses/ContactResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestException'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "201":
+          $ref: "#/components/responses/ContactResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
   /bands/{bandId}/contacts/{contactId}:
     put:
       tags:
-        - Contact
+        - Band
       operationId: updateBandContact
       summary: "밴드 연락처 수정"
       description: "특정 연락처 정보를 수정합니다."
       parameters:
-        - $ref: '#/components/parameters/BandId'
-        - $ref: '#/components/parameters/ContactId'
+        - $ref: "#/components/parameters/BandId"
+        - $ref: "#/components/parameters/ContactId"
       requestBody:
-        $ref: '#/components/requestBodies/UpdateContactRequest'
+        $ref: "#/components/requestBodies/UpdateContactRequest"
       responses:
-        '200':
-          $ref: '#/components/responses/ContactResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestException'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "200":
+          $ref: "#/components/responses/ContactResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
     delete:
       tags:
-        - Contact
+        - Band
       operationId: deleteBandContact
       summary: "밴드 연락처 삭제"
       description: "특정 연락처 정보를 삭제합니다."
       parameters:
-        - $ref: '#/components/parameters/BandId'
-        - $ref: '#/components/parameters/ContactId'
+        - $ref: "#/components/parameters/BandId"
+        - $ref: "#/components/parameters/ContactId"
       responses:
-        '204':
-          $ref: '#/components/responses/SuccessNoContent'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "204":
+          $ref: "#/components/responses/SuccessNoContent"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"

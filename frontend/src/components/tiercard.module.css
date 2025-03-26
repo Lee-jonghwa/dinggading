@@ -1,0 +1,31 @@
+.tiercard {
+  border: 5px solid;
+  display: flex;
+  flex-direction: column;
+  width: 30rem;
+}
+
+.icon {
+  border: 5px solid;
+  display: flex;
+  width: 60px;
+
+}
+
+.text {
+  border: 5px solid;
+  display: flex;
+  
+}
+
+.navigate {
+  border: 5px solid;
+  display: flex;
+  
+}
+
+.notice {
+  border: 5px solid;
+  display: flex;
+
+}

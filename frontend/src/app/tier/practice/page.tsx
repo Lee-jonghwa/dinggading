@@ -1,6 +1,6 @@
 'use client'
 
-export default function Practice () {
+export default function Practice ({}) {
 
   return (
     <div className="practice">

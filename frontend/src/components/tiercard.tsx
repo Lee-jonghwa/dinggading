@@ -17,6 +17,7 @@ export default function Tiercard ({tierText, noticeThing} : TiercardProps) {
         <Image 
           src={medal}
           alt="tier image"
+          className="image"
         /> 
       </div>
       <div className={styles.text}>{tierText}</div>

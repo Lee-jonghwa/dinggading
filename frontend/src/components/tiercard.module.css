@@ -2,14 +2,19 @@
   border: 5px solid;
   display: flex;
   flex-direction: column;
-  width: 30rem;
+  width: 50rem;
 }
 
 .icon {
   border: 5px solid;
   display: flex;
-  width: 60px;
+  width: 80%;
 
+}
+
+.image {
+  display: flex;
+  width: 80%;
 }
 
 .text {

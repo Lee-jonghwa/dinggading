@@ -12,6 +12,7 @@ export default function Challenge () {
           tierText="Silver"
           noticeThing=""
         /> 
+        
       </div>
     </div>
   )

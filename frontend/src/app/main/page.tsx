@@ -1,22 +1,33 @@
 'use client'
 import { NextPage } from "next"
-import Button from "@/components/button"
-import { useCountStore } from "@/store/count"
+import "@/styles/main.css"
+import Card from "@/components/card"
 
 const Main: NextPage = () => {
 
-  const { count , increment, decrement, reset } = useCountStore()
-
   return (
-    <div> 
-      <h1> Main </h1>
-      <Button></Button>
-      <div className="count">
-        <p>count : {count}</p>
-        <button onClick={increment}>+</button>
-        <button onClick={decrement}>-</button>
-        <button onClick={reset}>RESET</button>
-      </div>
+    <div className="main"> 
+      <Card 
+        subText="당신의 티어를 측정해보세요"
+        titleText="티어 측정"
+        icon=">"
+        image="#"
+        href="/tier"
+      />
+      <Card 
+        subText="나와 맞는 밴드원과 밴드를 결성해보세요"
+        titleText="밴드원 구하기"
+        icon=">"
+        image="#"
+        href="/band"
+      />
+      <Card 
+        subText="다른 사람의 연주를 듣고 내 실력을 뽐내 보세요"
+        titleText="라이브 하우스"
+        icon=">"
+        image="#"
+        href="/live"
+      />
     </div>
   )
 }

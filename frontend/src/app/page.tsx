@@ -6,8 +6,8 @@ import type { NextPage } from 'next';
 const Home: NextPage = () => {
   const [response, setResponse] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const mode = process.env.NEXT_PUBLIC_ENV_MODE;
-  const url = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const mode = process.env.NEXT_PUBLIC_ENV_MODE || 'default-mode';
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://default-api.com';
   console.log("page.tsx", mode);
   console.log("page.tsx", url);
 

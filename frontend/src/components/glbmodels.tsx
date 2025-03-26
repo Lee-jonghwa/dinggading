@@ -1,5 +1,6 @@
 import React from "react";
 import { useGLTF } from "@react-three/drei";
+import { Mesh, Material } from "three";
 
 interface ModelProps {
   glbPath: string;
@@ -14,8 +15,12 @@ export function Model({ glbPath, position = [0, 0, 0], rotation = [0, 0, 0], sca
   return (
     <group position={position} rotation={rotation} scale={scale} dispose={null}>
       {Object.keys(nodes).map((key) => {
-        const node = nodes[key];
+        const node = nodes[key] as Mesh;
         if (!node.geometry) return null; // geometry가 없는 노드는 건너뛰기
+
+        const materialInstance = Array.isArray(node.material) ? node.material[0] : node.material;
+        const materialName = (materialInstance as Material)?.name;
+        const material = materialName ? materials[materialName] : undefined;
 
         return (
           <mesh
@@ -23,7 +28,7 @@ export function Model({ glbPath, position = [0, 0, 0], rotation = [0, 0, 0], sca
             castShadow
             receiveShadow
             geometry={node.geometry}
-            material={materials[node.material?.name] || undefined} // 매칭되는 material 적용
+            material={material} // 매칭되는 material 적용
           />
         );
       })}

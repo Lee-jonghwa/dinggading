@@ -6,6 +6,7 @@ import { create } from "zustand"
 // title 을 기준으로 도전 페이지로 넘기면 되겠다. 
 
 interface Song {
+  id : string
   title : string, 
   description : string, 
   artist : string
@@ -25,19 +26,23 @@ export const useSongsStore = create<SongsStore>((set) => ({
 
   // fetchSongs 에서 할 일 : instrument, tier를 알면 그에 맞는 song list를 불러오기. 
   fetchSongs : async (instrument , tier) => {
+    console.log("songs.ts/fetchSongs 실행")
     set({loading : true, error : null})
     try {
-      const response = await axios.get("/api/rank", {
+      const response = await axios.get("#", {
         params : { instrument , tier}, 
       })
+      console.log("songs.ts/fetchSongs 실행 성공, response : ", response )
       set({ songs : response.data.songs , loading : false })
     } catch (error : unknown) {
       if (axios.isAxiosError(error)) {
+        console.log("songs.ts/axiosError : ", error)
         set({
           error : error.message || "데이터를 불러오지 못했습니다.", 
           loading : false
         })
       } else {
+        console.log("songs.ts/unknownError : ", error)
         set({
           error : "알 수 없는 오류가 발생했습니다.", 
           loading : false

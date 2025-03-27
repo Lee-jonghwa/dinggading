@@ -11,7 +11,6 @@ import DiamondIcon from "@/assets/star.png"
 import { useParams, useRouter } from "next/navigation"
 
 interface TiercardProps {
-  instrument : string, 
   tier : string , 
   currentTier : string, 
   noticeThing? : string 

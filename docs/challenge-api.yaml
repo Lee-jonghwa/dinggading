@@ -219,16 +219,58 @@ components:
         - rankType
         - targetTier
       example:
-        rankMatchingId: 123
+        rankMatchingId: 1
         status: "IN_PROGRESS"
-        songInstrumentPackId: 456
-        expireDate: "2023-12-31"
-        startedAt: "2023-12-01"
-        attemptCount: 2
-        successCount: 1
-        instrument: "GUITAR"
-        rankType: "CHALLENGE"
+        songInstrumentPackId: 1
+        expireDate: "2025-04-03"
+        startedAt: "2025-03-27"
+        attemptCount: 0
+        successCount: 0
+        instrument: "VOCAL"
+        rankType: "FIRST"
         targetTier: "GOLD"
+        songInstrumentPack:
+          songInstrumentPackId: 1
+          packName: "Vocal Beginners Pack"
+          songPackTier: "IRON"
+          songPackInstrument: "VOCAL"
+          songs:
+            - songByInstrumentId: 1
+              songId: 1
+              songInstrumentPackId: 1
+              instrumentUrl: "https://storage.vocals/smells_like_teen_spirit_iron.mp3"
+              instrument: "VOCAL"
+              tier: "IRON"
+              song: null
+            - songByInstrumentId: 2
+              songId: 2
+              songInstrumentPackId: 1
+              instrumentUrl: "https://storage.vocals/dynamite_iron.mp3"
+              instrument: "VOCAL"
+              tier: "IRON"
+              song: null
+            - songByInstrumentId: 3
+              songId: 3
+              songInstrumentPackId: 1
+              instrumentUrl: "https://storage.vocals/take_five_iron.mp3"
+              instrument: "VOCAL"
+              tier: "IRON"
+              song: null
+            - songByInstrumentId: 4
+              songId: 4
+              songInstrumentPackId: 1
+              instrumentUrl: "https://storage.vocals/lose_yourself_iron.mp3"
+              instrument: "VOCAL"
+              tier: "IRON"
+              song: null
+            - songByInstrumentId: 5
+              songId: 5
+              songInstrumentPackId: 1
+              instrumentUrl: "https://storage.vocals/gangnam_style_iron.mp3"
+              instrument: "VOCAL"
+              tier: "IRON"
+              song: null
+        attempts: null
 
     AttemptDTO:
       type: object

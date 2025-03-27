@@ -121,19 +121,24 @@ public class RankMatching extends BaseEntity {
         }
     }
 
-    /**
-     * 매칭 상태를 업데이트합니다.
-     */
-    public void updateStatus(MatchingStatus status) {
-        this.status = status;
+    /* ---------------------- 티어 변동 ----------------------*/
+
+    public boolean isFirstRankType() {
+        return this.rankType == RankType.FIRST;
     }
 
-    /**
-     * 만료 여부를 확인합니다.
-     */
-    public boolean isExpired() {
-        return LocalDate.now().isAfter(this.expireDate);
+    public void updateRankMatching(MemberRank memberRank) {
+        if (this.memberRank != null) {
+            this.memberRank.getRankMatching().remove(this);
+        }
+        this.memberRank = memberRank;
+        memberRank.getRankMatching().add(this);
+
     }
+
+
+
+    /* ---------------------- 도전 날자 ----------------------*/
 
     /**
      * 만료 처리를 합니다.
@@ -141,6 +146,46 @@ public class RankMatching extends BaseEntity {
     public void expire() {
         if (this.status == MatchingStatus.IN_PROGRESS) {
             this.status = MatchingStatus.EXPIRED;
+        }
+    }
+
+    public boolean isCompleted() {
+        return this.status == MatchingStatus.COMPLETED;
+    }
+
+    /**
+     * 만료 여부를 확인합니다.
+     */
+    public boolean isExpired() {
+        return this.status == MatchingStatus.EXPIRED;
+    }
+
+    /**
+     * 매칭이 완료 조건을 충족하는지 확인 최대 시도 횟수(5회)에 도달했거나 성공 횟수(3회)를 달성한 경우 완료 처리 가능
+     *
+     * @return 완료 조건 충족 여부
+     */
+    public boolean isEligibleForCompletion() {
+        return getAttemptCount() >= 5 || getSuccessCount() >= 3;
+    }
+
+    /**
+     * 매칭이 성공적으로 완료되었는지 확인 3회 이상 성공했을 경우 매칭 성공으로 간주
+     *
+     * @return 매칭 성공 여부
+     */
+    public boolean isSuccessful() {
+        return getSuccessCount() >= 3;
+    }
+
+    /**
+     * 매칭 상태를 완료 처리 성공 여부에 따라 COMPLETED 또는 FAILED 상태로 설정
+     */
+    public void complete() {
+        if (isSuccessful()) {
+            this.status = MatchingStatus.COMPLETED;
+        } else {
+            this.status = MatchingStatus.FAILED;
         }
     }
 }

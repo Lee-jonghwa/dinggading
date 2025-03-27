@@ -3,55 +3,57 @@ package com.mickey.dinggading.domain.band.converter;
 import com.mickey.dinggading.domain.band.model.entity.Band;
 import com.mickey.dinggading.domain.band.model.entity.BandMember;
 import com.mickey.dinggading.domain.band.model.entity.Contact;
-import com.mickey.dinggading.model.*;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Component;
-
+import com.mickey.dinggading.model.BandDTO;
+import com.mickey.dinggading.model.BandMemberDTO;
+import com.mickey.dinggading.model.ContactDTO;
+import com.mickey.dinggading.model.PageBandDTO;
+import com.mickey.dinggading.model.PageableDTO;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
 
 @Component
 public class BandConverter {
 
     public BandDTO toBandDTO(Band band) {
         List<BandMemberDTO> bandMemberDTOs = band.getMembers().stream()
-            .map(this::toBandMemberDTO)
-            .collect(Collectors.toList());
+                .map(this::toBandMemberDTO)
+                .collect(Collectors.toList());
 
         List<ContactDTO> contactDTOs = band.getContacts().stream()
-            .map(this::toContactDTO)
-            .collect(Collectors.toList());
+                .map(this::toContactDTO)
+                .collect(Collectors.toList());
 
         return BandDTO.builder()
-            .bandId(band.getBandId())
-            .name(band.getName())
-            .bandMasterId(band.getBandMasterId())
-            .description(band.getDescription())
-            .sigun(band.getSigun())
-            .tags(band.getTags())
-            .profileUrl(band.getProfileUrl())
-            .maxSize(band.getMaxSize())
-            .jobOpening(band.isJobOpening())
-            .bandMember(bandMemberDTOs)
-            .contact(contactDTOs)
-            .build();
+                .bandId(band.getBandId())
+                .name(band.getName())
+                .bandMasterId(band.getBandMasterId())
+                .description(band.getDescription())
+                .sigun(band.getSigun())
+                .tags(band.getTags())
+                .profileUrl(band.getProfileUrl())
+                .maxSize(band.getMaxSize())
+                .jobOpening(band.isJobOpening())
+                .bandMember(bandMemberDTOs)
+                .contact(contactDTOs)
+                .build();
     }
 
     public PageBandDTO toPageBandDTO(Page<Band> bandPage, List<BandDTO> bandDTOs) {
         // PageableDTO의 protected 생성자를 우회하기 위해 빌더 패턴 사용
-        PageableDTO1 pageableDTO = PageableDTO1.builder()
-            .page(bandPage.getNumber())
-            .size(bandPage.getSize())
-            .totalElements((int) bandPage.getTotalElements())
-            .totalPages(bandPage.getTotalPages())
-            .build();
+        PageableDTO pageableDTO = PageableDTO.builder()
+                .page(bandPage.getNumber())
+                .size(bandPage.getSize())
+                .totalElements((int) bandPage.getTotalElements())
+                .totalPages(bandPage.getTotalPages())
+                .build();
 
         return PageBandDTO.builder()
-            .content(bandDTOs)
-            .pageable(pageableDTO)
-            .build();
+                .content(bandDTOs)
+                .pageable(pageableDTO)
+                .build();
     }
-
 
     public BandMemberDTO toBandMemberDTO(BandMember bandMember) {
         return BandMemberDTO.builder()

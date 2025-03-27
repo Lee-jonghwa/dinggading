@@ -14,15 +14,12 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.*;
-
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
-import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Getter
@@ -34,6 +31,7 @@ public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "member_id")
+    //@Column(name = "member_id", columnDefinition = "BINARY(16)")
     private UUID memberId;
 
     @Column(name = "username", unique = true, nullable = false)
@@ -72,19 +70,6 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> receivedNotifications = new ArrayList<>();
 
-    // Update methods
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public void updateProfileImgUrl(String profileImgUrl) {
-        this.profileImgUrl = profileImgUrl;
-    }
-
-    public void updateFavoriteBand(Long favoriteBandId) {
-        this.favoriteBandId = favoriteBandId;
-    }
-
     public static Member createMember(String username, String nickname, String profileUrl) {
         // TODO: 최적화 포인트 -> Event를 발생시켜서 의존성 분리
 
@@ -107,6 +92,19 @@ public class Member extends BaseEntity {
         }
 
         return member;
+    }
+
+    // Update methods
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateProfileImgUrl(String profileImgUrl) {
+        this.profileImgUrl = profileImgUrl;
+    }
+
+    public void updateFavoriteBand(Long favoriteBandId) {
+        this.favoriteBandId = favoriteBandId;
     }
 
 }

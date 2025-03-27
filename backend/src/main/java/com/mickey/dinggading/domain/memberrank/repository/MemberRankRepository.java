@@ -2,6 +2,7 @@ package com.mickey.dinggading.domain.memberrank.repository;
 
 import com.mickey.dinggading.domain.memberrank.model.Instrument;
 import com.mickey.dinggading.domain.memberrank.model.MemberRank;
+import com.mickey.dinggading.domain.memberrank.model.RankMatching;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MemberRankRepository extends JpaRepository<MemberRank, Long> {
+
+    List<MemberRank> findByRankMatching(RankMatching rankMatching);
 
     /**
      * 회원 ID로 해당 회원의 모든 악기별 랭크 정보를 조회
@@ -38,4 +41,5 @@ public interface MemberRankRepository extends JpaRepository<MemberRank, Long> {
      * @return 존재 여부
      */
     boolean existsByMemberMemberIdAndInstrument(UUID memberId, Instrument instrument);
+
 }

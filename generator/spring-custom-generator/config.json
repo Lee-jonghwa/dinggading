@@ -4,7 +4,7 @@
   "interfaceOnly" : "true",
   "useTags" : "true",
   "skipDefaultInterface" : "true",
-  "dateLibrary": "java8",
+  "dateLibrary": "java8-localdatetime",
   "useBeanValidation" : "true",
   "serializableModel" : "true",
   "hideGenerationTimestamp": "true",

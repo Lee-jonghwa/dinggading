@@ -30,7 +30,8 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, MemberRepository memberRepository) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, MemberRepository memberRepository)
+            throws Exception {
         http
                 // CORS 설정 (Customizer 사용)
                 .cors(customizer -> customizer.configurationSource(corsConfigurationSource()))
@@ -42,7 +43,7 @@ public class SecurityConfig {
 
                 // 세션 정책 설정 (JWT는 세션을 사용하지 않음)
                 .sessionManagement(session -> session
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // JWT 필터 추가
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -57,7 +58,7 @@ public class SecurityConfig {
                 // OAuth 관련
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
-                            .userService(customOAuth2UserService))
+                                .userService(customOAuth2UserService))
                         .successHandler(new OAuth2AuthenticationSuccessHandler(memberRepository, jwtUtil))
                         .failureHandler(oAuth2AuthenticationFailureHandler)
                 );
@@ -69,7 +70,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8080", "http://localhost:18512", "http://localhost:18513", "http://localhost:18514"));
+        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8080", "http://localhost:18513",
+                "http://localhost:18512"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
         config.setExposedHeaders(List.of("Authorization"));

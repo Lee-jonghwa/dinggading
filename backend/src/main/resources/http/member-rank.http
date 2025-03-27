@@ -1,6 +1,6 @@
 
-@memberId = e571b3fd-dcd9-4ccf-abf2-bd3247d5cb0c
-@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhY2Nlc3NUb2tlbiIsInVzZXJuYW1lIjoicWtyd25zZ2g3MXdAZ21haWwuY29tIiwiaWQiOiJlNTcxYjNmZC1kY2Q5LTRjY2YtYWJmMi1iZDMyNDdkNWNiMGMiLCJpYXQiOjE3NDI5NzM4MDcsImV4cCI6MTc0NDY3ODg0MH0.qLF75VTnU0VqITsWzJfcWnSVTg3ccDhOj30T4MlWqgg
+@memberId = bf9507c1-f83f-473d-8ec9-b15bc9271594
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhY2Nlc3NUb2tlbiIsInVzZXJuYW1lIjoicWtyd25zZ2g3MXdAZ21haWwuY29tIiwiaWQiOiJiZjk1MDdjMS1mODNmLTQ3M2QtOGVjOS1iMTViYzkyNzE1OTQiLCJpYXQiOjE3NDMwNTIxMTIsImV4cCI6MTc0NDc1NzE0NH0.UD_OzVTwCmNErc-Va9qv7QR17RzphnNFcH-HVLwb1GA
 @instrument = DRUM
 
 ### 랭크 조회
@@ -23,7 +23,6 @@ Authorization: Bearer {{token}}
 #     * GET /api/members/me/ranks : 내 악기별 랭크 정보 조회
 #     * 현재 로그인한 회원의 악기별 랭크 정보를 조회합니다.
 #     *
-#     * @return 회원 악기별 랭크 정보 응답 (status code 200)
 #     *         or 인증되지 않은 요청입니다. (status code 401)
 GET http://localhost:8080/api/members/me/ranks
 Content-Type: application/json

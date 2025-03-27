@@ -138,4 +138,23 @@ public class Attempt extends BaseEntity {
 
         return validScoreCount > 0 ? totalScore / validScoreCount : 0;
     }
+
+    // 점수 설정 메서드
+    public void setScores(Integer beatScore, Integer tuneScore, Integer toneScore, Tier targetTier) {
+        this.beatScore = beatScore;
+        this.tuneScore = tuneScore;
+        this.toneScore = toneScore;
+
+        // 총점 계산 (평균)
+        this.totalScore = (beatScore + tuneScore + toneScore) / 3;
+
+        // 성공 여부 판단
+        this.status = isScoreSufficient() ? AttemptStatus.SUCCESS : AttemptStatus.FAIL;
+    }
+
+    // 점수가 목표 티어에 충분한지 확인
+    private boolean isScoreSufficient() {
+        // 모든 티어에 대해 60점 이상을 합격으로 통일
+        return totalScore >= 60;
+    }
 }

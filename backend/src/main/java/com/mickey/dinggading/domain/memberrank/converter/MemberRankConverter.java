@@ -39,8 +39,10 @@ public class MemberRankConverter {
                 .rankSuccessCount(memberRank.getRankSuccessCount())
                 .lastAttemptTier(memberRank.getLastAttemptTier() != null ?
                         LastAttemptTierEnum.valueOf(memberRank.getLastAttemptTier().name()) : null)
-                .defenceExpireDate(memberRank.getDefenceExpireDate())
-                .lastAttemptDate(memberRank.getLastAttemptDate())
+
+                // TODO: 나중에 바꿔
+                .defenceExpireDate(memberRank.getDefenceExpireDate().toLocalDate())
+                .lastAttemptDate(memberRank.getLastAttemptDate().toLocalDate())
                 .build();
     }
 

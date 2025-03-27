@@ -20,9 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
-import java.util.*;
-
 @Component
 @Slf4j
 public class JWTUtil {
@@ -48,7 +45,7 @@ public class JWTUtil {
         Jws<Claims> claims = getClaimsJws(token);
 
         Map<String, Object> value = claims.getPayload();
-        log.info("value : {}", value);
+        log.info("getMemberId value : {}", value);
 
         return UUID.fromString(value.get("id").toString());
     }
@@ -59,7 +56,7 @@ public class JWTUtil {
         Jws<Claims> claims = getClaimsJws(token);
 
         Map<String, Object> value = claims.getPayload();
-        log.info("value : {}", value);
+        log.info("getUserName value : {}", value);
 
         return value.get("username").toString();
     }

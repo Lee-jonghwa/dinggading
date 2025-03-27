@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Builder
@@ -23,9 +24,8 @@ public class Band extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "band_master_id", nullable = false)
-    private Member bandMaster;
+    @Column(name = "band_master_id", nullable = false)
+    private UUID bandMasterId;
 
     @Column(name = "description")
     private String description;

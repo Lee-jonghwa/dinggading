@@ -11,6 +11,12 @@ servers:
     description: 스프링 서버
   - url: http://localhost:8081
     description: 목 서버
+    
+tags:
+  - name: Calendar
+    description: 일정 관리 및 달력 관련 API - 개발전
+  - name: Event
+    description: 일정 관리 API - 개발전
 
 components:
   securitySchemes:
@@ -93,7 +99,7 @@ components:
           type: string
           description: "소유자 ID (회원 UUID 또는 밴드 ID)"
         ownerType:
-          $ref: '#/components/schemas/OwnerType'
+          $ref: "#/components/schemas/OwnerType"
         name:
           type: string
 
@@ -154,11 +160,11 @@ components:
       type: object
       properties:
         calendar:
-          $ref: '#/components/schemas/CalendarDTO'
+          $ref: "#/components/schemas/CalendarDTO"
         events:
           type: array
           items:
-            $ref: '#/components/schemas/ScheduleDTO'
+            $ref: "#/components/schemas/ScheduleDTO"
       required:
         - calendar
         - events
@@ -229,14 +235,14 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/CalendarDTO'
+            $ref: "#/components/schemas/CalendarDTO"
 
     ScheduleResponse:
       description: "일정 정보"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ScheduleDTO'
+            $ref: "#/components/schemas/ScheduleDTO"
 
     ScheduleListResponse:
       description: "일정 목록"
@@ -245,14 +251,14 @@ components:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/ScheduleDTO'
+              $ref: "#/components/schemas/ScheduleDTO"
 
     CalendarWithEventsResponse:
       description: "달력 및 일정 정보"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/CalendarWithEventsDTO'
+            $ref: "#/components/schemas/CalendarWithEventsDTO"
 
     # 에러 응답
     NotFoundException:
@@ -261,7 +267,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ProblemDetail'
+              - $ref: "#/components/schemas/ProblemDetail"
               - type: object
                 properties:
                   title:
@@ -274,7 +280,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ProblemDetail'
+              - $ref: "#/components/schemas/ProblemDetail"
               - type: object
                 properties:
                   title:
@@ -287,7 +293,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ProblemDetail'
+              - $ref: "#/components/schemas/ProblemDetail"
               - type: object
                 properties:
                   title:
@@ -300,7 +306,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ProblemDetail'
+              - $ref: "#/components/schemas/ProblemDetail"
               - type: object
                 properties:
                   title:
@@ -319,81 +325,81 @@ paths:
       summary: "달력 조회"
       description: "달력 정보와 일정을 조회합니다. JWT 토큰의 사용자가 본인의 달력이거나 속한 밴드의 달력인 경우에만 조회 가능합니다."
       security:
-        - BearerAuth: [ ]
+        - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/CalendarId'
-        - $ref: '#/components/parameters/StartDateParam'
-        - $ref: '#/components/parameters/EndDateParam'
+        - $ref: "#/components/parameters/CalendarId"
+        - $ref: "#/components/parameters/StartDateParam"
+        - $ref: "#/components/parameters/EndDateParam"
       responses:
-        '200':
-          $ref: '#/components/responses/CalendarWithEventsResponse'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "200":
+          $ref: "#/components/responses/CalendarWithEventsResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
   /calendars/{calendarId}/events:
     post:
       tags:
-        - Event
+        - Calendar
       operationId: createEvent
       summary: "일정 추가"
       description: "달력에 새로운 일정을 추가합니다. 본인의 달력이거나 속한 밴드의 달력인 경우에만 추가 가능합니다."
       security:
-        - BearerAuth: [ ]
+        - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/CalendarId'
+        - $ref: "#/components/parameters/CalendarId"
       requestBody:
-        $ref: '#/components/requestBodies/CreateEventRequest'
+        $ref: "#/components/requestBodies/CreateEventRequest"
       responses:
-        '201':
-          $ref: '#/components/responses/ScheduleResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestException'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "201":
+          $ref: "#/components/responses/ScheduleResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
   /calendars/{calendarId}/events/{eventId}:
     patch:
       tags:
-        - Event
+        - Calendar
       operationId: updateEvent
       summary: "일정 수정"
       description: "달력의 특정 일정을 수정합니다. 본인이 작성한 일정이거나 밴드 마스터인 경우에만 수정 가능합니다."
       security:
-        - BearerAuth: [ ]
+        - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/CalendarId'
-        - $ref: '#/components/parameters/EventId'
+        - $ref: "#/components/parameters/CalendarId"
+        - $ref: "#/components/parameters/EventId"
       requestBody:
-        $ref: '#/components/requestBodies/UpdateEventRequest'
+        $ref: "#/components/requestBodies/UpdateEventRequest"
       responses:
-        '200':
-          $ref: '#/components/responses/ScheduleResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestException'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "200":
+          $ref: "#/components/responses/ScheduleResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
     delete:
       tags:
-        - Event
+        - Calendar
       operationId: deleteEvent
       summary: "일정 삭제"
       description: "달력의 특정 일정을 삭제합니다. 본인이 작성한 일정이거나 밴드 마스터인 경우에만 삭제 가능합니다."
       security:
-        - BearerAuth: [ ]
+        - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/CalendarId'
-        - $ref: '#/components/parameters/EventId'
+        - $ref: "#/components/parameters/CalendarId"
+        - $ref: "#/components/parameters/EventId"
       responses:
-        '204':
-          $ref: '#/components/responses/SuccessNoContent'
-        '403':
-          $ref: '#/components/responses/ForbiddenException'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "204":
+          $ref: "#/components/responses/SuccessNoContent"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"

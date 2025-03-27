@@ -5,18 +5,17 @@ import com.mickey.dinggading.domain.member.model.entity.Member;
 import com.mickey.dinggading.domain.member.model.entity.Token;
 import com.mickey.dinggading.domain.member.repository.MemberRepository;
 import com.mickey.dinggading.domain.oauth.MemberPrincipal;
-import com.mickey.dinggading.util.JWTUtil;
 import com.mickey.dinggading.exception.ExceptionHandler;
+import com.mickey.dinggading.util.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
@@ -37,8 +36,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         // 토큰 생성
         Token jwtToken = jwtUtil.createAccessToken(member);
-
-        memberRepository.save(member);
+        log.info("jwtToken: {}", jwtToken);
 
         response.setHeader("Authorization", "Bearer " + jwtToken.getAccessToken());
 

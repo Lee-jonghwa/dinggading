@@ -218,6 +218,10 @@ components:
         instrumentAvailability:
           $ref: "#/components/schemas/InstrumentAvailabilityDTO"
           description: "악기별 담당자 존재 여부"
+        contact:
+          type: array
+          items: 
+            $ref: "#/components/schemas/ContactDTO"
         bandMember:
           type: array
           items:
@@ -359,10 +363,6 @@ components:
               name:
                 type: string
                 description: "밴드 이름"
-              bandMasterId:
-                type: string
-                format: uuid
-                description: "밴드 마스터 ID"
               description:
                 type: string
                 description: "밴드 소개"

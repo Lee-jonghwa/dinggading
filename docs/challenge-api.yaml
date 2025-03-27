@@ -20,7 +20,7 @@ tags:
   - name: Instrument
     description: 악기 정보 관련 API - 개발전
   - name: MemberRank
-    description: 회원 랭크 정보 관련 API - 개발전
+    description: 회원 랭크 정보 관련 API - 개발 완료
   - name: MemberTierLog
     description: 회원 티어 변동 이력 관련 API - 개발전
   - name: RankMatching
@@ -889,10 +889,7 @@ components:
                 type: string
                 enum: [UNRANKED, IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND]
                 description: "현재 티어"
-              availableSongPacks:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SongInstrumentPackDTO'
+
             required:
               - availableChallenge
               - availableDefence
@@ -903,15 +900,6 @@ components:
             availableDefence: false
             availableFirst: false
             currentTier: "SILVER"
-            availableSongPacks:
-              - songInstrumentPackId: 123
-                packName: "골드 보컬 팩"
-                songPackTier: "GOLD"
-                songPackInstrument: "VOCAL"
-              - songInstrumentPackId: 124
-                packName: "실버 보컬 팩"
-                songPackTier: "SILVER"
-                songPackInstrument: "VOCAL"
 
     AttemptDetailResponse:
       description: "시도 기록 상세 정보 응답"
@@ -1290,7 +1278,7 @@ paths:
       operationId: getMemberRanks
       summary: "회원 악기별 랭크 정보 조회"
       description: "특정 회원의 악기별 랭크 정보를 조회합니다."
-      deprecated: true
+      deprecated: false
       parameters:
         - $ref: '#/components/parameters/MemberId'
       responses:
@@ -1427,7 +1415,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
 
-  /api/rank-matchings/available:
+  /api/rank-matchings/{instrument}/available:
     get:
       tags:
         - RankMatching
@@ -1438,19 +1426,12 @@ paths:
         - BearerAuth: []
       parameters:
         - name: instrument
-          in: query
+          in: path
           description: "악기 종류 필터링 (VOCAL, GUITAR, DRUM, BASS)"
-          required: false
+          required: true
           schema:
             type: string
             enum: [VOCAL, GUITAR, DRUM, BASS]
-        - name: rankType
-          in: query
-          description: "랭크 유형 필터링 (FIRST, CHALLENGE, DEFENCE)"
-          required: false
-          schema:
-            type: string
-            enum: [FIRST, CHALLENGE, DEFENCE]
       responses:
         '200':
           $ref: '#/components/responses/AvailableRankMatchingsResponse'

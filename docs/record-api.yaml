@@ -12,6 +12,11 @@ servers:
   - url: http://localhost:8081
     description: 목 서버
 
+tags:
+  - name: Record
+    description: 녹음 기록 관련 API - 개발전
+
+
 components:
   securitySchemes:
     BearerAuth:

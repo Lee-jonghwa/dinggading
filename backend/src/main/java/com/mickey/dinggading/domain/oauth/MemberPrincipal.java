@@ -20,7 +20,7 @@ import java.util.*;
 */
 public class MemberPrincipal implements OAuth2User, UserDetails {
     private final UUID memberId;
-    private final String email;
+    private final String username;
     private final String nickname;
     private final Collection<? extends GrantedAuthority> authorities;
 
@@ -51,7 +51,7 @@ public class MemberPrincipal implements OAuth2User, UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 
     @Override

@@ -11,6 +11,28 @@ servers:
     description: 스프링 서버
   - url: http://localhost:8081
     description: 목 서버
+    
+tags:
+  - name: Attempt
+    description: 연주 시도 기록 관련 API - 개발전
+  - name: Analysis
+    description: 연주 분석 관련 API - 개발전
+  - name: Instrument
+    description: 악기 정보 관련 API - 개발전
+  - name: MemberRank
+    description: 회원 랭크 정보 관련 API - 개발 완료
+  - name: MemberTierLog
+    description: 회원 티어 변동 이력 관련 API - 개발전
+  - name: RankMatching
+    description: 랭크 매칭 관련 API - 개발전
+  - name: Song
+    description: 곡 관리 관련 API - 개발전
+  - name: SongByInstrument
+    description: 악기별 곡 관련 API - 개발전
+  - name: SongInstrumentPack
+    description: 곡 팩 관련 API - 개발전
+  - name: Tier
+    description: 티어 시스템 관련 API - 개발전
 
 components:
   schemas:
@@ -1268,7 +1290,7 @@ paths:
       operationId: getMemberRanks
       summary: "회원 악기별 랭크 정보 조회"
       description: "특정 회원의 악기별 랭크 정보를 조회합니다."
-      deprecated: true
+      deprecated: false
       parameters:
         - $ref: '#/components/parameters/MemberId'
       responses:

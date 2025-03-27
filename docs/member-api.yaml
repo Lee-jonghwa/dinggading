@@ -12,6 +12,16 @@ servers:
   - url: http://localhost:8081
     description: 목 서버
 
+tags:
+  - name: Auth
+    description: 사용자 인증 관련 API - 개발전
+  - name: Member
+    description: 회원 정보 관리 관련 API - 개발전
+  - name: Follow
+    description: 팔로우 관계 관리 관련 API - 개발전
+  - name: Notification
+    description: 알림 관리 관련 API - 개발전
+
 components:
   schemas:
     ProblemDetail:

@@ -10,8 +10,16 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorStatus implements BaseErrorCode {
 
-    // 멤버 관련 에러
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4001", "존재하지않는 계정입니다."),
+    // 일반적인 응답
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "COMMON401", "인증이 필요합니다."),
+    // 회원 관련 오류
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4001", "존재하지 않는 계정입니다."),
+
+    // 랭크 관련 오류
+    RANK_NOT_FOUND(HttpStatus.NOT_FOUND, "RANK4001", "랭크 정보를 찾을 수 없습니다."),
+
+    // 입력값 관련 오류
+    INVALID_INSTRUMENT_TYPE(HttpStatus.BAD_REQUEST, "INST4001", "유효하지 않은 악기 타입입니다."),
 
     // 토큰 관련 에러
     TOKEN_EXPIRED_ERROR(HttpStatus.UNAUTHORIZED, "TOKEN4001", "토큰의 유효기간이 만료되었습니다."),

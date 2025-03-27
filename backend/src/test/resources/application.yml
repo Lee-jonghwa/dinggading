@@ -9,7 +9,6 @@ spring:
       - optional:file:../infra/env/.env.development.local[.properties]
   jackson:
     time-zone: Asia/Seoul
-
   ### Google OAuth ###
   security:
     oauth2:

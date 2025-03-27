@@ -1,6 +1,7 @@
 package com.mickey.dinggading.domain.band.model.entity;
 
 import com.mickey.dinggading.base.BaseEntity;
+import com.mickey.dinggading.model.CreateBandContactRequest;
 import com.mickey.dinggading.model.Sns;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,4 +36,20 @@ public class Contact extends BaseEntity {
     @Column(name = "URL", nullable = false)
     private String url;
 
+    public Contact(Band band, Sns sns, String title, String url) {
+        this.band = band;
+        this.sns = sns;
+        this.title = title;
+        this.url = url;
+
+        if (band != null && !band.getContacts().contains(this)) {
+            band.getContacts().add(this);
+        }
+    }
+
+    public void update(CreateBandContactRequest request) {
+        if (request.getSns() != null)   this.sns = request.getSns();
+        if (request.getTitle() != null) this.title = request.getTitle();
+        if (request.getUrl() != null)   this.url = request.getUrl();
+    }
 }

@@ -4,6 +4,7 @@ import com.mickey.dinggading.domain.member.model.entity.Member;
 import com.mickey.dinggading.domain.member.repository.MemberRepository;
 import com.mickey.dinggading.domain.memberrank.repository.MemberRankRepository;
 import com.mickey.dinggading.domain.oauth.MemberPrincipal;
+import com.mickey.dinggading.util.SecurityUtil;
 import com.mickey.dinggading.domain.oauth.provider.GoogleOAuth2UserInfo;
 import com.mickey.dinggading.util.GenerateRandomNickname;
 import java.util.Map;
@@ -18,6 +19,9 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -74,10 +78,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private Member updateMember(Member existingMember, GoogleOAuth2UserInfo oAuth2UserInfo) {
         log.info("updateMember: {}", existingMember);
-        if(existingMember.getProfileImgUrl().equals(oAuth2UserInfo.getImageUrl())) {
-            return existingMember;
+        if(!existingMember.getProfileImgUrl().equals(oAuth2UserInfo.getImageUrl())) {
+            existingMember.updateProfileImgUrl(oAuth2UserInfo.getImageUrl());
         }
-        existingMember.updateProfileImgUrl(oAuth2UserInfo.getImageUrl());
         return memberRepository.save(existingMember);
     }
 }

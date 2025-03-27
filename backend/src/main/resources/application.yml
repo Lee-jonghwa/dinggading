@@ -2,6 +2,11 @@ spring:
   application:
     name: dinggading
 
+  ### problem details
+  mvc:
+    problemdetails:
+      enabled: true
+
   ### Google OAuth ###
   security:
     oauth2:

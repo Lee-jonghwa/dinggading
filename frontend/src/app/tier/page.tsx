@@ -6,14 +6,31 @@ import { NextPage } from "next"
 import Image from "next/image"
 import ChevronLeft from "@/assets/chevron-left.svg"
 import ChevronRight from "@/assets/chevron-right.svg"
+import { useState } from "react"
 
 const Tier: NextPage = () => {
+
+  const [instrument, setInstrument] = useState("drums") 
+
+  const changeInstrument = (direction : "left" | "right") => {
+    const instruments = ['drums', 'bass', 'guitar', 'vocals']
+    const currentIndex = instruments.indexOf(instrument)
+    let nextIndex = currentIndex
+
+    if (direction === "left") {
+      nextIndex = currentIndex === 0 ? instruments.length - 1 : currentIndex - 1
+    } else if (direction === "right") {
+      nextIndex = currentIndex === instruments.length - 1 ? 0 : currentIndex + 1 
+    }
+
+    setInstrument(instruments[nextIndex])
+  }
 
   return (
     <div className="tier"> 
       <div className="unity-area">
         <div className="upper">
-          <div className="change instrument">
+          <div className="change instrument" onClick={() => changeInstrument("left")}>
             <Image
               src={ChevronLeft}
               alt="changing instrument"
@@ -22,7 +39,7 @@ const Tier: NextPage = () => {
           <div className="playing-people">
             playing character
           </div>
-          <div className="change-instrument">
+          <div className="change-instrument" onClick={() => changeInstrument("right")}>
             <Image 
               src={ChevronRight}
               alt="change instrument"
@@ -48,13 +65,13 @@ const Tier: NextPage = () => {
       </div>
       <div className="nav-area">
         <Card 
-          href="/tier/challenge"
+          href={`/tier/${instrument}/challenge/`}
           subText="내 티어를 방어하고 더 높은 티어에 도전하세요"
           titleText="도전하기"
           image="#"
           /> 
         <Card 
-          href="/tier/practice"
+          href={`/tier/${instrument}/practice`}
           subText="내 티어에 맞는 곡으로 연습하세요"
           titleText="연습하기"
           image="#"

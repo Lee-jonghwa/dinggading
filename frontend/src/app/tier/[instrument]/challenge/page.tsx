@@ -6,7 +6,7 @@ import { useTierStore } from "@/store/tier"
 
 const tierOrder = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond']
 
-export default function Challenge () {
+export default function Challenge() {
 
   const { userTier } = useTierStore()
 

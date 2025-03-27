@@ -8,9 +8,10 @@ import SilverIcon from "@/assets/star.png"
 import GoldIcon from "@/assets/star.png"
 import PlatinumIcon from "@/assets/star.png"
 import DiamondIcon from "@/assets/star.png"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 
 interface TiercardProps {
+  instrument : string, 
   tier : string , 
   currentTier : string, 
   noticeThing? : string 
@@ -58,9 +59,13 @@ export default function Tiercard ({ tier, currentTier, noticeThing} : TiercardPr
   const tierStatus = getTierStatus() 
   const tierIcon = getTierIcon() 
 
+  const params = useParams() 
+  const { instrument } = params
+
   const router = useRouter()
+
   const toTier = () => {
-    if (tier) router.push(`/tier/challenge/${tier}`)
+    if (tier) router.push(`/tier/${instrument}/challenge/${tier}`)
   } 
 
   return (

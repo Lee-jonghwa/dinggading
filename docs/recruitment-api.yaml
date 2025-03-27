@@ -13,12 +13,12 @@ servers:
     description: 목 서버
 
 tags:
- - name: Recruitment
-   description: 밴드 구인 관련 API - 개발전
- - name: RecruitmentInstrument
-   description: 구인 악기 포지션 관련 API - 개발전
- - name: RecruitmentApplicant
-   description: 구인 지원자 관련 API - 개발전
+  - name: Recruitment
+    description: 밴드 구인 관련 API - 개발전
+  - name: RecruitmentInstrument
+    description: 구인 악기 포지션 관련 API - 개발전
+  - name: RecruitmentApplicant
+    description: 구인 지원자 관련 API - 개발전
 
 components:
   securitySchemes:
@@ -72,36 +72,7 @@ components:
       description: "구인 공고 상태"
       required: true
       schema:
-        type: string
-        enum: [RECRUITING, COMPLETED]
-
-    # 쿼리 파라미터 모음
-    PageParam:
-      name: page
-      in: query
-      description: "페이지 번호 (0부터 시작)"
-      required: false
-      schema:
-        type: integer
-        default: 0
-
-    SizeParam:
-      name: size
-      in: query
-      description: "페이지 크기"
-      required: false
-      schema:
-        type: integer
-        default: 10
-
-    SortParam:
-      name: sort
-      in: query
-      description: "정렬 기준 (필드명,정렬방향)"
-      required: false
-      schema:
-        type: string
-        default: "id,desc"
+        $ref: "#/components/schemas/RecruitmentStatus"
 
   schemas:
     # 에러 응답 스키마
@@ -119,18 +90,40 @@ components:
         instance:
           type: string
 
+    # 페이지네이션 관련 스키마
+    PageableDTO:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: "현재 페이지 번호"
+        size:
+          type: integer
+          description: "페이지 크기"
+        totalElements:
+          type: integer
+          description: "전체 요소 수"
+        totalPages:
+          type: integer
+          description: "전체 페이지 수"
+      required:
+        - page
+        - size
+        - totalElements
+        - totalPages
+
     # 열거형 정의
-    InstrumentEnum:
+    Instrument:
       type: string
       enum: [VOCAL, GUITAR, DRUM, BASS]
       description: "악기 유형"
 
-    TierEnum:
+    Tier:
       type: string
       enum: [UNRANKED, IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND]
       description: "티어 레벨"
 
-    RecruitmentStatusEnum:
+    RecruitmentStatus:
       type: string
       enum: [RECRUITING, COMPLETED]
       description: "구인 공고 상태"
@@ -158,7 +151,7 @@ components:
           format: date-time
           description: "오디션 날짜 및 시간"
         status:
-          $ref: "#/components/schemas/RecruitmentStatusEnum"
+          $ref: "#/components/schemas/RecruitmentStatus"
         auditionSongId:
           type: integer
           format: int64
@@ -182,6 +175,19 @@ components:
         - auditionSongId
         - status
 
+    PageRecruitmentDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecruitmentDTO"
+        pageable:
+          $ref: "#/components/schemas/PageableDTO"
+      required:
+        - content
+        - pageable
+
     RecruitmentInstrumentDTO:
       type: object
       properties:
@@ -194,9 +200,9 @@ components:
           format: int64
           description: "구인 공고 ID"
         instrument:
-          $ref: "#/components/schemas/InstrumentEnum"
+          $ref: "#/components/schemas/Instrument"
         requiredTier:
-          $ref: "#/components/schemas/TierEnum"
+          $ref: "#/components/schemas/Tier"
         maxSize:
           type: integer
           description: "모집 인원 수"
@@ -232,9 +238,9 @@ components:
           type: string
           description: "회원 프로필 이미지 URL"
         instrument:
-          $ref: "#/components/schemas/InstrumentEnum"
+          $ref: "#/components/schemas/Instrument"
         tier:
-          $ref: "#/components/schemas/TierEnum"
+          $ref: "#/components/schemas/Tier"
         applyDate:
           type: string
           format: date-time
@@ -244,28 +250,6 @@ components:
         - bandRecruitmentInstrumentsId
         - applicantId
         - instrument
-
-    # 페이지네이션 관련 스키마
-    PageableDTO:
-      type: object
-      properties:
-        page:
-          type: integer
-          description: "현재 페이지 번호"
-        size:
-          type: integer
-          description: "페이지 크기"
-        totalElements:
-          type: integer
-          description: "전체 요소 수"
-        totalPages:
-          type: integer
-          description: "전체 페이지 수"
-      required:
-        - page
-        - size
-        - totalElements
-        - totalPages
 
   # 요청 본문 정의
   requestBodies:
@@ -329,9 +313,9 @@ components:
             type: object
             properties:
               instrument:
-                $ref: "#/components/schemas/InstrumentEnum"
+                $ref: "#/components/schemas/Instrument"
               requiredTier:
-                $ref: "#/components/schemas/TierEnum"
+                $ref: "#/components/schemas/Tier"
               maxSize:
                 type: integer
                 description: "모집 인원 수"
@@ -380,6 +364,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/RecruitmentDTO"
+
+    RecruitmentListResponse:
+      description: "구인 공고 목록"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PageRecruitmentDTO"
 
     RecruitmentInstrumentResponse:
       description: "모집 악기 정보"
@@ -470,13 +461,25 @@ security:
   - BearerAuth: []
 
 paths:
+  /bands/recruitments:
+    get:
+      tags:
+        - Recruitment
+      operationId: getAllRecruitments
+      x-spring-paginated: true
+      summary: "전체 구인 공고 목록 조회"
+      description: "전체 구인 공고 목록을 조회합니다. 페이징 처리된 결과를 반환합니다."
+      responses:
+        "200":
+          $ref: "#/components/responses/RecruitmentListResponse"
+
   /bands/{bandId}/recruitments:
     get:
       tags:
         - Recruitment
-      operationId: getBandRecruitments
-      summary: "밴드 구인 공고 목록 조회"
-      description: "밴드의 구인 공고를 조회합니다."
+      operationId: getBandRecruitment
+      summary: "밴드 구인 공고 조회"
+      description: "밴드의 구인 공고를 조회합니다. 밴드는 동시간대에 하나의 구인 공고만 가질 수 있습니다."
       parameters:
         - $ref: "#/components/parameters/BandId"
       responses:
@@ -490,7 +493,7 @@ paths:
         - Recruitment
       operationId: createBandRecruitment
       summary: "밴드 구인 공고 등록"
-      description: "밴드에 새로운 구인 공고를 등록합니다. 제목, 설명, 오디션 날짜, 오디션 곡 등 포함"
+      description: "밴드에 새로운 구인 공고를 등록합니다. 제목, 설명, 오디션 날짜, 오디션 곡 등 포함. 밴드는 동시간대에 하나의 구인 공고만 가질 수 있습니다."
       security:
         - BearerAuth: []
       parameters:
@@ -508,7 +511,7 @@ paths:
           $ref: "#/components/responses/NotFoundException"
 
   /bands/{bandId}/recruitments/{recruitmentId}:
-    put:
+    patch:
       tags:
         - Recruitment
       operationId: updateBandRecruitment
@@ -591,7 +594,7 @@ paths:
 
     post:
       tags:
-        - Recruitment
+        - RecruitmentInstrument
       operationId: addRecruitmentInstrument
       summary: "구인 공고 악기 포지션 추가"
       description: "구인 공고에 새로운 악기 포지션을 추가합니다."
@@ -615,7 +618,7 @@ paths:
   /bands/{bandId}/recruitments/{recruitmentId}/instruments/{instrumentId}:
     delete:
       tags:
-        - Recruitment
+        - RecruitmentInstrument
       operationId: removeRecruitmentInstrument
       summary: "구인 공고 악기 포지션 제거"
       description: "구인 공고에서 특정 악기 포지션을 제거합니다."
@@ -636,7 +639,7 @@ paths:
   /bands/{bandId}/recruitments/{recruitmentId}/applicants:
     get:
       tags:
-        - Recruitment
+        - RecruitmentApplicant
       operationId: getRecruitmentApplicants
       summary: "구인 공고 지원자 목록 조회"
       description: "구인 공고에 지원한 지원자 목록을 조회합니다."
@@ -651,10 +654,10 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands/recruitments/{recruitmentId}/apply:
+  /recruitments/{recruitmentId}/apply:
     post:
       tags:
-        - Recruitment
+        - RecruitmentApplicant
       operationId: applyRecruitment
       summary: "구인 공고 지원"
       description: "구인 공고에 지원합니다. 지원자 ID, 악기 포지션 포함"
@@ -672,10 +675,10 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands/recruitments/{recruitmentId}/applicants/{applicantId}:
+  /recruitments/{recruitmentId}/applicants/{applicantId}:
     delete:
       tags:
-        - Recruitment
+        - RecruitmentApplicant
       operationId: cancelRecruitmentApplication
       summary: "구인 공고 지원 취소"
       description: "구인 공고 지원을 취소합니다."
@@ -695,7 +698,7 @@ paths:
   /bands/{bandId}/recruitments/{recruitmentId}/accept/{applicantId}:
     post:
       tags:
-        - Recruitment
+        - RecruitmentApplicant
       operationId: acceptApplicant
       summary: "지원자 승인"
       description: "특정 지원자의 밴드 가입을 승인합니다."
@@ -718,7 +721,7 @@ paths:
   /bands/{bandId}/recruitments/{recruitmentId}/reject/{applicantId}:
     post:
       tags:
-        - Recruitment
+        - RecruitmentApplicant
       operationId: rejectApplicant
       summary: "지원자 거절"
       description: "특정 지원자의 밴드 가입을 거절합니다."

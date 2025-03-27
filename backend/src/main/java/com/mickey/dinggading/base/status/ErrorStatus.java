@@ -12,8 +12,19 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 일반적인 응답
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "COMMON401", "인증이 필요합니다."),
+    INVALID_REQUEST_PARAMETER(HttpStatus.BAD_REQUEST, "COMMON402", "요청 매개변수가 올바르지 않습니다."),
+
     // 회원 관련 오류
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4001", "존재하지 않는 계정입니다."),
+
+    // 밴드 관련 에러
+    BAND_NOT_FOUND(HttpStatus.NOT_FOUND, "BAND4001", "존재하지 않는 밴드입니다"),
+    UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "BAND4002", "관리자 권한이 없는 계정입니다."),
+    MEMBER_NOT_IN_BAND(HttpStatus.NOT_FOUND, "BAND4003", "해당 멤버가 밴드에 속해있지 않습니다."),
+    BAND_MASTER_CANNOT_LEAVE(HttpStatus.BAD_REQUEST, "BAND4004", "밴드 마스터는 밴드를 떠날 수 없습니다. 먼저 다른 멤버에게 마스터 권한을 양도하세요."),
+    CONTACT_NOT_FOUND(HttpStatus.NOT_FOUND, "BAND4005", "존재하지 않는 SNS 입니다."),
+    INVALID_TRANSFER_REQUEST(HttpStatus.BAD_REQUEST, "BAND4006", "잘못된 권한 이전 요청입니다."),
+    MEMBER_ALREADY_IN_BAND(HttpStatus.FOUND, "BAND4007", "이미 밴드에 가입된 멤버입니다."),
 
     // 랭크 관련 오류
     RANK_NOT_FOUND(HttpStatus.NOT_FOUND, "RANK4001", "랭크 정보를 찾을 수 없습니다."),

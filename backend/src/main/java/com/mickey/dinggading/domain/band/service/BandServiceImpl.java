@@ -36,7 +36,7 @@ public class BandServiceImpl implements BandService {
     private final BandConverter bandConverter;
 
     @Override
-    public Band createBand(CreateBandRequest request, UUID memberId) {
+    public BandDTO createBand(CreateBandRequest request, UUID memberId) {
 
         Member master = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ExceptionHandler(ErrorStatus.MEMBER_NOT_FOUND));
@@ -44,8 +44,9 @@ public class BandServiceImpl implements BandService {
         Band band = new Band(request, master.getMemberId());
 
         BandMember bandMember = new BandMember(band, master, null);
+        bandRepository.save(band);
 
-        return bandRepository.save(band);
+        return bandConverter.toBandDTO(band);
 
     }
 

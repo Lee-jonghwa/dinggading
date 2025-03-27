@@ -67,7 +67,7 @@ public class BandController implements BandApi {
         UUID memberId = securityUtil.getCurrentMemberId();
         log.info("현재 로그인한 사용자 ID: {}", memberId);
 
-        Band band = bandService.createBand(createBandRequest, memberId);
+        BandDTO band = bandService.createBand(createBandRequest, memberId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(band);
     }
@@ -101,8 +101,8 @@ public class BandController implements BandApi {
             */
     @Override
     public ResponseEntity<?> getBands(Pageable pageable) {
-            PageBandDTO pageBandDTO = bandService.getAllBands(pageable);
-            return ResponseEntity.status(HttpStatus.OK).body(pageBandDTO);
+        PageBandDTO pageBandDTO = bandService.getAllBands(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(pageBandDTO);
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.mickey.dinggading.domain.member.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mickey.dinggading.base.BaseEntity;
 import com.mickey.dinggading.domain.memberrank.model.Instrument;
 import com.mickey.dinggading.domain.memberrank.model.MemberRank;
@@ -52,6 +53,7 @@ public class Member extends BaseEntity {
     @Comment("프로필 이미지")
     private String profileImgUrl;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberRank> memberRanks = new ArrayList<>();
 

@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface BandService {
 
     // 밴드 관련 기능
-    Band createBand(CreateBandRequest request, UUID memberId);
+    BandDTO createBand(CreateBandRequest request, UUID memberId);
 
     List<BandMemberDTO> addBandMember(UUID memberId, Long bandId, AddBandMemberRequest addBandMemberRequest);
 

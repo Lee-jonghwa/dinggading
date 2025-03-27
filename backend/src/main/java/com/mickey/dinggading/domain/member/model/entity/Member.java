@@ -1,15 +1,25 @@
 package com.mickey.dinggading.domain.member.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mickey.dinggading.base.BaseEntity;
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import com.mickey.dinggading.domain.memberrank.model.Instrument;
+import com.mickey.dinggading.domain.memberrank.model.MemberRank;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.*;
-
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
-import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Getter
@@ -21,6 +31,7 @@ public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "member_id")
+    //@Column(name = "member_id", columnDefinition = "BINARY(16)")
     private UUID memberId;
 
     @Column(name = "username", unique = true, nullable = false)
@@ -40,10 +51,9 @@ public class Member extends BaseEntity {
     @Comment("프로필 이미지")
     private String profileImgUrl;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    @Comment("생성된 날자")
-    private LocalDateTime createdAt;
+    @JsonIgnore
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberRank> memberRanks = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Record> records = new ArrayList<>();
@@ -60,6 +70,30 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> receivedNotifications = new ArrayList<>();
 
+    public static Member createMember(String username, String nickname, String profileUrl) {
+        // TODO: 최적화 포인트 -> Event를 발생시켜서 의존성 분리
+
+        Member member = Member.builder()
+                .username(username)
+                .nickname(nickname)
+                .favoriteBandId(null) // null 가능
+                .profileImgUrl(profileUrl)
+                .memberRanks(new ArrayList<>())
+                .records(new ArrayList<>())
+                .following(new ArrayList<>())
+                .followers(new ArrayList<>())
+                .sentNotifications(new ArrayList<>())
+                .receivedNotifications(new ArrayList<>())
+                .build();
+
+        for (Instrument instrument : Instrument.values()) {
+            MemberRank memberRank = MemberRank.createMemberRank(instrument);
+            memberRank.updateMember(member);
+        }
+
+        return member;
+    }
+
     // Update methods
     public void updateNickname(String nickname) {
         this.nickname = nickname;
@@ -72,4 +106,5 @@ public class Member extends BaseEntity {
     public void updateFavoriteBand(Long favoriteBandId) {
         this.favoriteBandId = favoriteBandId;
     }
+
 }

@@ -2,11 +2,14 @@ package com.mickey.dinggading.domain.band.model.entity;
 
 import com.mickey.dinggading.base.BaseEntity;
 import com.mickey.dinggading.domain.member.model.entity.Member;
+import com.mickey.dinggading.model.CreateBandRequest;
+import com.mickey.dinggading.model.UpdateBandRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Builder
@@ -23,9 +26,8 @@ public class Band extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "band_master_id", nullable = false)
-    private Member bandMaster;
+    @Column(name = "band_master_id", nullable = false)
+    private UUID bandMasterId;
 
     @Column(name = "description")
     private String description;
@@ -45,9 +47,48 @@ public class Band extends BaseEntity {
     @Column(name = "job_opening", nullable = false)
     private boolean jobOpening;
 
+    @Builder.Default
     @OneToMany(mappedBy = "band", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Contact> contacts = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "band", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BandMember> members = new ArrayList<>();
+
+    public void updateBandMembers(List<BandMember> bandMemberList) {
+        this.members.clear();
+        this.members.addAll(bandMemberList);
+    }
+
+    public void updateBandMaster(UUID newMasterId) {
+        this.bandMasterId = newMasterId;
+    }
+
+    public void updateContacts(List<Contact> contactList) {
+        this.contacts.clear();
+        this.contacts.addAll(contactList);
+    }
+
+    public Band(CreateBandRequest request, UUID masterId) {
+        if (masterId != null)                 this.bandMasterId = masterId;
+        if (request.getName() != null)        this.name = request.getName();
+        if (request.getDescription() != null) this.description = request.getDescription();
+        if (request.getSigun() != null)       this.sigun = request.getSigun();
+        if (request.getTags() != null)        this.tags = request.getTags();
+        if (request.getProfileUrl() != null)  this.profileUrl = request.getProfileUrl();
+        if (request.getMaxSize() != null)     this.maxSize =request.getMaxSize();
+        if (request.getJobOpening() != null)  this.jobOpening = request.getJobOpening();
+        this.contacts = new ArrayList<>();
+        this.members = new ArrayList<>();
+    }
+
+    public void update(UpdateBandRequest request) {
+        if (request.getName() != null)        this.name = request.getName();
+        if (request.getDescription() != null) this.description = request.getDescription();
+        if (request.getSigun() != null)       this.sigun = request.getSigun();
+        if (request.getTags() != null)        this.tags = request.getTags();
+        if (request.getProfileUrl() != null)  this.profileUrl = request.getProfileUrl();
+        if (request.getMaxSize() != null)     this.maxSize = request.getMaxSize();
+        if (request.getJobOpening() != null)  this.jobOpening = request.getJobOpening();
+    }
 }

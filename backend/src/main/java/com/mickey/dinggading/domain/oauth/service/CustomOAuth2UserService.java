@@ -2,9 +2,13 @@ package com.mickey.dinggading.domain.oauth.service;
 
 import com.mickey.dinggading.domain.member.model.entity.Member;
 import com.mickey.dinggading.domain.member.repository.MemberRepository;
+import com.mickey.dinggading.domain.memberrank.repository.MemberRankRepository;
 import com.mickey.dinggading.domain.oauth.MemberPrincipal;
+import com.mickey.dinggading.util.SecurityUtil;
 import com.mickey.dinggading.domain.oauth.provider.GoogleOAuth2UserInfo;
 import com.mickey.dinggading.util.GenerateRandomNickname;
+import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -17,7 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -27,6 +31,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     // http://localhost:8080/oauth2/authorization/google
 
     private final MemberRepository memberRepository;
+    private final MemberRankRepository memberRankRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
@@ -48,35 +53,34 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         GoogleOAuth2UserInfo googleOAuth2UserInfo = new GoogleOAuth2UserInfo(attributes);
 
-        // 회원 가입
-        Member member = memberRepository.findByUsername(googleOAuth2UserInfo.getEmail())
+        // 기존 회원 조회
+        Optional<Member> optionalMember = memberRepository.findByUsername(googleOAuth2UserInfo.getEmail());
+
+        Member member;
+
+        // 신규 회원 가입, 기존 회원 업데이트
+        member = optionalMember
+                .map(value -> updateMember(value, googleOAuth2UserInfo))
                 .orElseGet(() -> register(googleOAuth2UserInfo));
 
-        // 업데이트
-        member = updateMember(member, googleOAuth2UserInfo);
-
-        log.info("updateMember: {}", member);
         return MemberPrincipal.create(member, attributes);
     }
-
-
 
     // 사용자 DB 저장
     private Member register(GoogleOAuth2UserInfo oAuth2UserInfo) {
         log.info("register: {}", oAuth2UserInfo);
         String nickname = GenerateRandomNickname.generateRandomNickname();
+        String username = oAuth2UserInfo.getEmail();
+        String profileUrl = oAuth2UserInfo.getImageUrl();
 
-        Member member = Member.builder()
-                .username(oAuth2UserInfo.getEmail())
-                .nickname(nickname) // 자동 생성
-                .profileImgUrl(oAuth2UserInfo.getImageUrl())
-                .build();
-        return memberRepository.save(member);
+        return memberRepository.save(Member.createMember(username, nickname, profileUrl));
     }
 
     private Member updateMember(Member existingMember, GoogleOAuth2UserInfo oAuth2UserInfo) {
         log.info("updateMember: {}", existingMember);
-        existingMember.updateProfileImgUrl(oAuth2UserInfo.getImageUrl());
+        if(!existingMember.getProfileImgUrl().equals(oAuth2UserInfo.getImageUrl())) {
+            existingMember.updateProfileImgUrl(oAuth2UserInfo.getImageUrl());
+        }
         return memberRepository.save(existingMember);
     }
 }

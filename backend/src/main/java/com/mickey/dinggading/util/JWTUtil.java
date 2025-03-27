@@ -20,9 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
-import java.util.*;
-
 @Component
 @Slf4j
 public class JWTUtil {
@@ -48,7 +45,7 @@ public class JWTUtil {
         Jws<Claims> claims = getClaimsJws(token);
 
         Map<String, Object> value = claims.getPayload();
-        log.info("value : {}", value);
+        log.info("getMemberId value : {}", value);
 
         return UUID.fromString(value.get("id").toString());
     }
@@ -59,7 +56,7 @@ public class JWTUtil {
         Jws<Claims> claims = getClaimsJws(token);
 
         Map<String, Object> value = claims.getPayload();
-        log.info("value : {}", value);
+        log.info("getUserName value : {}", value);
 
         return value.get("username").toString();
     }
@@ -67,8 +64,15 @@ public class JWTUtil {
     public void checkTokenValidation(String header) {
         if (header == null) throw new ExceptionHandler(ErrorStatus.TOKEN_NOT_FOUND);
         String token = getToken(header);
-        Jws<Claims> claimsJws = getClaimsJws(token);
-        claimsJws.getPayload().forEach((key1, value1) -> log.info("key : {}, value : {}", key1, value1));
+        log.info("Validating token: {}", token);
+        try {
+            Jws<Claims> claimsJws = getClaimsJws(token);
+            log.info("Token validation successful");
+            claimsJws.getPayload().forEach((key1, value1) -> log.info("key : {}, value : {}", key1, value1));
+        } catch (Exception e) {
+            log.error("Token validation failed: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     // 토큰 검증
@@ -104,6 +108,7 @@ public class JWTUtil {
     private Jws<Claims> getClaimsJws(String token) {
         JwtParser parser = getParser();
         Jws<Claims> claimsJws;
+        log.info("토큰 : {}", token);
 
         try {
             claimsJws = parser.parseSignedClaims(token);

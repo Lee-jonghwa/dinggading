@@ -34,6 +34,9 @@ public class Song extends BaseEntity {
     @Column(name = "title", nullable = false, length = 255)
     private String title;
 
+    @Column(name = "artist", nullable = false, length = 255)
+    private String artist;
+
     @Column(name = "description", length = 255)
     private String description;
 
@@ -44,14 +47,15 @@ public class Song extends BaseEntity {
     private List<SongByInstrument> songByInstruments = new ArrayList<>();
 
     // 생성자
-    private Song(String title, String description, String youtubeUrl) {
+    private Song(String title, String description, String artist, String youtubeUrl) {
         this.title = title;
+        this.artist = artist;
         this.description = description;
         this.youtubeUrl = youtubeUrl;
     }
 
     // 팩토리 메소드
-    public static Song createSong(String title, String description, String youtubeUrl) {
+    public static Song createSong(String title, String artist, String description, String youtubeUrl) {
         if (title == null || title.isEmpty()) {
             throw new IllegalArgumentException("곡 제목은 필수입니다.");
         }
@@ -59,7 +63,7 @@ public class Song extends BaseEntity {
             throw new IllegalArgumentException("유튜브 URL은 필수입니다.");
         }
 
-        return new Song(title, description, youtubeUrl);
+        return new Song(title, artist, description, youtubeUrl);
     }
 
     // 악기별 곡 버전 추가 메소드

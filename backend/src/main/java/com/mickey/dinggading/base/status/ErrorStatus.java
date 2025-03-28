@@ -29,10 +29,6 @@ public enum ErrorStatus implements BaseErrorCode {
     // SongPack Errors
     SONG_PACK_NOT_FOUND(HttpStatus.NOT_FOUND, "SONGP4001", "존재하지 않는 곡 팩입니다."),
 
-    // Song Errors
-    SONG_NOT_FOUND(HttpStatus.NOT_FOUND, "SONG4001", "존재하지 않는 곡입니다."),
-    SONG_BY_INSTRUMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "SONG4002", "해당 악기의 곡이 존재하지 않습니다."),
-
     // Attempt Errors
     ATTEMPT_NOT_FOUND(HttpStatus.NOT_FOUND, "ATTEMPT4001", "존재하지 않는 시도 기록입니다."),
 
@@ -82,7 +78,16 @@ public enum ErrorStatus implements BaseErrorCode {
 
     TOKEN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "TOKEN5000", "토큰 처리 중 알 수 없는 에러가 발생했습니다."),
 
-    TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "TOKEN4006", "유저의 토큰정보를 얻어올 수 없습니다. 헤더를 확인하세요");
+    TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "TOKEN4006", "유저의 토큰정보를 얻어올 수 없습니다. 헤더를 확인하세요"),
+    // Song 관련 오류
+    SONG_NOT_FOUND(HttpStatus.NOT_FOUND, "SONG4001", "존재하지 않는 곡입니다."),
+    SONG_INSTRUMENT_PACK_NOT_FOUND(HttpStatus.NOT_FOUND, "SONG4002", "존재하지 않는 곡 팩입니다."),
+    SONG_BY_INSTRUMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "SONG4003", "존재하지 않는 악기별 곡입니다."),
+    DUPLICATE_INSTRUMENT_VERSION(HttpStatus.BAD_REQUEST, "SONG4004", "이미 해당 악기 버전이 존재합니다."),
+    DUPLICATE_INSTRUMENT_TIER_COMBINATION(HttpStatus.BAD_REQUEST, "SONG4005", "이미 동일한 악기와 티어 조합이 존재합니다."),
+    INVALID_INSTRUMENT(HttpStatus.BAD_REQUEST, "SONG4006", "유효하지 않은 악기입니다."),
+    INVALID_TIER(HttpStatus.BAD_REQUEST, "SONG4007", "유효하지 않은 티어입니다."),
+    PACK_INSTRUMENT_MISMATCH(HttpStatus.BAD_REQUEST, "SONG4008", "선택한 팩의 악기가 요청과 일치하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

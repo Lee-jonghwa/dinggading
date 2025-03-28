@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 
 echo -e "DDDDDDDDDDDDD                     GGGGGGGGGGGGG     DDDDDDDDDDDDD"
 echo -e "D::::::::::::DDD               GGG::::::::::::G     D::::::::::::DDD"
@@ -36,8 +36,8 @@ fi
 
 # 백엔드 .java 파일 삭제
 echo -e "\e[1;34m🔧 Cleaning: 자동으로 생성된 .java, .ts파일을 정리합니다. 🔧\e[0m"  # 파란색, 볼드 텍스트
-./cleanup.sh
+./codegen.sh
 
 # 클린업 완료 및 빌드 시작
 echo -e "\e[1;32m✅ Building: 개발 환경을 구성하는 중 입니다...✅\e[0m"  # 초록색, 볼드 텍스트
-docker-compose -f docker-compose.prod.local.yaml up "$@"
+docker-compose -f docker-compose.prod.local.yaml up --build

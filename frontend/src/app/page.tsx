@@ -34,7 +34,7 @@ const Home: NextPage = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h1>API 테스트</h1>
+      <h1>API </h1>
 
       <h1>현재 환경 {mode}</h1>
       <button 

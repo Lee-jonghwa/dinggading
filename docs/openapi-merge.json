@@ -4,16 +4,25 @@
       "inputFile": "./member-api.yaml"
     },
     {
-      "inputFile": "./notification-api.yaml"
-    },
-    {
       "inputFile": "./challenge-api.yaml"
     },
     {
       "inputFile": "./record-api.yaml"
     },
     {
-      "inputFile": "./song-api.yaml"
+      "inputFile": "./band-api.yaml"
+    },
+    {
+      "inputFile": "./calendar-api.yaml"
+    },
+    {
+      "inputFile": "./chatroom-api.yaml"
+    },
+    {
+      "inputFile": "./livehouse-api.yaml"
+    },
+    {
+      "inputFile": "./recruitment-api.yaml"
     }
   ],
   "output": "./output/openapi.yaml"

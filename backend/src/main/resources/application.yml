@@ -2,6 +2,23 @@ spring:
   application:
     name: dinggading
 
+  ### problem details
+  mvc:
+    problemdetails:
+      enabled: true
+
+  ### Google OAuth ###
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_ID}
+            client-secret: ${GOOGLE_SECRET}
+            scope:
+              - profile
+              - email
+
 #  profiles:
 #    include: oauth,python,minio
 

@@ -44,4 +44,4 @@ out/
 generated
 !generated/**/.gitkeep
 
-
+.env.*

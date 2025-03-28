@@ -1,5 +1,0 @@
-
-ChallengeType:
-  type: string
-  enum: [FIRST, PRACTICE, CHALLENGE, DEFENSE]
-  description: 도전 유형 (배치고사, 연습, 티어 도전, 방어전)

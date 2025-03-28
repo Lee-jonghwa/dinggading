@@ -1,0 +1,1280 @@
+openapi: 3.0.0
+info:
+  title: 딩가딩 Chatroom API
+  version: 1.0.0
+  description: "채팅방 및 메시지 관련 API 명세서"
+  contact:
+    email: nykim.ssafy2024@gmail.com
+
+servers:
+  - url: https://localhost:8080
+    description: 스프링 서버
+  - url: https://localhost:8081
+    description: 목 서버
+    
+tags:
+  - name: ChatRoom
+    description: 채팅방 관리 관련 API - 개발전
+  - name: ChatRoomParticipant
+    description: 채팅방 참가자 관리 관련 API - 개발전
+  - name: ChatMessage
+    description: 채팅 메시지 관리 관련 API - 개발전
+  - name: ChatRoomSetting
+    description: 채팅방 설정 관리 관련 API - 개발전
+  - name: ChatNotice
+    description: 채팅방 공지사항 관련 API - 개발전
+  - name: ChatNotice
+    description: 채팅방 공지사항 관련 API - 개발전
+  - name: ChatMedia
+    description: 채팅 미디어 API - 개발전
+  - name: ChatRoomMedia
+    description: 채팅방 미디어 관리 관련 API - 개발전
+  - name: WebSocket
+    description: 실시간 채팅 통신 관련 API - 개발전
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT 인증 토큰을 사용합니다. 예: Bearer {token}"
+
+  parameters:
+    # 경로 파라미터 모음
+    RoomId:
+      name: roomId
+      in: path
+      description: "채팅방 ID"
+      required: true
+      schema:
+        type: integer
+        format: int64
+
+    MemberId:
+      name: memberId
+      in: path
+      description: "회원 ID"
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    BandId:
+      name: bandId
+      in: path
+      description: "밴드 ID"
+      required: true
+      schema:
+        type: integer
+        format: int64
+
+    MessageId:
+      name: messageId
+      in: path
+      description: "메시지 ID"
+      required: true
+      schema:
+        type: integer
+        format: int64
+
+    NoticeId:
+      name: noticeId
+      in: path
+      description: "공지 ID"
+      required: true
+      schema:
+        type: integer
+        format: int64
+
+    MediaId:
+      name: mediaId
+      in: path
+      description: "미디어 ID"
+      required: true
+      schema:
+        type: integer
+        format: int64
+
+    # 쿼리 파라미터 모음
+    TypeParam:
+      name: type
+      in: query
+      description: "채팅방 유형 필터"
+      required: false
+      schema:
+        $ref: "#/components/schemas/ChatRoomTypeEnum"
+
+    BeforeParam:
+      name: before
+      in: query
+      description: "특정 메시지 ID 이전의 메시지만 조회"
+      required: false
+      schema:
+        type: integer
+        format: int64
+
+    AfterParam:
+      name: after
+      in: query
+      description: "특정 메시지 ID 이후의 메시지만 조회"
+      required: false
+      schema:
+        type: integer
+        format: int64
+
+  schemas:
+    # 공통 기본 스키마
+    BaseEntityDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "고유 식별자"
+
+    UuidEntityDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "고유 식별자 (UUID)"
+
+    TimestampDTO:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          description: "생성 시간"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "수정 시간"
+
+    # 에러 응답 스키마
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+
+    # 열거형 정의
+    ChatRoomTypeEnum:
+      type: string
+      enum: [PERSONAL, GROUP, BAND]
+      description: "채팅방 유형"
+
+    ParticipantRoleEnum:
+      type: string
+      enum: [OWNER, ADMIN, MEMBER]
+      description: "참가자 역할"
+
+    MessageTypeEnum:
+      type: string
+      enum: [TEXT, IMAGE, VIDEO, FILE, SYSTEM]
+      description: "메시지 유형"
+
+    MediaTypeEnum:
+      type: string
+      enum: [IMAGE, VIDEO, FILE]
+      description: "미디어 유형"
+
+    # 페이지네이션 관련 스키마
+    PageableDTO:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: 현재 페이지 번호
+        size:
+          type: integer
+          description: 페이지 크기
+        totalElements:
+          type: integer
+          description: 전체 요소 수
+        totalPages:
+          type: integer
+          description: 전체 페이지 수
+      required:
+        - page
+        - size
+        - totalElements
+        - totalPages
+
+    # 기본 DTO 스키마
+    ChatRoomDTO:
+      type: object
+      properties:
+        chatroomId:
+          type: integer
+          format: int64
+          description: "채팅방 ID"
+        title:
+          type: string
+          description: "채팅방 제목"
+        roomType:
+          $ref: "#/components/schemas/ChatRoomTypeEnum"
+        latestChat:
+          type: string
+          description: "마지막 메시지 내용"
+        latestChatDate:
+          type: string
+          format: date-time
+          description: "마지막 메시지 시간"
+        chatProfileUrl:
+          type: string
+          description: "채팅방 프로필 이미지 URL"
+        participantCount:
+          type: integer
+          description: "참가자 수"
+        unreadCount:
+          type: integer
+          description: "읽지 않은 메시지 수"
+        createdAt:
+          type: string
+          format: date-time
+          description: "생성 시간"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "수정 시간"
+      required:
+        - chatroomId
+        - title
+        - roomType
+        - chatProfileUrl
+
+    ChatMessageDTO:
+      type: object
+      properties:
+        chatMessageId:
+          type: integer
+          format: int64
+          description: "메시지 ID"
+        chatRoomId:
+          type: integer
+          format: int64
+          description: "채팅방 ID"
+        senderId:
+          type: string
+          format: uuid
+          description: "발신자 ID"
+        senderNickname:
+          type: string
+          description: "발신자 닉네임"
+        senderProfileUrl:
+          type: string
+          description: "발신자 프로필 이미지 URL"
+        message:
+          type: string
+          description: "메시지 내용"
+        messageType:
+          $ref: "#/components/schemas/MessageTypeEnum"
+        writedAt:
+          type: string
+          format: date-time
+          description: "작성 시간"
+        readCount:
+          type: integer
+          description: "읽은 사람 수"
+        edited:
+          type: boolean
+          description: "편집 여부"
+        mediaList:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMediaDTO"
+          description: "첨부된 미디어 목록 (있는 경우)"
+      required:
+        - chatMessageId
+        - chatRoomId
+        - senderId
+        - message
+        - messageType
+        - writedAt
+
+    ChatMediaDTO:
+      type: object
+      properties:
+        mediaId:
+          type: integer
+          format: int64
+          description: "미디어 ID"
+        messageId:
+          type: integer
+          format: int64
+          description: "메시지 ID"
+        mediaType:
+          $ref: "#/components/schemas/MediaTypeEnum"
+        mediaUrl:
+          type: string
+          description: "미디어 URL"
+        fileName:
+          type: string
+          description: "파일 이름"
+        fileSize:
+          type: integer
+          description: "파일 크기 (바이트)"
+        thumbnailUrl:
+          type: string
+          description: "썸네일 URL (이미지나 비디오인 경우)"
+        uploadedAt:
+          type: string
+          format: date-time
+          description: "업로드 시간"
+      required:
+        - mediaId
+        - messageId
+        - mediaType
+        - mediaUrl
+
+    ChatRoomParticipantDTO:
+      type: object
+      properties:
+        chatRoomParticipantId:
+          type: integer
+          format: int64
+          description: "참가자 ID"
+        chatroomId:
+          type: integer
+          format: int64
+          description: "채팅방 ID"
+        memberId:
+          type: string
+          format: uuid
+          description: "회원 ID"
+        nickname:
+          type: string
+          description: "회원 닉네임"
+        profileImgUrl:
+          type: string
+          description: "회원 프로필 이미지 URL"
+        role:
+          $ref: "#/components/schemas/ParticipantRoleEnum"
+        joinedAt:
+          type: string
+          format: date-time
+          description: "참가 시간"
+      required:
+        - chatRoomParticipantId
+        - chatroomId
+        - memberId
+        - role
+
+    ChatRoomSettingDTO:
+      type: object
+      properties:
+        chatRoomSettingId:
+          type: integer
+          format: int64
+          description: "설정 ID"
+        chatRoomId:
+          type: integer
+          format: int64
+          description: "채팅방 ID"
+        memberId:
+          type: string
+          format: uuid
+          description: "회원 ID"
+        alert:
+          type: boolean
+          description: "알림 여부"
+        unreadChatCount:
+          type: integer
+          description: "읽지 않은 메시지 수"
+        pinnedChatRoomOrder:
+          type: integer
+          description: "고정된 채팅방 순서 (고정되지 않은 경우 null)"
+      required:
+        - chatRoomSettingId
+        - chatRoomId
+        - memberId
+        - alert
+        - unreadChatCount
+
+    ChatNoticeDTO:
+      type: object
+      properties:
+        noticeId:
+          type: integer
+          format: int64
+          description: "공지 ID"
+        chatRoomId:
+          type: integer
+          format: int64
+          description: "채팅방 ID"
+        content:
+          type: string
+          description: "공지 내용"
+        authorId:
+          type: string
+          format: uuid
+          description: "작성자 ID"
+        authorNickname:
+          type: string
+          description: "작성자 닉네임"
+        pinned:
+          type: boolean
+          description: "고정 여부"
+        createdAt:
+          type: string
+          format: date-time
+          description: "생성 시간"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "수정 시간"
+      required:
+        - noticeId
+        - chatRoomId
+        - content
+        - authorId
+        - pinned
+        - createdAt
+
+    # 페이지네이션된 응답 스키마
+    PageChatRoomDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatRoomDTO"
+        pageable:
+          $ref: "#/components/schemas/PageableDTO"
+      required:
+        - content
+        - pageable
+      x-spring-paginated: true
+
+    PageChatMessageDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessageDTO"
+        pageable:
+          $ref: "#/components/schemas/PageableDTO"
+      required:
+        - content
+        - pageable
+      x-spring-paginated: true
+
+    PageChatNoticeDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatNoticeDTO"
+        pageable:
+          $ref: "#/components/schemas/PageableDTO"
+      required:
+        - content
+        - pageable
+      x-spring-paginated: true
+
+    PageChatMediaDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMediaDTO"
+        pageable:
+          $ref: "#/components/schemas/PageableDTO"
+      required:
+        - content
+        - pageable
+      x-spring-paginated: true
+
+  # 요청 본문 정의
+  requestBodies:
+    CreateGroupChatRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                description: "채팅방 제목"
+              participantIds:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+                description: "참가자 ID 목록"
+              profileUrl:
+                type: string
+                description: "채팅방 프로필 이미지 URL"
+            required:
+              - title
+              - participantIds
+
+    InviteMembersRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              memberIds:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+                description: "초대할 회원 ID 목록"
+            required:
+              - memberIds
+
+    SendMessageRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: "메시지 내용"
+              messageType:
+                $ref: "#/components/schemas/MessageTypeEnum"
+            required:
+              - message
+              - messageType
+
+    UpdateChatRoomSettingsRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              alert:
+                type: boolean
+                description: "알림 여부"
+              pinnedChatRoomOrder:
+                type: integer
+                description: "고정된 채팅방 순서 (고정 해제하려면 null)"
+
+    CreateNoticeRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              content:
+                type: string
+                description: "공지 내용"
+              pinned:
+                type: boolean
+                description: "고정 여부"
+                default: false
+            required:
+              - content
+
+    UpdateNoticeRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              content:
+                type: string
+                description: "수정할 공지 내용"
+            required:
+              - content
+
+    PinNoticeRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              pinned:
+                type: boolean
+                description: "고정 여부"
+            required:
+              - pinned
+
+    MediaMessageRequest:
+      description: "미디어 메시지 전송 요청"
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: "메시지 내용"
+              files:
+                type: array
+                items:
+                  type: string
+                  format: binary
+                description: "첨부할 파일 (최대 5개)"
+            required:
+              - files
+
+  # 응답 정의
+  responses:
+    # 성공 응답
+    SuccessNoContent:
+      description: "성공적으로 처리되었습니다."
+      content: {}
+
+    SuccessCreated:
+      description: "성공적으로 생성되었습니다."
+
+    WebSocketConnected:
+      description: "WebSocket 연결이 수립되었습니다."
+
+    # 에러 응답
+    NotFoundException:
+      description: "요청한 리소스를 찾을 수 없습니다."
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ProblemDetail"
+              - type: object
+                properties:
+                  title:
+                    type: string
+                    example: "리소스를 찾을 수 없습니다."
+
+    BadRequestException:
+      description: "잘못된 요청입니다."
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ProblemDetail"
+              - type: object
+                properties:
+                  title:
+                    type: string
+                    example: "잘못된 요청입니다."
+
+    UnauthorizedException:
+      description: "인증되지 않은 요청입니다."
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ProblemDetail"
+              - type: object
+                properties:
+                  title:
+                    type: string
+                    example: "인증되지 않은 요청입니다."
+
+    ForbiddenException:
+      description: "접근 권한이 없습니다."
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ProblemDetail"
+              - type: object
+                properties:
+                  title:
+                    type: string
+                    example: "접근 권한이 없습니다."
+
+    # 비즈니스 응답
+    ChatRoomResponse:
+      description: "채팅방 정보"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ChatRoomDTO"
+
+    ChatRoomListResponse:
+      description: "채팅방 목록"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PageChatRoomDTO"
+
+    ChatMessageResponse:
+      description: "채팅 메시지 정보"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ChatMessageDTO"
+
+    ChatMessageListResponse:
+      description: "채팅 메시지 목록"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PageChatMessageDTO"
+
+    ChatRoomParticipantResponse:
+      description: "채팅방 참가자 정보"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ChatRoomParticipantDTO"
+
+    ChatRoomParticipantListResponse:
+      description: "채팅방 참가자 목록"
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/ChatRoomParticipantDTO"
+
+    ChatRoomSettingResponse:
+      description: "채팅방 설정 정보"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ChatRoomSettingDTO"
+
+    ChatNoticeResponse:
+      description: "채팅방 공지 정보"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ChatNoticeDTO"
+
+    ChatNoticeListResponse:
+      description: "채팅방 공지 목록"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PageChatNoticeDTO"
+
+    ChatMediaResponse:
+      description: "채팅방 미디어 정보"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ChatMediaDTO"
+
+    ChatMediaListResponse:
+      description: "채팅방 미디어 목록"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PageChatMediaDTO"
+
+    UnreadCountResponse:
+      description: "읽지 않은 메시지 수"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              unreadCount:
+                type: integer
+                description: "읽지 않은 메시지 수"
+
+security:
+  - BearerAuth: []
+
+paths:
+  /chatrooms:
+    get:
+      tags:
+        - ChatRoom
+      operationId: getChatRooms
+      summary: "채팅방 목록 조회"
+      description: "사용자의 모든 채팅방 목록을 조회합니다. 유형별 필터링이 가능합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/TypeParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatRoomListResponse"
+
+  /chatrooms/{roomId}:
+    get:
+      tags:
+        - ChatRoom
+      operationId: getChatRoom
+      summary: "채팅방 정보 조회"
+      description: "특정 채팅방의 정보를 조회합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatRoomResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+    delete:
+      tags:
+        - ChatRoom
+      operationId: deleteChatRoom
+      summary: "채팅방 삭제"
+      description: "채팅방을 삭제합니다. 관리자 또는 생성자만 가능합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      responses:
+        "204":
+          $ref: "#/components/responses/SuccessNoContent"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/leave/{roomId}:
+    post:
+      tags:
+        - ChatRoom
+      operationId: leaveChatRoom
+      summary: "채팅방 나가기"
+      description: "채팅방을 나갑니다."
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      responses:
+        "204":
+          $ref: "#/components/responses/SuccessNoContent"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/personal/{memberId}:
+    post:
+      tags:
+        - ChatRoom
+      operationId: createPersonalChatRoom
+      summary: "1:1 DM 생성/조회"
+      description: "특정 회원과의 1:1 DM을 생성하거나 기존 채팅방을 조회합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/MemberId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatRoomResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/group:
+    post:
+      tags:
+        - ChatRoom
+      operationId: createGroupChatRoom
+      summary: "그룹 채팅방 생성"
+      description: "새로운 그룹 채팅방을 생성합니다. 여러 참가자를 지정할 수 있습니다."
+      security:
+        - BearerAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/CreateGroupChatRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/ChatRoomResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+
+  /chatrooms/band/{bandId}:
+    post:
+      tags:
+        - ChatRoom
+      operationId: createBandChatRoom
+      summary: "밴드 채팅방 생성/조회"
+      description: "특정 밴드의 채팅방을 생성하거나 기존 채팅방을 조회합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/BandId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatRoomResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/{roomId}/invite:
+    post:
+      tags:
+        - ChatRoom
+      operationId: inviteMembers
+      summary: "채팅방에 멤버 초대"
+      description: "채팅방에 멤버를 초대합니다. 1:1 채팅방에서 멤버를 초대할 경우, 새 그룹 채팅방을 생성합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      requestBody:
+        $ref: "#/components/requestBodies/InviteMembersRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatRoomResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/{roomId}/participants:
+    get:
+      tags:
+        - ChatRoom
+      operationId: getChatRoomParticipants
+      summary: "채팅방 참가자 목록 조회"
+      description: "채팅방의 참가자 목록을 조회합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatRoomParticipantListResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/{roomId}/messages:
+    get:
+      tags:
+        - ChatRoom
+      operationId: getChatMessages
+      summary: "메시지 히스토리 조회"
+      description: "채팅방의 메시지 히스토리를 조회합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+        - $ref: "#/components/parameters/BeforeParam"
+        - $ref: "#/components/parameters/AfterParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatMessageListResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+    post:
+      tags:
+        - ChatRoom
+      operationId: sendMessage
+      summary: "메시지 전송"
+      description: "채팅방에 메시지를 전송합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      requestBody:
+        $ref: "#/components/requestBodies/SendMessageRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/ChatMessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/{roomId}/settings:
+    patch:
+      tags:
+        - ChatRoom
+      operationId: updateChatRoomSettings
+      summary: "채팅방 설정 변경"
+      description: "채팅방 설정을 변경합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      requestBody:
+        $ref: "#/components/requestBodies/UpdateChatRoomSettingsRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatRoomSettingResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/{roomId}/read:
+    post:
+      tags:
+        - ChatRoom
+      operationId: markAsRead
+      summary: "읽음 상태 업데이트"
+      description: "채팅방의 메시지를 읽음 상태로 업데이트합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      responses:
+        "204":
+          $ref: "#/components/responses/SuccessNoContent"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/{roomId}/unread:
+    get:
+      tags:
+        - ChatRoom
+      operationId: getUnreadCount
+      summary: "읽지 않은 메시지 수 조회"
+      description: "채팅방의 읽지 않은 메시지 수를 조회합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      responses:
+        "200":
+          $ref: "#/components/responses/UnreadCountResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/{roomId}/notices:
+    post:
+      tags:
+        - ChatRoom
+      operationId: createNotice
+      summary: "채팅방 공지 등록"
+      description: "채팅방에 공지를 등록합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      requestBody:
+        $ref: "#/components/requestBodies/CreateNoticeRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/ChatNoticeResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+    get:
+      tags:
+        - ChatRoom
+      operationId: getNotices
+      summary: "채팅방 공지 목록 조회"
+      description: "채팅방의 공지 목록을 조회합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatNoticeListResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/{roomId}/notices/{noticeId}:
+    patch:
+      tags:
+        - ChatRoom
+      operationId: updateNotice
+      summary: "채팅방 공지 수정"
+      description: "채팅방의 특정 공지를 수정합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+        - $ref: "#/components/parameters/NoticeId"
+      requestBody:
+        $ref: "#/components/requestBodies/UpdateNoticeRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatNoticeResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+    delete:
+      tags:
+        - ChatRoom
+      operationId: deleteNotice
+      summary: "채팅방 공지 삭제"
+      description: "채팅방의 특정 공지를 삭제합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+        - $ref: "#/components/parameters/NoticeId"
+      responses:
+        "204":
+          $ref: "#/components/responses/SuccessNoContent"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/{roomId}/notices/{noticeId}/pin:
+    patch:
+      tags:
+        - ChatRoom
+      operationId: pinNotice
+      summary: "채팅방 공지 고정/해제"
+      description: "채팅방의 특정 공지를 고정하거나 고정을 해제합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+        - $ref: "#/components/parameters/NoticeId"
+      requestBody:
+        $ref: "#/components/requestBodies/PinNoticeRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatNoticeResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/{roomId}/media:
+    get:
+      tags:
+        - ChatRoom
+      operationId: getChatRoomMedia
+      summary: "채팅방 미디어 조회"
+      description: "채팅방 내 모든 미디어 파일을 조회합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatMediaListResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/{roomId}/media/images:
+    get:
+      tags:
+        - ChatRoom
+      operationId: getChatRoomImages
+      summary: "채팅방 이미지 조회"
+      description: "채팅방 내 이미지만 조회합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatMediaListResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/{roomId}/media/videos:
+    get:
+      tags:
+        - ChatRoom
+      operationId: getChatRoomVideos
+      summary: "채팅방 동영상 조회"
+      description: "채팅방 내 동영상만 조회합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatMediaListResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/{roomId}/media/files:
+    get:
+      tags:
+        - ChatRoom
+      operationId: getChatRoomFiles
+      summary: "채팅방 파일 조회"
+      description: "채팅방 내 기타 파일만 조회합니다. 페이징 처리된 결과를 반환합니다. size, page를 쿼리 파라미터로 전달하여 페이지네이션이 가능합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatMediaListResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  /chatrooms/{roomId}/messages/media:
+    post:
+      tags:
+        - ChatRoom
+      operationId: sendMediaMessage
+      summary: "미디어 메시지 전송"
+      description: "미디어 파일이 첨부된 메시지를 전송합니다."
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      requestBody:
+        $ref: "#/components/requestBodies/MediaMessageRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/ChatMessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestException"
+        "403":
+          $ref: "#/components/responses/ForbiddenException"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
+
+  # WebSocket 경로는 OAS에서 공식적으로 지원하지 않지만, 문서화 목적으로 추가합니다.
+  /ws/chat/{roomId}:
+    get:
+      tags:
+        - ChatRoom
+      operationId: connectWebSocket
+      summary: "WebSocket 연결"
+      description: "채팅방 WebSocket 연결을 수립합니다. 메시지 전송, 수신, 타이핑 알림 등 실시간 통신에 사용됩니다."
+      parameters:
+        - $ref: "#/components/parameters/RoomId"
+      responses:
+        "101":
+          $ref: "#/components/responses/WebSocketConnected"

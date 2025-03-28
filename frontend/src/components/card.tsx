@@ -1,6 +1,4 @@
 'use client'
-import React from "react"
-import { useRouter } from "next/navigation"
 import { colors } from "@/constants/colors"
 import "@/styles/components/card.css"
 import ChevronRight from "@/assets/chevron-right.svg"
@@ -33,7 +31,7 @@ const Card:React.FC<CardProps> = ({ subText, titleText, image, href }) => {
                   <Image
                     src={ChevronRight}
                     alt="chevron right"
-                  /> 
+                  />
                 </div>
               </div>
             </div>

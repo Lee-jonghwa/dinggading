@@ -9,7 +9,17 @@ spring:
       - optional:file:../infra/env/.env.development.local[.properties]
   jackson:
     time-zone: Asia/Seoul
-
+  ### Google OAuth ###
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_ID}
+            client-secret: ${GOOGLE_SECRET}
+            scope:
+              - profile
+              - email
   jpa:
     properties:
       hibernate:

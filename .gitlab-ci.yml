@@ -41,7 +41,9 @@ prepare_job:
       - frontend/generated/
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: always
+      allow_failure: false
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+      allow_failure: false
   tags:
     - cicd
 # Test backend
@@ -90,7 +92,14 @@ test_frontend:
 build_backend:
   extends: .docker
   stage: build
-  needs: ["test_backend"]
+  needs:
+    - job: test_backend
+      optional: true
+    - job: prepare_job
+  artifacts:
+    paths:
+      - backend/generated/
+      - frontend/generated/
   before_script:
     - ls -la ./backend/generated
     - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
@@ -101,6 +110,9 @@ build_backend:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
       when: on_success
       allow_failure: false
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+      when: on_success
+      allow_failure: false
   tags:
     - cicd
 
@@ -108,7 +120,14 @@ build_backend:
 build_frontend:
   extends: .docker
   stage: build
-  needs: ["test_frontend"]
+  needs:
+    - job: test_frontend
+      optional: true
+    - job: prepare_job
+  artifacts:
+    paths:
+      - backend/generated/
+      - frontend/generated/
   before_script:
     - ls -la ./frontend/generated
     - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
@@ -117,6 +136,9 @@ build_frontend:
     - docker push ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-next:latest
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      when: on_success
+      allow_failure: false
+    - if: '$CI_COMMIT_BRANCH == "develop"'
       when: on_success
       allow_failure: false
   tags:

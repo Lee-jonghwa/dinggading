@@ -26,9 +26,6 @@ public enum ErrorStatus implements BaseErrorCode {
     TARGET_TIER_REQUIRED(HttpStatus.BAD_REQUEST, "RANKM4007", "목표 티어를 지정해야 합니다."),
     MAX_ATTEMPT_REACHED(HttpStatus.BAD_REQUEST, "RANKM4008", "최대 도전 횟수를 초과했습니다."),
 
-    // SongPack Errors
-    SONG_PACK_NOT_FOUND(HttpStatus.NOT_FOUND, "SONGP4001", "존재하지 않는 곡 팩입니다."),
-
     // Attempt Errors
     ATTEMPT_NOT_FOUND(HttpStatus.NOT_FOUND, "ATTEMPT4001", "존재하지 않는 시도 기록입니다."),
 
@@ -67,18 +64,38 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 토큰 관련 에러
     TOKEN_EXPIRED_ERROR(HttpStatus.UNAUTHORIZED, "TOKEN4001", "토큰의 유효기간이 만료되었습니다."),
-
     TOKEN_MALFORMED_ERROR(HttpStatus.UNAUTHORIZED, "TOKEN4002", "토큰이 변형되었습니다."),
-
     TOKEN_UNSUPPORTED_ERROR(HttpStatus.BAD_REQUEST, "TOKEN4003", "지원되지 않는 형식의 토큰입니다."),
-
     TOKEN_SIGNATURE_ERROR(HttpStatus.UNAUTHORIZED, "TOKEN4004", "토큰의 서명이 유효하지 않습니다."),
-
     TOKEN_ILLEGAL_ARGUMENT_ERROR(HttpStatus.BAD_REQUEST, "TOKEN4005", "토큰 값이 잘못되었습니다."),
-
     TOKEN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "TOKEN5000", "토큰 처리 중 알 수 없는 에러가 발생했습니다."),
-
     TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "TOKEN4006", "유저의 토큰정보를 얻어올 수 없습니다. 헤더를 확인하세요"),
+
+    // 구인 공고 관련 오류
+    RECRUITMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "RECRUITMENT4001", "존재하지 않는 구인 공고입니다."),
+    RECRUITMENT_INSTRUMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "RECRUITMENT4002", "존재하지 않는 구인 악기 포지션입니다."),
+    RECRUITMENT_APPLICANT_NOT_FOUND(HttpStatus.NOT_FOUND, "RECRUITMENT4003", "존재하지 않는 지원자입니다."),
+    RECRUITMENT_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "RECRUITMENT4004", "이미 모집이 완료된 구인 공고입니다."),
+    RECRUITMENT_APPLICANT_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "RECRUITMENT4005", "이미 지원한 포지션입니다."),
+    RECRUITMENT_MAX_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "RECRUITMENT4006", "모집 인원을 초과하였습니다."),
+    RECRUITMENT_ALREADY_EXISTS(HttpStatus.FOUND, "RECRUITMENT4007", "이미 구인공고가 진행 중인 밴드입니다."),
+    RECRUITMENT_APPLICANT_ALREADY_PROCESSED(HttpStatus.BAD_REQUEST, "RECRUITMENT4008", "이미 처리된 지원자입니다."),
+    INVALID_RECRUITMENT_STATUS(HttpStatus.BAD_REQUEST, "RECRUITMENT4009", "잘못된 구인 공고 상태 값입니다."),
+    RECRUITMENT_INSTRUMENT_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "RECRUITMENT4010", "이미 존재하는 악기 포지션입니다."),
+    INVALID_RECRUITMENT_INSTRUMENT(HttpStatus.BAD_REQUEST, "RECRUITMENT4011", "유효하지 않은 악기 포지션입니다."),
+    RECRUITMENT_ALREADY_BAND_MEMBER(HttpStatus.BAD_REQUEST, "RECRUITMENT4012", "이미 해당 밴드의 멤버입니다."),
+    RECRUITMENT_INSTRUMENT_HAS_ACCEPTED_APPLICANTS(HttpStatus.BAD_REQUEST, "RECRUITMENT4013", "승인된 지원자가 있는 악기 포지션은 제거할 수 없습니다."),
+    INSUFFICIENT_TIER(HttpStatus.BAD_REQUEST, "RECRUITMENT_4013", "지원자의 티어가 요구 티어보다 낮습니다."),
+    RECRUITMENT_NOT_STARTED(HttpStatus.BAD_REQUEST, "RECRUITMENT4014", "아직 모집이 시작되지 않은 구인 공고입니다."),
+
+    RECRUITMENT_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "BAND_RECRUITMENT_5001", "구인 공고 삭제 중 오류가 발생했습니다."),
+    APPLICANT_ACCEPT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "BAND_RECRUITMENT_5002", "지원자 승인 처리 중 오류가 발생했습니다."),
+    RECRUITMENT_APPLICANT_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "BAND_RECRUITMENT_5003", "지원 정보 삭제 중 오류가 발생했습니다."),
+    RECRUITMENT_INSTRUMENT_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "BAND_RECRUITMENT_5004", "악기 포지션 삭제 중 오류가 발생했습니다."),
+
+    // SongPack Errors
+    SONG_PACK_NOT_FOUND(HttpStatus.NOT_FOUND, "SONGP4001", "존재하지 않는 곡 팩입니다."),
+
     // Song 관련 오류
     SONG_NOT_FOUND(HttpStatus.NOT_FOUND, "SONG4001", "존재하지 않는 곡입니다."),
     SONG_INSTRUMENT_PACK_NOT_FOUND(HttpStatus.NOT_FOUND, "SONG4002", "존재하지 않는 곡 팩입니다."),

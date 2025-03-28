@@ -1,8 +1,9 @@
 package com.mickey.dinggading.domain.band.model.entity;
 
 import com.mickey.dinggading.base.BaseEntity;
-import com.mickey.dinggading.domain.memberrank.model.Instrument;
-import com.mickey.dinggading.domain.memberrank.model.Tier;
+import com.mickey.dinggading.model.AddRecruitmentInstrumentRequest;
+import com.mickey.dinggading.model.Instrument;
+import com.mickey.dinggading.model.Tier;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,6 +40,12 @@ public class BandRecruitmentInstrument extends BaseEntity {
 
     @OneToMany(mappedBy = "bandRecruitmentInstrument", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BandRecruitmentApplicant> applicants = new ArrayList<>();
+
+    public BandRecruitmentInstrument(Instrument instrument, Tier requiredTier, Integer maxSize) {
+        this.instrument = instrument;
+        this.requiredTier = requiredTier;
+        this.maxSize = maxSize;
+    }
 
     /**
      * BandRecruitment 설정

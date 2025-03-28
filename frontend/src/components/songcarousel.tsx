@@ -5,9 +5,11 @@ import Songcard from "@/components/songcard"
 import styles from './songcarousel.module.css'
 
 interface Song {
-  id: string
-  title: string
+  songId: number
+  title: string 
   artist: string
+  description : string
+  youtubeUrl : string
 }
 
 interface SongCarouselProps {
@@ -30,39 +32,54 @@ export default function SongCarousel({ songs }: SongCarouselProps) {
     )
   }
 
+  // youtube 썸네일 활용해 이미지 구하기 
+  const getYouTubeThumbnail = (url: string): string | null => {
+    const match = url.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/);
+    const thumbnailUrl = match ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : null;
+    return thumbnailUrl
+  }
+
+  const bgImage = getYouTubeThumbnail(songs[currentIndex]?.youtubeUrl)
+  console.log("songcarousel.tsx/ bgImage : ", bgImage)
+
   return (
     <div className={styles.songCarousel}>
       <div className={styles.carouselWrapper}>
         {/* 이전 곡 (위쪽) */}
         {currentIndex > 0 && (
-          <div className={styles.prevSong}>
+          <div className={styles.song}>
             <Songcard 
-              key={songs[currentIndex - 1].id}
+              songId={songs[currentIndex - 1].songId}
+              key={songs[currentIndex - 1].songId}
               songName={songs[currentIndex - 1].title}
               artist={songs[currentIndex - 1].artist}
+              thumbnailImg={getYouTubeThumbnail(songs[currentIndex - 1].youtubeUrl) || ""}
               // className={styles.smallerCard}
-            />
+              />
           </div>
         )}
-
         <div className={styles.navigationButtons}>
           <button 
             onClick={handlePrev} 
             disabled={currentIndex === 0}
             className={styles.prevButton}
-          >
+            >
             ▲
           </button>
         </div>
 
         {/* 현재 곡 (가운데) */}
-        <div className={styles.currentSong}>
+        <div className={styles.song}>
           <Songcard 
-            key={songs[currentIndex].id}
+            songId={
+              songs[currentIndex].songId
+            }
+            key={songs[currentIndex].songId}
             songName={songs[currentIndex].title}
             artist={songs[currentIndex].artist}
             // className={styles.largerCard}
-          />
+            thumbnailImg={getYouTubeThumbnail(songs[currentIndex].youtubeUrl) || ""}
+            />
         </div>
 
         <div className={styles.navigationButtons}>
@@ -70,40 +87,24 @@ export default function SongCarousel({ songs }: SongCarouselProps) {
             onClick={handleNext} 
             disabled={currentIndex === songs.length - 1}
             className={styles.nextButton}
-          >
+            >
             ▼
           </button>
         </div>
 
         {/* 다음 곡 (아래쪽) */}
         {currentIndex < songs.length - 1 && (
-          <div className={styles.nextSong}>
+          <div className={styles.song}>
             <Songcard 
-              key={songs[currentIndex + 1].id}
+              songId={songs[currentIndex + 1].songId}
+              key={songs[currentIndex + 1].songId}
               songName={songs[currentIndex + 1].title}
               artist={songs[currentIndex + 1].artist}
               // className={styles.smallerCard}
+              thumbnailImg={getYouTubeThumbnail(songs[currentIndex + 1].youtubeUrl) || ""}
             />
           </div>
         )}
-
-        {/* 네비게이션 버튼 */}
-        <div className={styles.navigationButtons}>
-          <button 
-            onClick={handlePrev} 
-            disabled={currentIndex === 0}
-            className={styles.prevButton}
-          >
-            ▲
-          </button>
-          <button 
-            onClick={handleNext} 
-            disabled={currentIndex === songs.length - 1}
-            className={styles.nextButton}
-          >
-            ▼
-          </button>
-        </div>
       </div>
     </div>
   )

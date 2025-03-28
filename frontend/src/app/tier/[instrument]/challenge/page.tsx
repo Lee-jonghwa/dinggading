@@ -4,7 +4,7 @@ import styles from "./challenge.module.css"
 import Tiercard from "@/components/tiercard"
 import { useTierStore } from "@/store/tier"
 
-const tierOrder = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond']
+const tierOrder = ['IRON', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'DIAMOND']
 
 export default function Challenge() {
 

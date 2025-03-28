@@ -1,0 +1,24 @@
+.songCarousel {
+  /* border: 5px solid red; */
+  display: flex;
+  flex: 1;
+}
+
+.carouselWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  gap: 2rem;
+}
+
+.song {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  
+}
+
+.navigationButtons {
+  display: flex;
+}

@@ -26,13 +26,15 @@ export default function TierPage () {
   // 하지만 store에서 가져오는 값을 바로 useEffet의 의존성 배열로 사용할 경우, 참조 불안정성 때문에 계속 값이 바뀌게 되고 , 리렌더링하게 되면서 무한 렌더링이 될 수 있음 
   // useCallback을 사용하여 fetchSongs 함수의 참조 안정성 보장
     const fetchSongsCallback = useCallback(() => {
+      console.log("현재 instrument : ", nowInstrument, "현재 tier : ", nowTier)
         if (nowInstrument && nowTier) {
             fetchSongs(nowInstrument, nowTier)
         }
     }, [fetchSongs, nowInstrument, nowTier])
 
     useEffect(() => {
-        fetchSongsCallback()
+      fetchSongsCallback()
+      console.log("현재의 songs 상태 : ", songs)
     }, [fetchSongsCallback])
 
   return (
@@ -42,50 +44,29 @@ export default function TierPage () {
         tier={nowTier} 
       /> 
       <div className={styles.songs}>
-        {/* 방법 1. 캐루셀 컴포넌트 관리 */}
-        <SongCarousel 
-          songs={songs}
-        />
-        {/* 방법 2. 일일이 card로 가져오기 */}
-        {!songs.length ? (
+
+        {/* 방법 1. 일일이 card로 가져오기 */}
+        {/* {!songs.length ? (
           <p>노래를 불러오는 중 ...</p>
         ) : (
           songs.map((song) => (
             <Songcard
-              key={song.id} 
+              songId={song.songId}
+              key={song.songId} 
               songName = {song.title}
               artist = {song.artist}
             />
           ))
+        )} */}
+
+        {/* 방법 2. 캐루셀 컴포넌트 관리 */}
+        {songs.length > 0 && (
+          <SongCarousel 
+          songs={songs}
+        />
         )}
-          {/* 더미 데이터 */}
-          {/* <Songcard
-            key={"1"} 
-            songName = {"American idiot"}
-            artist = {"GreenDay"}
-          />
-          <Songcard
-            key={"12"} 
-            songName = {"American idiot"}
-            artist = {"GreenDay"}
-          />
-          <Songcard
-            key={"123"} 
-            songName = {"American idiot"}
-            artist = {"GreenDay"}
-          />
-          <Songcard
-            key={"1234"} 
-            songName = {"American idiot"}
-            artist = {"GreenDay"}
-          />
-          <Songcard
-            key={"12345"} 
-            songName = {"American idiot"}
-            artist = {"GreenDay"}
-          /> */}
       </div>
-      <div className={styles.right}>
+      {/* <div className={styles.right}>
         <div className={styles.selectedSongs}>
           <div className={styles.songTitle}>
             <div className={styles.songName}>Songname</div>
@@ -94,7 +75,7 @@ export default function TierPage () {
           <div className={styles.startButton}>도전/연습하기</div>
         </div>
         <div className={styles.soundtest}>음향 테스트</div>
-      </div>
+      </div> */}
     </div>
   )
 }

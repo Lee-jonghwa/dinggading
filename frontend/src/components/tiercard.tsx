@@ -18,12 +18,12 @@ interface TiercardProps {
 
 export default function Tiercard ({ tier, currentTier, noticeThing} : TiercardProps) {
 
-  const tierOrder = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond']
+  const tierOrder = ['IRON', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'DIAMOND']
 
   const getTierStatus = () => {
     const currentIndex = tierOrder.indexOf(currentTier)
     const tierIndex = tierOrder.indexOf(tier)
-    
+     
     if (tierIndex === currentIndex) {
       return {
         isBlurred : false, navigateText : "방어하기", showNotice : true 

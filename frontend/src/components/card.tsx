@@ -3,6 +3,7 @@ import { colors } from "@/constants/colors"
 import "@/styles/components/card.css"
 import ChevronRight from "@/assets/chevron-right.svg"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 
 interface CardProps {
   subText : string, 

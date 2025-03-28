@@ -6,6 +6,6 @@ interface TierState {
 }
 
 export const useTierStore = create<TierState>((set) => ({
-  userTier : "Silver", // 임시
+  userTier : "SILVER", // 임시
   setUserTier : (tier) => set({ userTier : tier })
 }))

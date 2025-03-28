@@ -22,7 +22,6 @@ const Tier: NextPage = () => {
     } else if (direction === "right") {
       nextIndex = currentIndex === instruments.length - 1 ? 0 : currentIndex + 1
     }
-
     setInstrument(instruments[nextIndex])
   }
 

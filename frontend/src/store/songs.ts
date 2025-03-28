@@ -5,11 +5,13 @@ import { create } from "zustand"
 // 곡 팩 안에는 title, description, artist가 있다. 
 // title 을 기준으로 도전 페이지로 넘기면 되겠다. 
 
+
 interface Song {
-  id : string
-  title : string, 
-  description : string, 
+  songId : number
+  title : string 
+  description : string 
   artist : string
+  youtubeUrl : string
 }
 
 interface SongsStore {
@@ -29,11 +31,14 @@ export const useSongsStore = create<SongsStore>((set) => ({
     console.log("songs.ts/fetchSongs 실행")
     set({loading : true, error : null})
     try {
-      const response = await axios.get(`api/songs/by-tier/${tier}`, {
+      const response = await axios.get(`http://localhost:8081/api/songs/by-tier/${tier}`, {
         params : { instrument , tier}, 
+        headers : {
+          Authorization : `Bearer YOUR_ACCESS_TOKEN`
+        }
       })
-      console.log("songs.ts/fetchSongs 실행 성공, response : ", response )
-      set({ songs : response.data.songs , loading : false })
+      console.log("songs.ts/fetchSongs 실행 성공, response : ", response.data.content )
+      set({ songs : response.data.content , loading : false })
     } catch (error : unknown) {
       if (axios.isAxiosError(error)) {
         console.log("songs.ts/axiosError : ", error)

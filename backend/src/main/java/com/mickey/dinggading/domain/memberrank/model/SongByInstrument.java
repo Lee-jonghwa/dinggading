@@ -57,38 +57,79 @@ public class SongByInstrument extends BaseEntity {
     @OneToMany(mappedBy = "songByInstrument", cascade = CascadeType.ALL)
     private List<Attempt> attempts = new ArrayList<>();
 
-    /**
-     * 새로운 악기별 곡 버전을 생성합니다.
-     */
-    public static SongByInstrument createSongByInstrument(
-            Song song,
-            SongInstrumentPack songInstrumentPack,
-            String instrumentUrl,
-            Instrument instrument,
-            Tier tier
-    ) {
-        return SongByInstrument.builder()
-                .song(song)
-                .songInstrumentPack(songInstrumentPack)
-                .instrumentUrl(instrumentUrl)
-                .instrument(instrument)
-                .tier(tier)
-                .build();
-    }
-
-    /**
-     * 악기별 곡 정보를 업데이트합니다.
-     */
-    public void updateInstrumentUrl(String instrumentUrl) {
-        if (instrumentUrl != null && !instrumentUrl.isBlank()) {
-            this.instrumentUrl = instrumentUrl;
-        }
-    }
-
-    /**
-     * 티어를 업데이트합니다.
-     */
-    public void updateTier(Tier tier) {
+    // 생성자
+    private SongByInstrument(Song song, Instrument instrument, Tier tier,
+                             String instrumentUrl, SongInstrumentPack pack) {
+        this.song = song;
+        this.instrument = instrument;
         this.tier = tier;
+        this.instrumentUrl = instrumentUrl;
+        this.songInstrumentPack = pack;
+    }
+
+    // 팩토리 메소드
+    public static SongByInstrument createSongByInstrument(Song song,
+                                                          Instrument instrument,
+                                                          Tier tier,
+                                                          String instrumentUrl,
+                                                          SongInstrumentPack pack) {
+        if (song == null) {
+            throw new IllegalArgumentException("곡은 필수입니다.");
+        }
+        if (instrument == null) {
+            throw new IllegalArgumentException("악기는 필수입니다.");
+        }
+        if (tier == null) {
+            throw new IllegalArgumentException("티어는 필수입니다.");
+        }
+        if (instrumentUrl == null || instrumentUrl.isEmpty()) {
+            throw new IllegalArgumentException("악기 URL은 필수입니다.");
+        }
+
+        // 팩의 tier와 instrument가 일치하는지 확인
+        if (pack.getSongPackTier() != tier || pack.getSongPackInstrument() != instrument) {
+            throw new IllegalArgumentException("선택한 팩의 티어와 악기가 파라미터와 일치하지 않습니다.");
+        }
+
+        SongByInstrument songByInstrument = new SongByInstrument(song, instrument, tier, instrumentUrl, pack);
+
+        // 양방향 관계 설정을 위해 팩의 songs 컬렉션에 추가
+        // 이 부분은 SongInstrumentPack.addSong() 메소드에서 처리해야 하므로 주석 처리
+        // pack.getSongs().add(songByInstrument);
+
+        return songByInstrument;
+    }
+
+    // 악기 연주 URL 업데이트
+    public void updateInstrumentUrl(String instrumentUrl) {
+        if (instrumentUrl == null || instrumentUrl.isEmpty()) {
+            throw new IllegalArgumentException("악기 URL은 필수입니다.");
+        }
+        this.instrumentUrl = instrumentUrl;
+    }
+
+    // 티어 난이도 변경
+    public void changeTier(Tier tier) {
+        if (tier == null) {
+            throw new IllegalArgumentException("티어는 필수입니다.");
+        }
+
+        // 현재 속한 팩의 티어와 일치하는지 확인
+        // 주의: 이는 설계 결정사항임. 팩의 티어와 곡의 티어가 항상 일치해야 하는지에 따라 달라짐
+        if (this.songInstrumentPack != null && this.songInstrumentPack.getSongPackTier() != tier) {
+            throw new IllegalStateException("곡의 티어 변경은 속한 팩의 티어와 일치해야 합니다.");
+        }
+
+        this.tier = tier;
+    }
+
+    // 특정 악기와 티어에 맞는 곡인지 확인
+    public boolean matchesInstrumentAndTier(Instrument instrument, Tier tier) {
+        return this.instrument == instrument && this.tier == tier;
+    }
+
+    // 연관관계 편의 메소드
+    public void setSongInstrumentPack(SongInstrumentPack pack) {
+        this.songInstrumentPack = pack;
     }
 }

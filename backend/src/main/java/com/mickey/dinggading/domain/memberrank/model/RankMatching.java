@@ -75,7 +75,6 @@ public class RankMatching extends BaseEntity {
     @OneToMany(mappedBy = "rankMatching", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attempt> attempts = new ArrayList<>();
 
-
     /**
      * 새로운 랭크 매칭을 생성합니다.
      */

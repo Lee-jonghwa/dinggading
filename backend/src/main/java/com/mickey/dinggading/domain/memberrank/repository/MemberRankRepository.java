@@ -42,4 +42,6 @@ public interface MemberRankRepository extends JpaRepository<MemberRank, Long> {
      */
     boolean existsByMemberMemberIdAndInstrument(UUID memberId, Instrument instrument);
 
+    @Query("SELECT mr FROM MemberRank mr WHERE mr.member.memberId = :memberId AND mr.instrument = :instrument")
+    Optional<MemberRank> findByMemberMemberIdAndInstrument(UUID memberId, com.mickey.dinggading.model.Instrument instrument);
 }

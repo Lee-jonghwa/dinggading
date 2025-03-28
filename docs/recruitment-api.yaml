@@ -125,7 +125,7 @@ components:
 
     RecruitmentStatus:
       type: string
-      enum: [RECRUITING, COMPLETED]
+      enum: [READY, RECRUITING, COMPLETED]
       description: "구인 공고 상태"
 
     # 기본 DTO 스키마
@@ -594,7 +594,7 @@ paths:
 
     post:
       tags:
-        - RecruitmentInstrument
+        - Recruitment
       operationId: addRecruitmentInstrument
       summary: "구인 공고 악기 포지션 추가"
       description: "구인 공고에 새로운 악기 포지션을 추가합니다."
@@ -618,7 +618,7 @@ paths:
   /bands/{bandId}/recruitments/{recruitmentId}/instruments/{instrumentId}:
     delete:
       tags:
-        - RecruitmentInstrument
+        - Recruitment
       operationId: removeRecruitmentInstrument
       summary: "구인 공고 악기 포지션 제거"
       description: "구인 공고에서 특정 악기 포지션을 제거합니다."
@@ -639,7 +639,7 @@ paths:
   /bands/{bandId}/recruitments/{recruitmentId}/applicants:
     get:
       tags:
-        - RecruitmentApplicant
+        - Recruitment
       operationId: getRecruitmentApplicants
       summary: "구인 공고 지원자 목록 조회"
       description: "구인 공고에 지원한 지원자 목록을 조회합니다."
@@ -657,7 +657,7 @@ paths:
   /recruitments/{recruitmentId}/apply:
     post:
       tags:
-        - RecruitmentApplicant
+        - Recruitment
       operationId: applyRecruitment
       summary: "구인 공고 지원"
       description: "구인 공고에 지원합니다. 지원자 ID, 악기 포지션 포함"
@@ -678,7 +678,7 @@ paths:
   /recruitments/{recruitmentId}/applicants/{applicantId}:
     delete:
       tags:
-        - RecruitmentApplicant
+        - Recruitment
       operationId: cancelRecruitmentApplication
       summary: "구인 공고 지원 취소"
       description: "구인 공고 지원을 취소합니다."
@@ -698,7 +698,7 @@ paths:
   /bands/{bandId}/recruitments/{recruitmentId}/accept/{applicantId}:
     post:
       tags:
-        - RecruitmentApplicant
+        - Recruitment
       operationId: acceptApplicant
       summary: "지원자 승인"
       description: "특정 지원자의 밴드 가입을 승인합니다."
@@ -721,7 +721,7 @@ paths:
   /bands/{bandId}/recruitments/{recruitmentId}/reject/{applicantId}:
     post:
       tags:
-        - RecruitmentApplicant
+        - Recruitment
       operationId: rejectApplicant
       summary: "지원자 거절"
       description: "특정 지원자의 밴드 가입을 거절합니다."

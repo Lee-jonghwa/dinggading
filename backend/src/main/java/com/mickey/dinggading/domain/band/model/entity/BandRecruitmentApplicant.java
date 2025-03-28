@@ -85,4 +85,15 @@ public class BandRecruitmentApplicant extends BaseEntity {
             this.status = ApplicantStatus.PENDING;
         }
     }
+
+    public static BandRecruitmentApplicant createApplicant(Member applicant,
+                                                           BandRecruitmentInstrument instrument,
+                                                           LocalDateTime applyDate) {
+        return BandRecruitmentApplicant.builder()
+            .applicant(applicant)
+            .bandRecruitmentInstrument(instrument)
+            .status(ApplicantStatus.PENDING)
+            .applyDate(applyDate)
+            .build();
+    }
 }

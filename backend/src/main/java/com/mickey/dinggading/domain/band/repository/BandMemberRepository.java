@@ -29,4 +29,6 @@ public interface BandMemberRepository extends JpaRepository<BandMember, Long> {
 
     @Query("SELECT bm FROM BandMember bm JOIN FETCH bm.member WHERE bm.band.bandId = :bandId")
     List<BandMember> findAllWithMemberByBandId(@Param("bandId") Long bandId);
+
+    boolean existsByBandBandIdAndMemberMemberId(Long bandId, UUID memberId);
 }

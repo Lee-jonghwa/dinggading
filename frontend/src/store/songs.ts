@@ -29,7 +29,7 @@ export const useSongsStore = create<SongsStore>((set) => ({
     console.log("songs.ts/fetchSongs 실행")
     set({loading : true, error : null})
     try {
-      const response = await axios.get("#", {
+      const response = await axios.get(`api/songs/by-tier/${tier}`, {
         params : { instrument , tier}, 
       })
       console.log("songs.ts/fetchSongs 실행 성공, response : ", response )

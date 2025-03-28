@@ -16,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -64,15 +63,6 @@ public class RankMatchingController implements RankMatchingApi {
         return ResponseEntity.ok(availableMatchings);
     }
 
-    @GetMapping("/api/rank-matchings/available/{instrument}")
-    public ResponseEntity<?> getAvailableRankMatching(
-            @PathVariable(name = "instrument") Instrument instrument
-    ) {
-        UUID currentUser = securityUtil.getCurrentMemberId();
-
-        return ResponseEntity.ok(null);
-    }
-
     /**
      * GET /api/rank-matchings/{rank_matching_id} : 랭크 매칭 상세 정보 조회 특정 랭크 매칭의 상세 정보를 조회합니다.
      *
@@ -116,5 +106,25 @@ public class RankMatchingController implements RankMatchingApi {
 
         Page<RankMatchingDTO> matchings = rankMatchingService.getRankMatchings(pageable);
         return ResponseEntity.ok(matchings);
+    }
+
+    /**
+     * GET /api/rank-matchings/{instrument}/tier-available : 악기별 티어 도전/방어 가능 정보 조회 현재 로그인한 회원이 각 티어별로 도전, 방어, 배치고사가 가능한지
+     * 여부와 진행 중인 랭크 매칭 정보를 조회합니다. &#39;availableFirst&#39;는 배치고사 가능 여부,  &#39;availableChallenge&#39;는 상위 티어 도전 가능 여부,
+     * &#39;availableDefence&#39;는  현재 티어 방어 가능 여부를 나타냅니다. &#39;ongoingMatching&#39;은 현재 진행 중인  도전/방어 정보로, 목표 티어, 유형,
+     * 시작일, 만료일, 시도 횟수, 성공 횟수를  포함합니다.
+     *
+     * @param instrument 악기 종류 (VOCAL, GUITAR, DRUM, BASS) (required)
+     * @return TierAvailabilitiesResponseDTO 악기별 티어 도전/방어 가능 정보 응답 (status code 200) or 잘못된 요청입니다. (status code 400) or
+     * 인증되지 않은 요청입니다. (status code 401)
+     */
+    @Override
+    public ResponseEntity<?> getTierAvailableRankMatchings(String instrument) {
+        Instrument instrumentEnum = Instrument.valueOf(instrument.toUpperCase());
+
+        UUID currentUser = securityUtil.getCurrentMemberId();
+        Map<String, Object> availableRankMatchingsByTier = rankMatchingService.getAvailableRankMatchingsByTier(
+                currentUser, instrumentEnum);
+        return ResponseEntity.ok(availableRankMatchingsByTier);
     }
 }

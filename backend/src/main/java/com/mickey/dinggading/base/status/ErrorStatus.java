@@ -53,6 +53,9 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 랭크 관련 오류
     RANK_NOT_FOUND(HttpStatus.NOT_FOUND, "RANK4001", "랭크 정보를 찾을 수 없습니다."),
+    // 녹음 API 관련 오류 상태
+    RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "RECORD4001", "녹음 정보를 찾을 수 없습니다."),
+    INVALID_AUDIO_FILE(HttpStatus.BAD_REQUEST, "RECORD4002", "유효하지 않은 오디오 파일입니다."),
 
     // 입력값 관련 오류
     INVALID_INSTRUMENT_TYPE(HttpStatus.BAD_REQUEST, "INST4001", "유효하지 않은 악기 타입입니다."),

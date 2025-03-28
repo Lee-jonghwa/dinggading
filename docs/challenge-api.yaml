@@ -14,7 +14,7 @@ servers:
     
 tags:
   - name: Attempt
-    description: 연주 시도 기록 관련 API - 개발전
+    description: 연주 시도 기록 관련 API - 개발 완료
   - name: Analysis
     description: 연주 분석 관련 API - 개발전
   - name: Instrument
@@ -24,9 +24,9 @@ tags:
   - name: MemberTierLog
     description: 회원 티어 변동 이력 관련 API - 개발전
   - name: RankMatching
-    description: 랭크 매칭 관련 API - 개발전
+    description: 랭크 매칭 관련 API - 개발 완료
   - name: Song
-    description: 곡 관리 관련 API - 개발전
+    description: 곡 관리 관련 API - 개발 완료
   - name: SongByInstrument
     description: 악기별 곡 관련 API - 개발전
   - name: SongInstrumentPack
@@ -736,7 +736,122 @@ components:
             instrument: "GUITAR"
             tier: "GOLD"
             songInstrumentPackId: 457
+    TierAvailabilityDTO:
+      type: object
+      properties:
+        availableChallenge:
+          type: boolean
+          description: "티어 도전 가능 여부"
+        availableDefence:
+          type: boolean
+          description: "티어 방어 가능 여부"
+        availableFirst:
+          type: boolean
+          description: "배치고사 가능 여부"
+      required:
+        - availableChallenge
+        - availableDefence
+        - availableFirst
+      example:
+        availableChallenge: true
+        availableDefence: false
+        availableFirst: false
 
+    OngoingMatchingDTO:
+      type: object
+      properties:
+        tier:
+          type: string
+          enum: [UNRANKED, IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND]
+          description: "목표 티어 또는 방어 중인 티어"
+        type:
+          type: string
+          enum: [FIRST, CHALLENGE, DEFENCE]
+          description: "랭크 매칭 유형"
+        startedAt:
+          type: string
+          format: date
+          description: "랭크 매칭 시작일"
+        expireDate:
+          type: string
+          format: date
+          description: "랭크 매칭 만료일"
+        attemptCount:
+          type: integer
+          description: "현재까지 시도 횟수"
+        successCount:
+          type: integer
+          description: "현재까지 성공 횟수"
+      required:
+        - tier
+        - type
+        - startedAt
+        - expireDate
+        - attemptCount
+        - successCount
+      example:
+        tier: "GOLD"
+        type: "CHALLENGE"
+        startedAt: "2025-03-20"
+        expireDate: "2025-03-27"
+        attemptCount: 2
+        successCount: 1            
+    TierAvailabilitiesResponseDTO:
+      type: object
+      properties:
+        currentTier:
+          type: string
+          enum: [UNRANKED, IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND]
+          description: "현재 티어"
+        ongoingMatching:
+          $ref: '#/components/schemas/OngoingMatchingDTO'
+        IRON:
+          $ref: '#/components/schemas/TierAvailabilityDTO'
+        BRONZE:
+          $ref: '#/components/schemas/TierAvailabilityDTO'
+        SILVER:
+          $ref: '#/components/schemas/TierAvailabilityDTO'
+        GOLD:
+          $ref: '#/components/schemas/TierAvailabilityDTO'
+        PLATINUM:
+          $ref: '#/components/schemas/TierAvailabilityDTO'
+        DIAMOND:
+          $ref: '#/components/schemas/TierAvailabilityDTO'
+      required:
+        - currentTier
+      example:
+        currentTier: "SILVER"
+        ongoingMatching:
+          tier: "GOLD"
+          type: "CHALLENGE"
+          startedAt: "2025-03-20"
+          expireDate: "2025-03-27"
+          attemptCount: 2
+          successCount: 1
+        IRON:
+          availableChallenge: false
+          availableDefence: false
+          availableFirst: false
+        BRONZE:
+          availableChallenge: false
+          availableDefence: false
+          availableFirst: false
+        SILVER:
+          availableChallenge: false
+          availableDefence: false
+          availableFirst: false
+        GOLD:
+          availableChallenge: false
+          availableDefence: false
+          availableFirst: false
+        PLATINUM:
+          availableChallenge: false
+          availableDefence: false
+          availableFirst: false
+        DIAMOND:
+          availableChallenge: false
+          availableDefence: false
+          availableFirst: false
   parameters:
     MemberId:
       name: memberId
@@ -764,6 +879,12 @@ components:
       description: "JWT 인증 토큰을 사용합니다. 예: Bearer {token}"
 
   responses:
+    TierAvailabilitiesResponse:
+      description: "악기별 티어 도전/방어 가능 정보 응답"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TierAvailabilitiesResponseDTO'
     MemberRanksResponse:
       description: "회원 악기별 랭크 정보 응답"
       content:
@@ -1400,7 +1521,7 @@ paths:
       operationId: getRankMatchings
       summary: "랭크 매칭 목록 조회"
       description: "전체 랭크 매칭 목록을 조회합니다. size, page를 쿼리 파라미터로 전달하여 페이징 처리가 가능합니다."
-      deprecated: true
+      deprecated: false
       x-spring-paginated: true
       responses:
         '200':
@@ -1479,7 +1600,36 @@ paths:
           $ref: '#/components/responses/AvailableRankMatchingsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
+  /api/rank-matchings/{instrument}/tier-available:
+    get:
+      tags:
+        - RankMatching
+      operationId: getTierAvailableRankMatchings
+      summary: "악기별 티어 도전/방어 가능 정보 조회"
+      description: >
+              현재 로그인한 회원이 각 티어별로 도전, 방어, 배치고사가 가능한지 여부와 
+              진행 중인 랭크 매칭 정보를 조회합니다. 'availableFirst'는 배치고사 가능 여부, 
+              'availableChallenge'는 상위 티어 도전 가능 여부, 'availableDefence'는 
+              현재 티어 방어 가능 여부를 나타냅니다. 'ongoingMatching'은 현재 진행 중인 
+              도전/방어 정보로, 목표 티어, 유형, 시작일, 만료일, 시도 횟수, 성공 횟수를 
+              포함합니다.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: instrument
+          in: path
+          description: "악기 종류 (VOCAL, GUITAR, DRUM, BASS)"
+          required: true
+          schema:
+            type: string
+            enum: [VOCAL, GUITAR, DRUM, BASS]
+      responses:
+        '200':
+          $ref: '#/components/responses/TierAvailabilitiesResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
   /api/rank-matchings/history:
     get:
       tags:

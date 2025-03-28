@@ -14,7 +14,7 @@ servers:
 
 tags:
   - name: Band
-    description: 밴드 관리 관련 API - 개발전
+    description: 밴드 관리 관련 API - 개발 완료
 
 components:
   securitySchemes:

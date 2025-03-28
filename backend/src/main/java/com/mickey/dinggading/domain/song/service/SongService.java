@@ -101,6 +101,7 @@ public class SongService {
         // 도메인 모델의 createSong 메서드 활용하여 기본 곡 정보 생성
         Song song = Song.createSong(
                 requestDTO.getTitle(),
+                requestDTO.getArtist(),
                 requestDTO.getDescription(),
                 requestDTO.getYoutubeUrl()
         );

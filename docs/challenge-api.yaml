@@ -224,10 +224,10 @@ components:
         songInstrumentPackId: 1
         expireDate: "2025-04-03"
         startedAt: "2025-03-27"
-        attemptCount: 0
-        successCount: 0
+        attemptCount: 5
+        successCount: 3
         instrument: "VOCAL"
-        rankType: "FIRST"
+        rankType: "CHALLENGE"
         targetTier: "GOLD"
         songInstrumentPack:
           songInstrumentPackId: 1
@@ -270,8 +270,102 @@ components:
               instrument: "VOCAL"
               tier: "IRON"
               song: null
-        attempts: null
-
+        attempts:
+          - attemptId: 101
+            rankMatchingId: 1
+            songByInstrumentId: 1
+            tuneScore: 83
+            toneScore: 79
+            beatScore: 91
+            totalScore: 84
+            status: "SUCCESS"
+            gameType: "RANK"
+            rankType: "CHALLENGE"
+            createdAt: "2025-03-27T14:30:00Z"
+            songByInstrument: 
+              songByInstrumentId: 1
+              songId: 1
+              songInstrumentPackId: 1
+              instrumentUrl: "https://storage.vocals/smells_like_teen_spirit_iron.mp3"
+              instrument: "VOCAL"
+              tier: "IRON"
+              song: null
+          - attemptId: 102
+            rankMatchingId: 1
+            songByInstrumentId: 2
+            tuneScore: 75
+            toneScore: 68
+            beatScore: 82
+            totalScore: 75
+            status: "SUCCESS"
+            gameType: "RANK"
+            rankType: "CHALLENGE"
+            createdAt: "2025-03-28T09:15:00Z"
+            songByInstrument:
+              songByInstrumentId: 2
+              songId: 2
+              songInstrumentPackId: 1
+              instrumentUrl: "https://storage.vocals/dynamite_iron.mp3"
+              instrument: "VOCAL"
+              tier: "IRON"
+              song: null
+          - attemptId: 103
+            rankMatchingId: 1
+            songByInstrumentId: 3
+            tuneScore: 62
+            toneScore: 71
+            beatScore: 68
+            totalScore: 67
+            status: "FAIL"
+            gameType: "RANK"
+            rankType: "CHALLENGE"
+            createdAt: "2025-03-28T16:45:00Z"
+            songByInstrument:
+              songByInstrumentId: 3
+              songId: 3
+              songInstrumentPackId: 1
+              instrumentUrl: "https://storage.vocals/take_five_iron.mp3"
+              instrument: "VOCAL"
+              tier: "IRON"
+              song: null
+          - attemptId: 104
+            rankMatchingId: 1
+            songByInstrumentId: 4
+            tuneScore: 85
+            toneScore: 88
+            beatScore: 92
+            totalScore: 88
+            status: "SUCCESS"
+            gameType: "RANK"
+            rankType: "CHALLENGE"
+            createdAt: "2025-03-29T11:20:00Z"
+            songByInstrument:
+              songByInstrumentId: 4
+              songId: 4
+              songInstrumentPackId: 1
+              instrumentUrl: "https://storage.vocals/lose_yourself_iron.mp3"
+              instrument: "VOCAL"
+              tier: "IRON"
+              song: null
+          - attemptId: 105
+            rankMatchingId: 1
+            songByInstrumentId: 5
+            tuneScore: 64
+            toneScore: 59
+            beatScore: 73
+            totalScore: 65
+            status: "FAIL"
+            gameType: "RANK"
+            rankType: "CHALLENGE"
+            createdAt: "2025-03-30T15:10:00Z"
+            songByInstrument:
+              songByInstrumentId: 5
+              songId: 5
+              songInstrumentPackId: 1
+              instrumentUrl: "https://storage.vocals/gangnam_style_iron.mp3"
+              instrument: "VOCAL"
+              tier: "IRON"
+              song: null
     AttemptDTO:
       type: object
       properties:
@@ -347,6 +441,9 @@ components:
         title:
           type: string
           description: "곡 제목"
+        artist:
+          type: string
+          description: "아티스트"
         description:
           type: string
           description: "곡 설명"
@@ -359,11 +456,13 @@ components:
             $ref: '#/components/schemas/SongByInstrumentDTO'
       required:
         - songId
+        - artist
         - title
         - youtubeUrl
       example:
         songId: 123
         title: "Shape of You"
+        artist: "Ed Sheeran"
         description: "2017년 Ed Sheeran의 히트곡"
         youtubeUrl: "https://www.youtube.com/watch?v=JGwWNGJdvx8"
 
@@ -693,6 +792,9 @@ components:
         title:
           type: string
           description: "곡 제목"
+        artist:
+          type: string
+          description: "아티스트"
         description:
           type: string
           description: "곡 설명"
@@ -894,17 +996,6 @@ components:
             items:
               $ref: '#/components/schemas/MemberRankDTO'
           example:
-            - memberRankId: 123
-              memberId: "123e4567-e89b-12d3-a456-426614174000"
-              instrument: "VOCAL"
-              tier: "SILVER"
-              beatScore: 85
-              tuneScore: 78
-              toneScore: 90
-              rankSuccessCount: 3
-              lastAttemptTier: "GOLD"
-              defenceExpireDate: "2023-12-31"
-              lastAttemptDate: "2023-11-15"
             - memberRankId: 124
               memberId: "123e4567-e89b-12d3-a456-426614174000"
               instrument: "GUITAR"
@@ -916,6 +1007,39 @@ components:
               lastAttemptTier: "BRONZE"
               defenceExpireDate: "2023-12-15"
               lastAttemptDate: "2023-11-01"
+            - memberRankId: 125
+              memberId: "123e4567-e89b-12d3-a456-426614174000"
+              instrument: "DRUM"
+              tier: "GOLD"
+              beatScore: 92
+              tuneScore: 85
+              toneScore: 79
+              rankSuccessCount: 5
+              lastAttemptTier: "PLATINUM"
+              defenceExpireDate: "2023-12-25"
+              lastAttemptDate: "2023-11-10"
+            - memberRankId: 126
+              memberId: "123e4567-e89b-12d3-a456-426614174000"
+              instrument: "BASS"
+              tier: "IRON"
+              beatScore: 48
+              tuneScore: 52
+              toneScore: 45
+              rankSuccessCount: 0
+              lastAttemptTier: "BRONZE"
+              defenceExpireDate: "2023-10-05"
+              lastAttemptDate: "2023-10-05"
+            - memberRankId: 127
+              memberId: "123e4567-e89b-12d3-a456-426614174001"
+              instrument: "VOCAL"
+              tier: "PLATINUM"
+              beatScore: 95
+              tuneScore: 88
+              toneScore: 92
+              rankSuccessCount: 8
+              lastAttemptTier: "DIAMOND"
+              defenceExpireDate: "2023-12-20"
+              lastAttemptDate: "2023-11-12"
 
     MemberRankDetailResponse:
       description: "회원 악기별 랭크 상세 정보 응답"
@@ -970,12 +1094,27 @@ components:
                 beforeTier: "UNRANKED"
                 afterTier: "BRONZE"
                 changedDate: "2023-10-05"
+              - tierLogId: 125
+                memberRankId: 456
+                beforeTier: "SILVER"
+                afterTier: "GOLD"
+                changedDate: "2023-12-10"
+              - tierLogId: 126
+                memberRankId: 456
+                beforeTier: "GOLD"
+                afterTier: "SILVER"
+                changedDate: "2024-01-05"
+              - tierLogId: 127
+                memberRankId: 456
+                beforeTier: "SILVER"
+                afterTier: "GOLD"
+                changedDate: "2024-02-20"
             pageable:
               page: 0
-              size: 10
-              totalElements: 2
+              size: 5
+              totalElements: 5
               totalPages: 1
-
+              
     PageRankMatchingResponse:
       description: "랭크 매칭 목록 페이지 응답"
       content:
@@ -1072,40 +1211,101 @@ components:
             $ref: '#/components/schemas/AttemptDTO'
 
     PageAttemptResponse:
-      description: "시도 기록 목록 페이지 응답"
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              content:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AttemptDTO'
-              pageable:
+          description: "시도 기록 목록 페이지 응답"
+          content:
+            application/json:
+              schema:
                 type: object
                 properties:
-                  page:
-                    type: integer
-                    description: 현재 페이지 번호
-                  size:
-                    type: integer
-                    description: 페이지 크기
-                  totalElements:
-                    type: integer
-                    description: 전체 요소 수
-                  totalPages:
-                    type: integer
-                    description: 전체 페이지 수
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AttemptDTO'
+                  pageable:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        description: 현재 페이지 번호
+                      size:
+                        type: integer
+                        description: 페이지 크기
+                      totalElements:
+                        type: integer
+                        description: 전체 요소 수
+                      totalPages:
+                        type: integer
+                        description: 전체 페이지 수
+                    required:
+                      - page
+                      - size
+                      - totalElements
+                      - totalPages
                 required:
-                  - page
-                  - size
-                  - totalElements
-                  - totalPages
-            required:
-              - content
-              - pageable
-
+                  - content
+                  - pageable
+              example:
+                content:
+                  - attemptId: 101
+                    rankMatchingId: 1
+                    songByInstrumentId: 1
+                    tuneScore: 83
+                    toneScore: 79
+                    beatScore: 91
+                    totalScore: 84
+                    status: "SUCCESS"
+                    gameType: "RANK"
+                    rankType: "CHALLENGE"
+                    createdAt: "2025-03-27T14:30:00Z"
+                  - attemptId: 102
+                    rankMatchingId: 1
+                    songByInstrumentId: 2
+                    tuneScore: 75
+                    toneScore: 68
+                    beatScore: 82
+                    totalScore: 75
+                    status: "SUCCESS"
+                    gameType: "RANK"
+                    rankType: "CHALLENGE"
+                    createdAt: "2025-03-28T09:15:00Z"
+                  - attemptId: 103
+                    rankMatchingId: 1
+                    songByInstrumentId: 3
+                    tuneScore: 62
+                    toneScore: 71
+                    beatScore: 68
+                    totalScore: 67
+                    status: "FAIL"
+                    gameType: "RANK"
+                    rankType: "CHALLENGE"
+                    createdAt: "2025-03-28T16:45:00Z"
+                  - attemptId: 104
+                    rankMatchingId: 1
+                    songByInstrumentId: 4
+                    tuneScore: 85
+                    toneScore: 88
+                    beatScore: 92
+                    totalScore: 88
+                    status: "SUCCESS"
+                    gameType: "RANK"
+                    rankType: "CHALLENGE"
+                    createdAt: "2025-03-29T11:20:00Z"
+                  - attemptId: 105
+                    rankMatchingId: 1
+                    songByInstrumentId: 5
+                    tuneScore: 64
+                    toneScore: 59
+                    beatScore: 73
+                    totalScore: 65
+                    status: "FAIL"
+                    gameType: "RANK"
+                    rankType: "CHALLENGE"
+                    createdAt: "2025-03-30T15:10:00Z"
+                pageable:
+                  page: 0
+                  size: 5
+                  totalElements: 5
+                  totalPages: 1
     PageSongResponse:
       description: "곡 목록 페이지 응답"
       content:
@@ -1260,6 +1460,12 @@ components:
               instrumentUrl: "https://storage.example.com/songs/bass_456.mp3"
               instrument: "BASS"
               tier: "SILVER"
+            - songByInstrumentId: 127
+              songId: 456
+              songInstrumentPackId: 793
+              instrumentUrl: "https://storage.example.com/songs/keyboard_456.mp3"
+              instrument: "VOCAL"
+              tier: "PLATINUM"
 
     TierSystemResponse:
       description: "티어 시스템 기본 정보 응답"
@@ -1328,7 +1534,6 @@ components:
             - code: "BASS"
               name: "베이스"
               description: "저음을 담당하는 현악기"
-
     NotFoundError:
       description: "요청한 리소스를 찾을 수 없습니다."
       content:
@@ -1433,6 +1638,7 @@ components:
             audioFileUrl: "https://storage.example.com/recordings/user123_song456.mp3"
             rankMatchingId: 789
             gameType: "RANK"
+            
 paths:
   /api/members/{memberId}/ranks:
     get:

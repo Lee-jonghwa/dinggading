@@ -130,6 +130,11 @@ public class SongByInstrument extends BaseEntity {
 
     // 연관관계 편의 메소드
     public void setSongInstrumentPack(SongInstrumentPack pack) {
+        if (this.songInstrumentPack != null) {
+            this.songInstrumentPack.getSongByInstruments().remove(this);
+        }
+
         this.songInstrumentPack = pack;
+        pack.getSongByInstruments().add(this);
     }
 }

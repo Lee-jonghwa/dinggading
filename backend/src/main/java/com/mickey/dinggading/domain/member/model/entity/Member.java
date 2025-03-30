@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mickey.dinggading.base.BaseEntity;
 import com.mickey.dinggading.domain.memberrank.model.Instrument;
 import com.mickey.dinggading.domain.memberrank.model.MemberRank;
+import com.mickey.dinggading.domain.record.model.Record;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

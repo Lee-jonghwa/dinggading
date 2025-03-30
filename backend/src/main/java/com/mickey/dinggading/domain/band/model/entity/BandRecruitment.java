@@ -2,6 +2,7 @@ package com.mickey.dinggading.domain.band.model.entity;
 
 import com.mickey.dinggading.base.BaseEntity;
 import com.mickey.dinggading.domain.memberrank.model.Song;
+import com.mickey.dinggading.model.CreateBandRecruitmentRequest;
 import com.mickey.dinggading.model.RecruitmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -47,34 +48,33 @@ public class BandRecruitment extends BaseEntity {
     @OneToMany(mappedBy = "bandRecruitment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BandRecruitmentInstrument> instruments = new ArrayList<>();
 
-    /**
-     * 구인 공고 상태를 업데이트합니다.
-     */
+    public static BandRecruitment create(CreateBandRecruitmentRequest request, Band band, Song auditionSong) {
+        return BandRecruitment.builder()
+            .band(band)
+            .title(request.getTitle())
+            .description(request.getDescription())
+            .auditionDate(request.getAuditionDate())
+            .auditionSong(auditionSong)
+            .status(RecruitmentStatus.READY) // 초기 상태는 항상 READY
+            .build();
+    }
+
     public void updateStatus(RecruitmentStatus status) {
         this.status = status;
     }
 
-    /**
-     * 구인 공고 정보를 업데이트합니다.
-     */
-    public void update(String title, String description, LocalDateTime auditionDate, Song auditionSong) {
-        this.title = title;
-        this.description = description;
-        this.auditionDate = auditionDate;
-        this.auditionSong = auditionSong;
+    public void update(CreateBandRecruitmentRequest request, Song auditionSong) {
+        if (request.getTitle() != null) this.title = request.getTitle();
+        if (request.getDescription() != null) this.description = request.getDescription();
+        if (request.getAuditionDate() != null) this.auditionDate = request.getAuditionDate();
+        if (auditionSong != null) this.auditionSong = auditionSong;
     }
 
-    /**
-     * 악기 포지션을 추가합니다.
-     */
     public void addInstrument(BandRecruitmentInstrument instrument) {
         this.instruments.add(instrument);
         instrument.setBandRecruitment(this);
     }
 
-    /**
-     * 악기 포지션을 제거합니다.
-     */
     public void removeInstrument(BandRecruitmentInstrument instrument) {
         this.instruments.remove(instrument);
         instrument.setBandRecruitment(null);

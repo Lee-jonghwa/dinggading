@@ -1,110 +1,113 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.3.9'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '3.3.9'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.mickey'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 ext {
-	set('springCloudVersion', "2023.0.5")
+    set('springCloudVersion', "2023.0.5")
 }
 
 dependencies {
-	/* DATABASE */
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    /* DATABASE */
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-	/********* SECURITY *********/
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    /* 이미지 스토리지 */
+    implementation("io.minio:minio:8.5.17")
 
-	/********* TOOLS *********/
-	compileOnly 'org.projectlombok:lombok'
+    /********* SECURITY *********/
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
-	/********* RUNTIME *********/
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
+    /********* TOOLS *********/
+    compileOnly 'org.projectlombok:lombok'
 
-	/********* TEST *********/
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	testImplementation 'com.h2database:h2'
+    /********* RUNTIME *********/
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor 'org.projectlombok:lombok'
 
-	/* JWT START */
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'    // Jackson 사용시
-	/* JWT END */
+    /********* TEST *********/
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'com.h2database:h2'
 
-	/* SQL 로깅 */
-	implementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.10.0'
+    /* JWT START */
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'    // Jackson 사용시
+    /* JWT END */
 
-	/* env 파일 관리 */
-	implementation 'me.paulschwarz:spring-dotenv:2.5.4'
+    /* SQL 로깅 */
+    implementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.10.0'
 
-	/* 이미지 스토리지 */
-	implementation("io.minio:minio:8.5.17")
+    /* env 파일 관리 */
+    implementation 'me.paulschwarz:spring-dotenv:2.5.4'
 
-	/* Swagger 3 START */
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+    /* 이미지 스토리지 */
+    implementation("io.minio:minio:8.5.17")
 
-	// Swagger Core (OpenAPI)
-	implementation 'org.springdoc:springdoc-openapi-starter-common:2.3.0'
-	/* Swagger 3 END */
+    /* Swagger 3 START */
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
-	/* Oauth START */
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	/* Oauth END */
+    // Swagger Core (OpenAPI)
+    implementation 'org.springdoc:springdoc-openapi-starter-common:2.3.0'
+    /* Swagger 3 END */
 
-	/* 헬스 체크 START*/
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    /* Oauth START */
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    /* Oauth END */
 
-	// 테스트할 때는 빼주기
-	configurations {
-		testImplementation.exclude module: 'spring-boot-starter-actuator'
-	}
+    /* 헬스 체크 START*/
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // 테스트할 때는 빼주기
+    configurations {
+        testImplementation.exclude module: 'spring-boot-starter-actuator'
+    }
 }
 
 sourceSets {
-	main {
-		java {
-			srcDir "${projectDir}/generated/src/main/java"
-		}
-	}
-	test {
-		resources {
-			srcDirs = ["src/test/resources"]
-		}
-	}
+    main {
+        java {
+            srcDir "${projectDir}/generated/src/main/java"
+        }
+    }
+    test {
+        resources {
+            srcDirs = ["src/test/resources"]
+        }
+    }
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 test {
-	systemProperty 'jdk.internal.platform.useContainerSupport', 'false'
-	useJUnitPlatform()
+    systemProperty 'jdk.internal.platform.useContainerSupport', 'false'
+    useJUnitPlatform()
 }

@@ -4,7 +4,7 @@
 @instrument = DRUM
 
 ### 랭크 조회
-GET {{base_url}}/api/members/{{memberId}}/ranks
+GET {{baseUrl}}/api/members/{{memberId}}/ranks
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -15,7 +15,7 @@ Authorization: Bearer {{token}}
 %}
 
 ### 악기 별 조회
-GET http://localhost:8080/api/members/me/ranks/{{instrument}}
+GET {{baseUrl}}/api/members/me/ranks/{{instrument}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -24,6 +24,6 @@ Authorization: Bearer {{token}}
 #     * 현재 로그인한 회원의 악기별 랭크 정보를 조회합니다.
 #     *
 #     *         or 인증되지 않은 요청입니다. (status code 401)
-GET http://localhost:8080/api/members/me/ranks
+GET {{baseUrl}}/api/members/me/ranks
 Content-Type: application/json
 Authorization: Bearer {{token}}

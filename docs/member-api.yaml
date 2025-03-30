@@ -14,7 +14,7 @@ servers:
 
 tags:
   - name: Auth
-    description: 사용자 인증 관련 API - 개발전
+    description: 사용자 인증 관련 API - 개발 완료
   - name: Member
     description: 회원 정보 관리 관련 API - 개발전
   - name: Follow

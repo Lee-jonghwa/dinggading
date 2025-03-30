@@ -76,3 +76,9 @@ jwt:
     expiretime: 86400000
   refresh-token:
     expiretime: 604800000
+
+minio:
+  endpoint: temp
+  access-key: temp
+  secret-key: temp
+  bucket: temp

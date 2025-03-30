@@ -1,5 +1,5 @@
 .songCard {
-  border: 5px solid yellow;
+  /* border: 5px solid yellow; */
   border-radius: 5px;
   display: flex;
   flex-direction: column;
@@ -8,7 +8,7 @@
 }
 
 .song {
-  border: 5px solid salmon;
+  /* border: 5px solid salmon; */
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -26,32 +26,32 @@
 }
 
 .songInfo {
-  border: 5px solid brown;
+  /* border: 5px solid brown; */
   display: flex;
   flex-direction: column;
 }
 
 .songName {
-  border: 5px solid blue;
+  /* border: 5px solid blue; */
   display: flex;
 
 }
 
 .artist {
-  border: 5px solid blue;
+  /* border: 5px solid blue; */
   display: flex;
 
 }
 
 .startButton {
-  border: 5px solid aqua;
+  /* border: 5px solid aqua; */
   display: flex;
   padding: 2rem 1rem;
   
 }
 
 .soundTest {
-  border: 5px solid aqua;
+  /* border: 5px solid aqua; */
   display: flex;
   flex-direction: column;
   align-items: center;

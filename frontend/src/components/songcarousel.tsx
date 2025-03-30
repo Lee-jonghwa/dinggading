@@ -54,7 +54,6 @@ export default function SongCarousel({ songs }: SongCarouselProps) {
               songName={songs[currentIndex - 1].title}
               artist={songs[currentIndex - 1].artist}
               thumbnailImg={getYouTubeThumbnail(songs[currentIndex - 1].youtubeUrl) || ""}
-              // className={styles.smallerCard}
               />
           </div>
         )}

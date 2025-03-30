@@ -9,7 +9,6 @@ import { useTierStore } from "@/store/tier"
 import { useParams } from "next/navigation"
 import React, { useCallback, useEffect } from "react"
 import { useSongsStore } from "@/store/songs"
-// import Songcard from "@/components/songcard"
 import SongCarousel from "@/components/songcarousel"
 
 export default function TierPage () {
@@ -35,7 +34,7 @@ export default function TierPage () {
     useEffect(() => {
       fetchSongsCallback()
       console.log("현재의 songs 상태 : ", songs)
-    }, [fetchSongsCallback, songs])
+    }, [fetchSongsCallback])
 
   return (
     <div className={styles.tierpage}>
@@ -44,21 +43,6 @@ export default function TierPage () {
         tier={nowTier} 
       /> 
       <div className={styles.songs}>
-
-        {/* 방법 1. 일일이 card로 가져오기 */}
-        {/* {!songs.length ? (
-          <p>노래를 불러오는 중 ...</p>
-        ) : (
-          songs.map((song) => (
-            <Songcard
-              songId={song.songId}
-              key={song.songId} 
-              songName = {song.title}
-              artist = {song.artist}
-            />
-          ))
-        )} */}
-
         {/* 방법 2. 캐루셀 컴포넌트 관리 */}
         {songs.length > 0 && (
           <SongCarousel 
@@ -66,16 +50,6 @@ export default function TierPage () {
         />
         )}
       </div>
-      {/* <div className={styles.right}>
-        <div className={styles.selectedSongs}>
-          <div className={styles.songTitle}>
-            <div className={styles.songName}>Songname</div>
-            <div className={styles.artist}>Artist</div>
-          </div>
-          <div className={styles.startButton}>도전/연습하기</div>
-        </div>
-        <div className={styles.soundtest}>음향 테스트</div>
-      </div> */}
     </div>
   )
 }

@@ -20,7 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "SongInstrumentPack")
+@Table(name = "song_instrument_pack")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -101,6 +101,10 @@ public class SongInstrumentPack extends BaseEntity {
         // 양방향 연관관계 설정
         songByInstruments.add(song);
         song.setSongInstrumentPack(this);
+    }
+
+    public boolean hasSongByInstrument(SongByInstrument songByInstrument) {
+        return songByInstruments.contains(songByInstrument);
     }
 
     // 팩 정보 업데이트

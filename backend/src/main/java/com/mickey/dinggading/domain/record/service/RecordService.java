@@ -5,14 +5,19 @@ import com.mickey.dinggading.domain.member.model.entity.Member;
 import com.mickey.dinggading.domain.member.repository.MemberRepository;
 import com.mickey.dinggading.domain.membermatching.repository.AttemptRepository;
 import com.mickey.dinggading.domain.memberrank.model.Attempt;
+import com.mickey.dinggading.domain.memberrank.model.Song;
 import com.mickey.dinggading.domain.record.RecordConverter;
 import com.mickey.dinggading.domain.record.model.ChallengeType;
 import com.mickey.dinggading.domain.record.model.Record;
 import com.mickey.dinggading.domain.record.repository.AudioRecordRepository;
 import com.mickey.dinggading.exception.ExceptionHandler;
 import com.mickey.dinggading.infra.minio.AudioFileService;
+import com.mickey.dinggading.infra.rabbitmq.dto.MessageDTO;
+import com.mickey.dinggading.infra.rabbitmq.producer.JsonMessageProducer;
 import com.mickey.dinggading.model.RecordCreateRequestDTO;
 import com.mickey.dinggading.model.RecordDTO;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class RecordService {
+    private final JsonMessageProducer jsonMessageProducer;
     private final AudioRecordRepository audioRecordRepository;
     private final MemberRepository memberRepository;
     private final AttemptRepository attemptRepository;
@@ -73,7 +79,31 @@ public class RecordService {
 
         // 저장 및 변환
         Record savedRecord = audioRecordRepository.save(record);
+        sendAudioAnalyzeMessage(recordInfo, attempt, savedRecord, member);
+
         return recordConverter.toDto(savedRecord);
+    }
+
+    private void sendAudioAnalyzeMessage(RecordCreateRequestDTO recordInfo, Attempt attempt, Record savedRecord,
+                                         Member member) {
+        Song song = getSongIdFromAttempt(attempt.getAttemptId());
+        // URL, 노래 제목, 악기
+        HashMap<String, Object> payload = new HashMap<>();
+        payload.put("title", recordInfo.getTitle());
+        payload.put("songTitle", song.getTitle());
+        payload.put("songId", song.getSongId());
+        payload.put("recordUrl", savedRecord.getRecordUrl());
+
+        MessageDTO message = new MessageDTO(payload, member.getMemberId(), LocalDateTime.now());
+        jsonMessageProducer.sendJsonMessage(message);
+    }
+
+    private Song getSongIdFromAttempt(Long attemptId) {
+        Attempt attempt = attemptRepository.findByIdWithSongDetails(attemptId)
+                .orElseThrow(() -> new ExceptionHandler(ErrorStatus.ATTEMPT_NOT_FOUND));
+
+        // 이제 패치 조인으로 이미 로딩되어 있으므로 N+1 문제 없이 안전하게 접근 가능
+        return attempt.getSongByInstrument().getSong();
     }
 
     /**

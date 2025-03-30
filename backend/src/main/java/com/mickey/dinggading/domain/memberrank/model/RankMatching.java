@@ -1,6 +1,8 @@
 package com.mickey.dinggading.domain.memberrank.model;
 
 import com.mickey.dinggading.base.BaseEntity;
+import com.mickey.dinggading.base.status.ErrorStatus;
+import com.mickey.dinggading.exception.ExceptionHandler;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -24,7 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "RankMatching")
+@Table(name = "rank_matching")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -78,16 +81,23 @@ public class RankMatching extends BaseEntity {
     /**
      * 새로운 랭크 매칭을 생성합니다.
      */
-    public static RankMatching createRankMatching(SongInstrumentPack songInstrumentPack,
-                                                  Instrument instrument,
-                                                  RankType rankType,
-                                                  Tier targetTier) {
-        LocalDate now = LocalDate.now();
-        LocalDate expireDate = now.plusDays(7);
+    public static RankMatching createRankMatching(
+            MemberRank memberRank,
+            SongInstrumentPack songInstrumentPack,
+            Instrument instrument,
+            RankType rankType,
+            Tier targetTier,
+            LocalDateTime currentTime
+    ) {
+        validateRankTypeEligibility(rankType, memberRank, targetTier, songInstrumentPack, currentTime);
+
+        LocalDate now = currentTime.toLocalDate();
+        LocalDate expireDate = currentTime.toLocalDate().plusDays(7);
 
         return RankMatching.builder()
                 .status(MatchingStatus.IN_PROGRESS)
                 .songInstrumentPack(songInstrumentPack)
+                .memberRank(memberRank)
                 .expireDate(expireDate)
                 .startedAt(now)
                 .attemptCount(0)
@@ -95,17 +105,55 @@ public class RankMatching extends BaseEntity {
                 .instrument(instrument)
                 .rankType(rankType)
                 .targetTier(targetTier)
+                .attempts(new ArrayList<>())
                 .build();
+    }
+
+    private static void validateRankTypeEligibility(RankType rankType, MemberRank memberRank, Tier targetTier,
+                                                    SongInstrumentPack songPack, LocalDateTime currentTime) {
+
+        if (songPack.getSongPackTier() != targetTier) {
+            throw new ExceptionHandler(ErrorStatus.SONG_PACK_TIER_NOT_MATCHED_MATCHING);
+        }
+
+        if (rankType == RankType.FIRST) {
+            if (memberRank.canFirst()) {
+                throw new ExceptionHandler(ErrorStatus.ALREADY_RANKED);
+            }
+        }
+
+        if (rankType == RankType.CHALLENGE) {
+            if (memberRank.canChallenge()) {
+                throw new ExceptionHandler(ErrorStatus.INVALID_TARGET_TIER);
+            }
+        }
+
+        if (rankType == RankType.DEFENCE) {
+            if (memberRank.isInDefencePeriod(currentTime)) {
+                throw new ExceptionHandler(ErrorStatus.NOT_IN_DEFENCE_PERIOD);
+            }
+        }
     }
 
     /**
      * 시도를 진행하고 결과를 업데이트합니다.
      */
     public void addAttempt(Attempt attempt) {
-        this.attempts.add(attempt);
-        this.attemptCount++;
+        if (attemptCount >= 5) {
+            throw new ExceptionHandler(ErrorStatus.MAX_ATTEMPT_REACHED);
+        }
 
-        if (attempt.getStatus() == AttemptStatus.SUCCESS) {
+        if (attemptCount == 4) {
+            this.status = MatchingStatus.ANALYZING; // 4 인경우
+        }
+
+        this.attemptCount++;
+        attempt.updateRankMatching(this);
+    }
+
+    public void doMatchingResult(Attempt attempt, LocalDateTime currentTime) {
+
+        if (attempt.isSuccess()) {
             this.successCount++;
 
             // 성공 횟수가 3 이상이면 완료 상태로 변경
@@ -126,7 +174,8 @@ public class RankMatching extends BaseEntity {
         return this.rankType == RankType.FIRST;
     }
 
-    public void updateRankMatching(MemberRank memberRank) {
+    public void updateMemberRank(MemberRank memberRank) {
+
         if (this.memberRank != null) {
             this.memberRank.getRankMatching().remove(this);
         }
@@ -134,7 +183,6 @@ public class RankMatching extends BaseEntity {
         memberRank.getRankMatching().add(this);
 
     }
-
 
 
     /* ---------------------- 도전 날자 ----------------------*/
@@ -148,8 +196,12 @@ public class RankMatching extends BaseEntity {
         }
     }
 
-    public boolean isCompleted() {
-        return this.status == MatchingStatus.COMPLETED;
+    public boolean isAnalyzing() {
+        return this.status == MatchingStatus.ANALYZING;
+    }
+
+    public boolean isFinished() {
+        return this.status != MatchingStatus.IN_PROGRESS;
     }
 
     /**
@@ -160,31 +212,12 @@ public class RankMatching extends BaseEntity {
     }
 
     /**
-     * 매칭이 완료 조건을 충족하는지 확인 최대 시도 횟수(5회)에 도달했거나 성공 횟수(3회)를 달성한 경우 완료 처리 가능
-     *
-     * @return 완료 조건 충족 여부
-     */
-    public boolean isEligibleForCompletion() {
-        return getAttemptCount() >= 5 || getSuccessCount() >= 3;
-    }
-
-    /**
      * 매칭이 성공적으로 완료되었는지 확인 3회 이상 성공했을 경우 매칭 성공으로 간주
      *
      * @return 매칭 성공 여부
      */
     public boolean isSuccessful() {
-        return getSuccessCount() >= 3;
+        return successCount >= 3;
     }
 
-    /**
-     * 매칭 상태를 완료 처리 성공 여부에 따라 COMPLETED 또는 FAILED 상태로 설정
-     */
-    public void complete() {
-        if (isSuccessful()) {
-            this.status = MatchingStatus.COMPLETED;
-        } else {
-            this.status = MatchingStatus.FAILED;
-        }
-    }
 }

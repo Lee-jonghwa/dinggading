@@ -4,6 +4,7 @@ import com.mickey.dinggading.domain.memberrank.model.Attempt;
 import com.mickey.dinggading.domain.memberrank.model.GameType;
 import com.mickey.dinggading.domain.memberrank.model.Instrument;
 import com.mickey.dinggading.domain.memberrank.model.RankType;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,13 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface AttemptRepository extends JpaRepository<Attempt, Long> {
+
+    // JPQL로 패치 조인 작성
+    @Query("SELECT a FROM Attempt a " +
+            "JOIN FETCH a.songByInstrument sbi " +
+            "JOIN FETCH sbi.song s " +
+            "WHERE a.attemptId = :attemptId")
+    Optional<Attempt> findByIdWithSongDetails(@Param("attemptId") Long attemptId);
 
     /**
      * 회원 ID로 게임 유형(PRACTICE/RANK)에 따른 시도 목록을 페이징 조회
@@ -82,14 +90,4 @@ public interface AttemptRepository extends JpaRepository<Attempt, Long> {
                                                                     @Param("rankType") RankType rankType,
                                                                     Pageable pageable);
 
-    /**
-     * 특정 랭크 매칭에서 가장 최근 시도를 조회
-     *
-     * @param rankMatchingId 랭크 매칭 ID
-     * @return 시도 목록
-     */
-//    @Query("SELECT a FROM Attempt a WHERE a.rankMatching.rankMatchingId = :rankMatchingId " +
-//            "ORDER BY a.createdAt DESC")
-//    List<Attempt> findLatestByRankMatchingId(@Param("rankMatchingId") Long rankMatchingId,
-//                                             Pageable pageable);
 }

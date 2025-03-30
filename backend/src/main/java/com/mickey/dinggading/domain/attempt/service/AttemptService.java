@@ -1,17 +1,23 @@
-package com.mickey.dinggading.domain.membermatching.service;
+package com.mickey.dinggading.domain.attempt.service;
 
 import com.mickey.dinggading.base.status.ErrorStatus;
+import com.mickey.dinggading.domain.TimeWrapper;
 import com.mickey.dinggading.domain.membermatching.converter.RankMatchingConverter;
 import com.mickey.dinggading.domain.membermatching.repository.AttemptRepository;
 import com.mickey.dinggading.domain.membermatching.repository.RankMatchingRepository;
+import com.mickey.dinggading.domain.membermatching.service.RankMatchingService;
 import com.mickey.dinggading.domain.memberrank.model.Attempt;
 import com.mickey.dinggading.domain.memberrank.model.GameType;
 import com.mickey.dinggading.domain.memberrank.model.Instrument;
 import com.mickey.dinggading.domain.memberrank.model.RankMatching;
 import com.mickey.dinggading.domain.memberrank.model.RankType;
-import com.mickey.dinggading.domain.memberrank.model.Tier;
+import com.mickey.dinggading.domain.memberrank.model.SongByInstrument;
+import com.mickey.dinggading.domain.song.repository.SongByInstrumentRepository;
 import com.mickey.dinggading.exception.ExceptionHandler;
 import com.mickey.dinggading.model.AttemptDTO;
+import com.mickey.dinggading.model.CreateAttemptRequestDTO;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +35,55 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class AttemptService {
 
+    private final SongByInstrumentRepository songByInstrumentRepository;
     private final AttemptRepository attemptRepository;
     private final RankMatchingConverter rankMatchingConverter;
     private final RankMatchingService rankMatchingService;
     private final RankMatchingRepository rankMatchingRepository;
+    private final TimeWrapper timeWrapper;
+
+    // 전략 맵
+    private final Map<GameType, AttemptCreationStrategy> strategies = new HashMap<>() {{
+        put(GameType.RANK, new RankAttemptCreationStrategy());
+        put(GameType.PRACTICE, new PracticeAttemptCreationStrategy());
+    }};
+
+    /**
+     * 연주 시도 기록을 생성하고 분석을 요청합니다.
+     *
+     * @param requestDTO 시도 생성 요청 DTO
+     * @param memberId   회원 ID
+     * @return 생성된 시도 ID
+     */
+    @Transactional
+    public Long createAttempt(CreateAttemptRequestDTO requestDTO, UUID memberId) {
+        Long songByInstrumentId = requestDTO.getSongByInstrumentId();
+        Long rankMatchingId = requestDTO.getRankMatchingId();
+        GameType gameType = GameType.valueOf(requestDTO.getGameType().name());
+        // requestDTO.getRankType();
+        // requestDTO.getSongByInstrumentId();
+
+        log.info("시도 기록 생성 요청: {}, 회원 ID: {}", requestDTO, memberId);
+
+        // 1. SongByInstrument 조회
+        SongByInstrument songByInstrument = songByInstrumentRepository.findById(songByInstrumentId)
+                .get();
+
+        // 랭크 매칭 조회 (랭크 모드일 경우에만 사용됨)
+        RankMatching rankMatching = null;
+        if (gameType == GameType.RANK && rankMatchingId != null) {
+            rankMatching = rankMatchingRepository.findById(rankMatchingId).get();
+        }
+
+        // 전략 패턴을 사용하여 게임 타입에 맞는 전략 선택 및 시도 생성
+        AttemptCreationStrategy strategy = strategies.get(gameType);
+        Attempt attempt = strategy.createAttempt(songByInstrument, rankMatching, memberId);
+
+        Attempt save = attemptRepository.save(attempt);
+        log.info("시도 기록 생성 완료: 시도 ID: {}", save.getAttemptId());
+
+        return save.getAttemptId();
+    }
 
     /**
      * 특정 시도 기록의 상세 정보를 조회
@@ -109,24 +160,9 @@ public class AttemptService {
         Attempt attempt = attemptRepository.findById(attemptId)
                 .orElseThrow(() -> new ExceptionHandler(ErrorStatus.ATTEMPT_NOT_FOUND));
 
-        // 목표 티어 정보 획득
-        RankType rankType = attempt.getRankType();
-        Tier targetTier = null;
-
-        if (rankType != null) {
-            // 랭크 매칭 정보에서 목표 티어 획득
-            RankMatching rankMatching = rankMatchingRepository.findById(attempt.getRankMatching().getRankMatchingId())
-                    .orElseThrow(() -> new ExceptionHandler(ErrorStatus.RANK_MATCHING_NOT_FOUND));
-            targetTier = rankMatching.getTargetTier();
-        }
-
         // 점수 설정 및 상태 업데이트
-        attempt.setScores(beatScore, tuneScore, toneScore, targetTier);
-        attemptRepository.save(attempt);
+        attempt.updateScore(beatScore, tuneScore, toneScore, timeWrapper.now());
 
-        // 랭크 매칭인 경우 매칭 상태 업데이트
-        if (attempt.getGameType() == GameType.RANK) {
-            rankMatchingService.processRankMatchingCompletion(attempt.getRankMatching());
-        }
     }
+
 }

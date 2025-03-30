@@ -19,16 +19,23 @@ public enum ErrorStatus implements BaseErrorCode {
     // RankMatching Errors
     RANK_MATCHING_NOT_FOUND(HttpStatus.NOT_FOUND, "RANKM4001", "존재하지 않는 랭크 매칭입니다."),
     ONGOING_MATCHING_EXISTS(HttpStatus.BAD_REQUEST, "RANKM4002", "이미 진행 중인 랭크 매칭이 있습니다."),
-    ALREADY_RANKED(HttpStatus.BAD_REQUEST, "RANKM4003", "이미 티어가 배정되어 있습니다."),
+    ALREADY_RANKED(HttpStatus.BAD_REQUEST, "RANKM4003", "이미 티어가 배정되어 있습니다. 배치고사를 이미 진행했습니다."),
     NEED_PLACEMENT_FIRST(HttpStatus.BAD_REQUEST, "RANKM4004", "먼저 배치고사를 진행해야 합니다."),
     NOT_IN_DEFENCE_PERIOD(HttpStatus.BAD_REQUEST, "RANKM4005", "현재 방어전 기간이 아닙니다."),
     INVALID_TARGET_TIER(HttpStatus.BAD_REQUEST, "RANKM4006", "유효하지 않은 목표 티어입니다."),
     TARGET_TIER_REQUIRED(HttpStatus.BAD_REQUEST, "RANKM4007", "목표 티어를 지정해야 합니다."),
     MAX_ATTEMPT_REACHED(HttpStatus.BAD_REQUEST, "RANKM4008", "최대 도전 횟수를 초과했습니다."),
+    ANALYZING_NOT_FINISHED(HttpStatus.BAD_REQUEST, "RANKM4009", "아직 도전이 분석중입니다."),
+    RANK_MATCHING_EXPIRED(HttpStatus.BAD_REQUEST, "RANKM4009", "매칭이 만료되었습니다."),
+    RANK_MATCHING_FINISHED(HttpStatus.BAD_REQUEST, "RANKM4009", "종료된 도전입니다."),
+
+    // SongPack Errors
+    SONG_PACK_NOT_FOUND(HttpStatus.NOT_FOUND, "SONGP4001", "존재하지 않는 곡 팩입니다."),
+    SONG_PACK_TIER_NOT_MATCHED_MATCHING(HttpStatus.BAD_REQUEST, "SONGP4002", "매칭과 일치하지않는 티어의 곡 팩 입니다."),
 
     // Attempt Errors
     ATTEMPT_NOT_FOUND(HttpStatus.NOT_FOUND, "ATTEMPT4001", "존재하지 않는 시도 기록입니다."),
-
+    DUPLICATE_SONG_ATTEMPT(HttpStatus.BAD_REQUEST, "ATTEMPT4002", "이미 시도한 곡입니다."),
     // MemberRank Errors
     MEMBER_RANK_NOT_FOUND(HttpStatus.NOT_FOUND, "MRANK4001", "해당 회원의 랭크 정보가 존재하지 않습니다."),
 
@@ -92,9 +99,6 @@ public enum ErrorStatus implements BaseErrorCode {
     APPLICANT_ACCEPT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "BAND_RECRUITMENT_5002", "지원자 승인 처리 중 오류가 발생했습니다."),
     RECRUITMENT_APPLICANT_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "BAND_RECRUITMENT_5003", "지원 정보 삭제 중 오류가 발생했습니다."),
     RECRUITMENT_INSTRUMENT_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "BAND_RECRUITMENT_5004", "악기 포지션 삭제 중 오류가 발생했습니다."),
-
-    // SongPack Errors
-    SONG_PACK_NOT_FOUND(HttpStatus.NOT_FOUND, "SONGP4001", "존재하지 않는 곡 팩입니다."),
 
     // Song 관련 오류
     SONG_NOT_FOUND(HttpStatus.NOT_FOUND, "SONG4001", "존재하지 않는 곡입니다."),

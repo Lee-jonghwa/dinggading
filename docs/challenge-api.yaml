@@ -15,8 +15,6 @@ servers:
 tags:
   - name: Attempt
     description: 연주 시도 기록 관련 API - 개발 완료
-  - name: Analysis
-    description: 연주 분석 관련 API - 개발전
   - name: Instrument
     description: 악기 정보 관련 API - 개발전
   - name: MemberRank
@@ -28,14 +26,47 @@ tags:
   - name: Song
     description: 곡 관리 관련 API - 개발 완료
   - name: SongByInstrument
-    description: 악기별 곡 관련 API - 개발전
+    description: 악기별 곡 관련 API - 개발 완료
   - name: SongInstrumentPack
-    description: 곡 팩 관련 API - 개발전
+    description: 곡 팩 관련 API - 개발 완료
   - name: Tier
     description: 티어 시스템 관련 API - 개발전
 
 components:
   schemas:
+    CreateAttemptRequestDTO:
+      type: object
+      properties:
+        rankMatchingId:
+          type: integer
+          format: int64
+          description: "랭크 매칭 ID"
+        songByInstrumentId:
+          type: integer
+          format: int64
+          description: "악기별 곡 ID"
+        recordUrl:
+          type: string
+          description: "녹음 파일 URL"
+        gameType:
+          type: string
+          enum: [PRACTICE, RANK]
+          description: "게임 유형 (연습 또는 랭크)"
+        rankType:
+          type: string
+          enum: [FIRST, CHALLENGE, DEFENCE]
+          description: "랭크 유형 (FIRST: 배치고사, CHALLENGE: 티어 도전, DEFENCE: 티어 방어)"
+      required:
+        - songByInstrumentId
+        - recordUrl
+        - gameType
+      example:
+        rankMatchingId: 123
+        songByInstrumentId: 456
+        recordUrl: "https://storage.example.com/recordings/user123_song456.mp3"
+        gameType: "RANK"
+        rankType: "CHALLENGE"
+
     ProblemDetail:
       type: object
       properties:
@@ -169,7 +200,7 @@ components:
           description: "랭크 매칭 고유 식별자"
         status:
           type: string
-          enum: [IN_PROGRESS, COMPLETED, EXPIRED, FAILED]
+          enum: [IN_PROGRESS, COMPLETED, EXPIRED, FAILED, ANALYZING]
           description: "매칭 상태"
         songInstrumentPackId:
           type: integer
@@ -395,7 +426,7 @@ components:
           description: "총 점수"
         status:
           type: string
-          enum: [SUCCESS, FAIL]
+          enum: [SUCCESS, FAIL, BEFORE_ANALYZE]
           description: "성공 여부"
         gameType:
           type: string
@@ -414,10 +445,8 @@ components:
       required:
         - attemptId
         - songByInstrumentId
-        - totalScore
         - status
         - gameType
-        - createdAt
       example:
         attemptId: 123
         rankMatchingId: 456
@@ -564,66 +593,6 @@ components:
         title: "Shape of You"
         youtubeUrl: "https://www.youtube.com/watch?v=JGwWNGJdvx8"
 
-    TierSystemDTO:
-      type: object
-      properties:
-        tiers:
-          type: array
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-                enum: [UNRANKED, IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND]
-              minScore:
-                type: integer
-              maxScore:
-                type: integer
-              description:
-                type: string
-        defencePeriodDays:
-          type: integer
-          description: "티어 방어 기간(일)"
-        attemptLimit:
-          type: integer
-          description: "도전 최대 횟수"
-        winCondition:
-          type: integer
-          description: "승리에 필요한 성공 횟수"
-      required:
-        - tiers
-        - defencePeriodDays
-        - attemptLimit
-        - winCondition
-      example:
-        tiers:
-          - name: "IRON"
-            minScore: 0
-            maxScore: 49
-            description: "입문자 레벨"
-          - name: "BRONZE"
-            minScore: 50
-            maxScore: 59
-            description: "초보자 레벨"
-          - name: "SILVER"
-            minScore: 60
-            maxScore: 69
-            description: "중급자 레벨"
-          - name: "GOLD"
-            minScore: 70
-            maxScore: 79
-            description: "상급자 레벨"
-          - name: "PLATINUM"
-            minScore: 80
-            maxScore: 89
-            description: "전문가 레벨"
-          - name: "DIAMOND"
-            minScore: 90
-            maxScore: 100
-            description: "마스터 레벨"
-        defencePeriodDays: 30
-        attemptLimit: 5
-        winCondition: 3
 
     DefencePeriodDTO:
       type: object
@@ -662,79 +631,6 @@ components:
         defenceExpireDate: "2023-12-31"
         isInDefencePeriod: true
         daysLeft: 15
-
-    AnalysisRequestDTO:
-      type: object
-      properties:
-        songByInstrumentId:
-          type: integer
-          format: int64
-          description: "악기별 곡 ID"
-        audioFileUrl:
-          type: string
-          description: "녹음 파일 URL"
-        rankMatchingId:
-          type: integer
-          format: int64
-          description: "랭크 매칭 ID (랭크 모드인 경우)"
-        gameType:
-          type: string
-          enum: [PRACTICE, RANK]
-          description: "게임 유형"
-      required:
-        - songByInstrumentId
-        - audioFileUrl
-        - gameType
-      example:
-        songByInstrumentId: 123
-        audioFileUrl: "https://storage.example.com/recordings/user123_song456.mp3"
-        rankMatchingId: 789
-        gameType: "RANK"
-
-    AnalysisResultDTO:
-      type: object
-      properties:
-        attemptId:
-          type: integer
-          format: int64
-          description: "시도 ID"
-        beatScore:
-          type: integer
-          description: "박자 점수"
-        tuneScore:
-          type: integer
-          description: "음정 점수"
-        toneScore:
-          type: integer
-          description: "톤 점수"
-        totalScore:
-          type: integer
-          description: "총 점수"
-        status:
-          type: string
-          enum: [SUCCESS, FAIL]
-          description: "성공 여부"
-        feedback:
-          type: string
-          description: "피드백 메시지"
-        timestamp:
-          type: string
-          format: date-time
-          description: "분석 시간"
-      required:
-        - attemptId
-        - totalScore
-        - status
-        - timestamp
-      example:
-        attemptId: 123
-        beatScore: 85
-        tuneScore: 78
-        toneScore: 92
-        totalScore: 85
-        status: "SUCCESS"
-        feedback: "음정 조절이 필요합니다. 박자 감각은 뛰어납니다."
-        timestamp: "2023-12-15T14:35:00Z"
 
     InstrumentDTO:
       type: object
@@ -981,6 +877,30 @@ components:
       description: "JWT 인증 토큰을 사용합니다. 예: Bearer {token}"
 
   responses:
+    AttemptCreatedResponse:
+      description: "시도 기록 생성 성공 응답"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              attemptId:
+                type: integer
+                format: int64
+                description: "생성된 시도 ID"
+              message:
+                type: string
+                description: "성공 메시지"
+              estimatedTime:
+                type: integer
+                description: "음성 분석 예상 처리 시간(초)"
+            required:
+              - attemptId
+              - message
+          example:
+            attemptId: 789
+            message: "연주 시도가 기록되었습니다. 분석이 진행 중입니다."
+            estimatedTime: 30
     TierAvailabilitiesResponse:
       description: "악기별 티어 도전/방어 가능 정보 응답"
       content:
@@ -1170,38 +1090,6 @@ components:
                     type: array
                     items:
                       $ref: '#/components/schemas/AttemptDTO'
-
-    AvailableRankMatchingsResponse:
-      description: "도전 가능한 랭크 매칭 응답"
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              availableChallenge:
-                type: boolean
-                description: "티어 도전 가능 여부"
-              availableDefence:
-                type: boolean
-                description: "티어 방어 가능 여부"
-              availableFirst:
-                type: boolean
-                description: "배치고사 가능 여부"
-              currentTier:
-                type: string
-                enum: [UNRANKED, IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND]
-                description: "현재 티어"
-
-            required:
-              - availableChallenge
-              - availableDefence
-              - availableFirst
-              - currentTier
-          example:
-            availableChallenge: true
-            availableDefence: false
-            availableFirst: false
-            currentTier: "SILVER"
 
     AttemptDetailResponse:
       description: "시도 기록 상세 정보 응답"
@@ -1467,51 +1355,12 @@ components:
               instrument: "VOCAL"
               tier: "PLATINUM"
 
-    TierSystemResponse:
-      description: "티어 시스템 기본 정보 응답"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/TierSystemDTO'
-
     DefencePeriodResponse:
       description: "티어 방어 기간 정보 응답"
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/DefencePeriodDTO'
-
-    AnalysisRequestedResponse:
-      description: "음성 분석 요청 성공 응답"
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              attemptId:
-                type: integer
-                format: int64
-                description: "생성된 시도 ID"
-              message:
-                type: string
-                description: "요청 처리 메시지"
-              estimatedTime:
-                type: integer
-                description: "예상 처리 시간(초)"
-            required:
-              - attemptId
-              - message
-          example:
-            attemptId: 123
-            message: "음성 분석이 요청되었습니다. 곧 결과가 제공됩니다."
-            estimatedTime: 30
-
-    AnalysisResultResponse:
-      description: "음성 분석 결과 응답"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AnalysisResultDTO'
 
     InstrumentsResponse:
       description: "지원되는 악기 목록 응답"
@@ -1587,6 +1436,16 @@ components:
                     example: "잘못된 요청입니다."
 
   requestBodies:
+    CreateAttemptRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateAttemptRequestDTO'
+          example:
+            rankMatchingId: 123
+            songByInstrumentId: 456
+            recordUrl: "https://storage.example.com/recordings/user123_song456.mp3"
 
     CreateSongByInstrumentRequest:
       required: true
@@ -1626,20 +1485,29 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreateSongRequestDTO'
-
-    AnalysisRequest:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AnalysisRequestDTO'
-          example:
-            songByInstrumentId: 123
-            audioFileUrl: "https://storage.example.com/recordings/user123_song456.mp3"
-            rankMatchingId: 789
-            gameType: "RANK"
             
 paths:
+  /api/attempts:
+    post:
+      tags:
+        - Attempt
+      operationId: createAttempt
+      summary: "연주 시도 기록 생성"
+      description: "사용자의 연주 시도를 기록하고 음성 분석을 요청합니다. 연습 모드와 랭크 모드 모두 사용 가능합니다. 랭크 모드의 경우 rankMatchingId와 rankType을 함께 제공해야 합니다."
+      security:
+        - BearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/CreateAttemptRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/AttemptCreatedResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
   /api/members/{memberId}/ranks:
     get:
       tags:
@@ -1783,29 +1651,7 @@ paths:
           $ref: '#/components/responses/RankMatchingDetailResponse'
         '404':
           $ref: '#/components/responses/NotFoundError'
-
-  /api/rank-matchings/{instrument}/available:
-    get:
-      tags:
-        - RankMatching
-      operationId: getAvailableRankMatchings
-      summary: "도전 가능한 랭크 매칭 조회"
-      description: "현재 로그인한 회원이 도전 가능한 랭크 매칭 정보를 조회합니다."
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: instrument
-          in: path
-          description: "악기 종류 필터링 (VOCAL, GUITAR, DRUM, BASS)"
-          required: true
-          schema:
-            type: string
-            enum: [VOCAL, GUITAR, DRUM, BASS]
-      responses:
-        '200':
-          $ref: '#/components/responses/AvailableRankMatchingsResponse'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+          
   /api/rank-matchings/{instrument}/tier-available:
     get:
       tags:
@@ -2072,7 +1918,7 @@ paths:
       operationId: getSongPacks
       summary: "곡 팩 목록 조회"
       description: "전체 곡 팩 목록을 조회합니다. size, page를 쿼리 파라미터로 전달하여 페이징 처리가 가능합니다."
-      deprecated: true
+      deprecated: false
       x-spring-paginated: true
       responses:
         '200':
@@ -2185,17 +2031,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
 
-  /api/tiers:
-    get:
-      tags:
-        - Tier
-      operationId: getTierInfo
-      summary: "티어 시스템 기본 정보 조회"
-      description: "티어 시스템에 대한 기본 정보를 조회합니다. 티어별 승급/강등 조건, 점수 기준 등이 포함됩니다."
-      responses:
-        '200':
-          $ref: '#/components/responses/TierSystemResponse'
-
   /api/tiers/defence-period:
     get:
       tags:
@@ -2220,48 +2055,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '400':
           $ref: '#/components/responses/BadRequestError'
-
-  /api/analysis/record:
-    post:
-      tags:
-        - Analysis
-      operationId: analyzeRecord
-      summary: "연주 녹음 분석 요청"
-      description: "연주 녹음을 제출하고 분석을 요청합니다."
-      deprecated: true
-      security:
-        - BearerAuth: []
-      requestBody:
-        $ref: '#/components/requestBodies/AnalysisRequest'
-      responses:
-        '202':
-          $ref: '#/components/responses/AnalysisRequestedResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-
-  /api/analysis/result/{attempt_id}:
-    get:
-      tags:
-        - Analysis
-      operationId: getAnalysisResult
-      summary: "음성 분석 결과 조회"
-      description: "특정 시도에 대한 음성 분석 결과를 조회합니다."
-      deprecated: true
-      parameters:
-        - name: attempt_id
-          in: path
-          description: "시도 ID"
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          $ref: '#/components/responses/AnalysisResultResponse'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
 
   /api/instruments:
     get:

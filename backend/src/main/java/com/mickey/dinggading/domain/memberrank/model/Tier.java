@@ -16,10 +16,10 @@ public enum Tier {
     /**
      * 도전 모드를 진행할 때 사용
      *
-     * @param otherTier
+     * @param targetTier
      * @return
      */
-    public boolean isNextTier(Tier otherTier) {
-        return this.value - otherTier.value == 1;
+    public boolean isNextTier(Tier targetTier) {
+        return targetTier.value - this.value == 1;
     }
 }

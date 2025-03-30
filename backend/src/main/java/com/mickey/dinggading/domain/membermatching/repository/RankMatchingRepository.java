@@ -65,7 +65,7 @@ public interface RankMatchingRepository extends JpaRepository<RankMatching, Long
      * @param instrument 악기
      * @return 진행 중인 랭크 매칭 목록
      */
-    @Query("SELECT rm FROM RankMatching rm JOIN rm.memberRank mr JOIN mr.member m WHERE m.memberId = :memberId AND rm.instrument = :instrument AND rm.status = 'IN_PROGRESS'")
+    @Query("SELECT rm FROM RankMatching rm JOIN rm.memberRank mr JOIN mr.member m WHERE m.memberId = :memberId AND rm.instrument = :instrument AND rm.status = 'IN_PROGRESS' OR rm.status = 'ANALYZING' ORDER BY rm.createdAt DESC ")
     List<RankMatching> findOngoingMatchingsByMemberIdAndInstrument(@Param("memberId") UUID memberId,
                                                                    @Param("instrument") Instrument instrument);
 

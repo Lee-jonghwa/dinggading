@@ -144,24 +144,6 @@ build_frontend:
   tags:
     - cicd
 
-# Build and push Nginx image
-build_nginx:
-  extends: .docker
-  stage: prepare
-  script:
-    - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
-    - docker buildx build -t ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-nginx:latest -f ./infra/dockerfiles/nginx.Dockerfile --build-arg PLATFORM=linux/amd64 --platform linux/amd64 ./nginx
-    - docker push ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-nginx:latest
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
-      when: on_success
-      allow_failure: false
-    - if: '$CI_COMMIT_BRANCH == "develop"'
-      when: on_success
-      allow_failure: false
-  tags:
-    - cicd
-
 # Deploy to production server
 deploy:
   stage: deploy
@@ -169,8 +151,6 @@ deploy:
     - job: build_frontend
       optional: true
     - job: build_backend
-      optional: true
-    - job: build_nginx
       optional: true
 
 
@@ -191,13 +171,11 @@ deploy:
     - scp -i $PEM_FILE docker-compose.prod.yaml ubuntu@$SERVER_HOST:/home/ubuntu/${PROJECT_NAME}/
     # ubuntu 사용자를 docker 그룹에 추가하는 명령을 실행
     - ssh -i $PEM_FILE ubuntu@$SERVER_HOST "sudo usermod -aG docker ubuntu && newgrp docker"
-    - cat docker-compose.prod.yaml
     - ssh -i $PEM_FILE ubuntu@$SERVER_HOST "
       cd /home/ubuntu/${PROJECT_NAME} &&
       echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin &&
       docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-spring:latest &&
       docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-next:latest &&
-      docker pull $DOCKER_HUB_USERNAME/${PROJECT_NAME}-nginx:latest &&
       docker-compose -f docker-compose.prod.yaml down &&
       docker-compose -f docker-compose.prod.yaml up -d"
   rules:

@@ -1,4 +1,4 @@
-package com.mickey.dinggading.domain.memberrank;
+package com.mickey.dinggading.domain.memberrank.model.strategy;
 
 import com.mickey.dinggading.domain.memberrank.model.RankType;
 

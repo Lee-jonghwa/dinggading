@@ -1,5 +1,5 @@
 package com.mickey.dinggading.domain.memberrank.model;
 
 public enum AttemptStatus {
-    SUCCESS, FAIL
+    SUCCESS, FAIL, BEFORE_ANALYZE
 }

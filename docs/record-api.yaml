@@ -229,7 +229,7 @@ paths:
         - Record
       operationId: createRecord
       summary: "녹음 생성"
-      description: "새로운 연주 녹음을 업로드합니다."
+      description: "새로운 연주 녹음을 업로드합니다. 업로드가 끝나면 분석이 바로 시작됩니다."
       security:
         - BearerAuth: []
       requestBody:

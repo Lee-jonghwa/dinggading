@@ -9,7 +9,7 @@ import { useTierStore } from "@/store/tier"
 import { useParams } from "next/navigation"
 import React, { useCallback, useEffect } from "react"
 import { useSongsStore } from "@/store/songs"
-import Songcard from "@/components/songcard"
+// import Songcard from "@/components/songcard"
 import SongCarousel from "@/components/songcarousel"
 
 export default function TierPage () {
@@ -35,7 +35,7 @@ export default function TierPage () {
     useEffect(() => {
       fetchSongsCallback()
       console.log("현재의 songs 상태 : ", songs)
-    }, [fetchSongsCallback])
+    }, [fetchSongsCallback, songs])
 
   return (
     <div className={styles.tierpage}>

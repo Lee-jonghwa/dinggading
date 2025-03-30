@@ -1,6 +1,6 @@
 'use client'
 
-import { useParams, useRouter } from "next/navigation"
+// import { useParams, useRouter } from "next/navigation"
 import styles from "./challengeBySongId.module.css"
 
 // const router = useRouter() 
@@ -11,8 +11,8 @@ export default function ChallengeBySongId () {
   return (
     <div className={styles.challengeBySongId}>
       <div className={styles.songInfo}>
-        <div className={styles.songName}>{song.title}</div>
-        <div className={styles.artist}>{song.artist}</div>
+        {/* <div className={styles.songName}>{song.title}</div>
+        <div className={styles.artist}>{song.artist}</div> */}
         <div className={styles.image}>{}</div>
         <div className={styles.controller}>
           <div className={styles.left}>

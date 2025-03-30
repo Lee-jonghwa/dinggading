@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation"
 import styles from "./songcard.module.css"
-import Image from "next/image"
+// import Image from "next/image"
 
 interface SongcardProps {
   songId : number

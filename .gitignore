@@ -20,7 +20,7 @@
 Thumbs.db
 
 /infra/env/.env.*
-
+/infra/env/other/**
 package.json
 package-lock.json
 node_modules

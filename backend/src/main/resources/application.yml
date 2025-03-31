@@ -2,11 +2,25 @@ spring:
   application:
     name: dinggading
 
+  data:
+    mongodb:
+      host: ${MONGO_DB_HOST}
+      port: ${MONGO_DB_PORT}
+      username: ${MONGO_INITDB_ROOT_USERNAME}
+      password: ${MONGO_INITDB_ROOT_PASSWORD}
+      database: ${MONGO_INITDB_DATABASE}
+      authentication-database: admin
+
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_ROOT_PASSWORD}
+
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${RABBIT_MQ_HOST}
+    port: ${RABBIT_MQ_PORT}
+    username: ${RABBITMQ_DEFAULT_USER}
+    password: ${RABBITMQ_DEFAULT_PASS}
 
   ### problem details
   mvc:
@@ -48,9 +62,9 @@ spring:
       ddl-auto: ${JPA_DDL_AUTO}
 
   datasource:
-    url: jdbc:mysql://${DATABASE_URL}/${DATABASE_SCHEMA}?serverTimezone=UTC&useUniCode=yes&characterEncoding=UTF-8
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?serverTimezone=UTC&useUniCode=yes&characterEncoding=UTF-8
+    username: ${MYSQL_ROOT_USERNAME}
+    password: ${MYSQL_ROOT_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       pool-name: hikari-pool

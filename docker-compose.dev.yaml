@@ -1,0 +1,37 @@
+services:
+  next:
+    platform: linux/amd64
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ./infra/dockerfiles/frontend.Dockerfile
+      args:
+        - STAGE=development
+        - NEXT_PUBLIC_API_BASE_URL=spring:8080
+        - NEXT_PUBLIC_ENV_MODE=DEVELOP_LOCAL
+    ports:
+      - "3000:3000"
+    networks:
+      - ding-ga-ding-network
+
+  spring:
+    platform: linux/amd64
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ./infra/dockerfiles/backend.Dockerfile
+      args:
+        - STAGE=development
+    env_file:
+      - ./infra/env/.env.development
+    ports:
+      - "8080:8080"
+    networks:
+      - ding-ga-ding-network
+
+volumes:
+  shared-data:  # 공유 볼륨 정의
+
+networks:
+  ding-ga-ding-network:
+    external: true

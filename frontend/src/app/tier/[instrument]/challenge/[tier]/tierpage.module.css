@@ -8,48 +8,9 @@
 }
 
 .songs {
-  border: 5px solid blue;
+  /* border: 5px solid blue; */
   display: flex;
   flex: 1;
   flex-direction: column;
   gap: 2rem;
-}
-
-.right {
-  border: 5px solid red;
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.selectedSongs {
-  display: flex;
-  flex-direction: column;
-}
-
-.songTitle {
-  border: 5px solid skyblue;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  height: 15vh;
-  gap: 1rem;
-  padding-inline: 2rem;
-  padding-top: 1rem;
-}
-
-.startButton {
-  border: 5px solid ;
-  display: flex;
-  justify-content: center;
-  padding: 1rem 0.5rem;
-  
-}
-
-.soundtest {
-  border: 5px solid;
-  display: flex;
-  justify-content: center;
-  padding: 1rem 0.5rem;
 }

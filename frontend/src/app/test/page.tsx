@@ -1,5 +1,5 @@
 'use client'
-import Button from "@/components/Button"
+import Button from "@/components/button"
 import { useCountStore } from "@/store/count"
 import { Canvas } from "@react-three/fiber"
 import { Model } from "@/components/glbmodels"

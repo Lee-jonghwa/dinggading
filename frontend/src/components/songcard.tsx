@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation"
 import styles from "./songcard.module.css"
+import Image from "next/image"
 // import Image from "next/image"
 
 interface SongcardProps {
@@ -33,29 +34,27 @@ export default function Songcard ({
     <div className={styles.songCard}>
       <div 
         className={styles.song} 
-        onClick={onClickSong} 
         // style={{backgroundImage : `url(${thumbnailImg})`}}
       >
         <div 
           className={styles.image}
-          style={{backgroundImage : `url(${thumbnailImg})`}}
         >
-          {/* <Image 
-            src={thumbnailImg} 
-            alt="thumbnail image"
-            fill
-            sizes="100%"
-            style={{objectFit: "cover"}}
-            priority
-          /> */}
+          <img src={thumbnailImg} alt="thumbnail image" />
         </div>
-        <div className={styles.songInfo}>
-          <div className={styles.songName}>{songName}</div>
-          <div className={styles.artist}>{artist}</div>
+        <div className={styles.right} >
+          <div className={styles.upper} onClick={onClickSong}>
+            <div className={styles.songInfo}>
+              <div className={styles.songName}>{songName}</div>
+              <div className={styles.artist}>{artist}</div>
+            </div>
+            <div className={styles.startButton}>도전/연습하기</div>
+          </div>
+          <div className={styles.under}>
+            <div className={styles.soundTest}>음향 테스트</div>
+          </div>
         </div>
-        <div className={styles.startButton}>도전/연습하기</div>
       </div>
-      <div className={styles.soundTest}>음향 테스트</div>
     </div>
   )
 }
+  

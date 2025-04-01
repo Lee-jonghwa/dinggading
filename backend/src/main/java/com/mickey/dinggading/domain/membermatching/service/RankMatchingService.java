@@ -5,6 +5,8 @@ import com.mickey.dinggading.domain.TimeWrapper;
 import com.mickey.dinggading.domain.membermatching.converter.RankMatchingConverter;
 import com.mickey.dinggading.domain.membermatching.repository.AttemptRepository;
 import com.mickey.dinggading.domain.membermatching.repository.RankMatchingRepository;
+import com.mickey.dinggading.domain.memberrank.RankMatchingCompletionStrategy;
+import com.mickey.dinggading.domain.memberrank.RankMatchingStrategyFactory;
 import com.mickey.dinggading.domain.memberrank.model.Instrument;
 import com.mickey.dinggading.domain.memberrank.model.MemberRank;
 import com.mickey.dinggading.domain.memberrank.model.RankMatching;
@@ -121,36 +123,43 @@ public class RankMatchingService {
 
         // 각 티어별 가능한 랭크 매칭 정보 추가 (UNRANKED 제외)
         for (Tier tier : Tier.values()) {
-            if (tier.equals(Tier.UNRANKED)) {
+            if (tier == Tier.UNRANKED) {
                 continue;
             }
 
-            result.put(tier.name(), availableRankMatchingInfo(tier, hasOngoingMatching, memberRank));
+            Map<String, Boolean> tierAvailability = new HashMap<>();
+
+            if (hasOngoingMatching) {
+                // 진행 중인 매칭이 있으면 모두 불가능
+                tierAvailability.put("availableFirst", false);
+                tierAvailability.put("availableChallenge", false);
+                tierAvailability.put("availableDefence", false);
+            } else {
+                // 배치고사 가능 여부
+                boolean availableFirst = currentTier == Tier.UNRANKED &&
+                        memberRank.canFirst() &&
+                        (memberRank.getLastAttemptTier() == null ||
+                                memberRank.getLastAttemptTier().compareTo(tier) >= 0);
+
+                // 도전 가능 여부
+                boolean availableChallenge = currentTier != Tier.UNRANKED &&
+                        memberRank.canChallenge() &&
+                        currentTier.isNextTier(tier);
+
+                // 방어 가능 여부
+                boolean availableDefence = tier == currentTier &&
+                        currentTier != Tier.UNRANKED &&
+                        memberRank.isInDefencePeriod(timeWrapper.now());
+
+                tierAvailability.put("availableFirst", availableFirst);
+                tierAvailability.put("availableChallenge", availableChallenge);
+                tierAvailability.put("availableDefence", availableDefence);
+            }
+
+            result.put(tier.name(), tierAvailability);
         }
 
         return result;
-    }
-
-    private Map<String, Boolean> availableRankMatchingInfo(Tier tier, boolean hasOngoingMatching,
-                                                           MemberRank memberRank) {
-        Map<String, Boolean> tierAvailability = new HashMap<>();
-
-        if (hasOngoingMatching) {
-            // 진행 중인 매칭이 있으면 모두 불가능
-            tierAvailability.put("availableFirst", false);
-            tierAvailability.put("availableChallenge", false);
-            tierAvailability.put("availableDefence", false);
-        } else {
-            boolean availableFirst = memberRank.canFirst(tier);
-            boolean availableChallenge = memberRank.canChallenge(tier);
-            boolean availableDefence = memberRank.isInDefencePeriod(timeWrapper.now());
-
-            tierAvailability.put("availableFirst", availableFirst);
-            tierAvailability.put("availableChallenge", availableChallenge);
-            tierAvailability.put("availableDefence", availableDefence);
-        }
-
-        return tierAvailability;
     }
 
     /**

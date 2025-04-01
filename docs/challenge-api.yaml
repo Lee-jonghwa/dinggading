@@ -15,6 +15,8 @@ servers:
 tags:
   - name: Attempt
     description: 연주 시도 기록 관련 API - 개발 완료
+  - name: Analysis
+    description: 연주 분석 관련 API - 개발전
   - name: Instrument
     description: 악기 정보 관련 API - 개발전
   - name: MemberRank
@@ -877,30 +879,6 @@ components:
       description: "JWT 인증 토큰을 사용합니다. 예: Bearer {token}"
 
   responses:
-    AttemptCreatedResponse:
-      description: "시도 기록 생성 성공 응답"
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              attemptId:
-                type: integer
-                format: int64
-                description: "생성된 시도 ID"
-              message:
-                type: string
-                description: "성공 메시지"
-              estimatedTime:
-                type: integer
-                description: "음성 분석 예상 처리 시간(초)"
-            required:
-              - attemptId
-              - message
-          example:
-            attemptId: 789
-            message: "연주 시도가 기록되었습니다. 분석이 진행 중입니다."
-            estimatedTime: 30
     TierAvailabilitiesResponse:
       description: "악기별 티어 도전/방어 가능 정보 응답"
       content:
@@ -1355,6 +1333,13 @@ components:
               instrument: "VOCAL"
               tier: "PLATINUM"
 
+    TierSystemResponse:
+      description: "티어 시스템 기본 정보 응답"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TierSystemDTO'
+
     DefencePeriodResponse:
       description: "티어 방어 기간 정보 응답"
       content:
@@ -1485,6 +1470,18 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreateSongRequestDTO'
+
+    AnalysisRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AnalysisRequestDTO'
+          example:
+            songByInstrumentId: 123
+            audioFileUrl: "https://storage.example.com/recordings/user123_song456.mp3"
+            rankMatchingId: 789
+            gameType: "RANK"
             
 paths:
   /api/attempts:
@@ -1652,6 +1649,34 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
           
+  /api/rank-matchings/{instrument}/tier-available:
+    get:
+      tags:
+        - RankMatching
+      operationId: getTierAvailableRankMatchings
+      summary: "악기별 티어 도전/방어 가능 정보 조회"
+      description: >
+              현재 로그인한 회원이 각 티어별로 도전, 방어, 배치고사가 가능한지 여부와 
+              진행 중인 랭크 매칭 정보를 조회합니다. 'availableFirst'는 배치고사 가능 여부, 
+              'availableChallenge'는 상위 티어 도전 가능 여부, 'availableDefence'는 
+              현재 티어 방어 가능 여부를 나타냅니다. 'ongoingMatching'은 현재 진행 중인 
+              도전/방어 정보로, 목표 티어, 유형, 시작일, 만료일, 시도 횟수, 성공 횟수를 
+              포함합니다.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: instrument
+          in: path
+          description: "악기 종류 (VOCAL, GUITAR, DRUM, BASS)"
+          required: true
+          schema:
+            type: string
+            enum: [VOCAL, GUITAR, DRUM, BASS]
+      responses:
+        '200':
+          $ref: '#/components/responses/TierAvailabilitiesResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
   /api/rank-matchings/{instrument}/tier-available:
     get:
       tags:

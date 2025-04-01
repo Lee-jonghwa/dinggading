@@ -29,10 +29,6 @@ public enum ErrorStatus implements BaseErrorCode {
     RANK_MATCHING_EXPIRED(HttpStatus.BAD_REQUEST, "RANKM4009", "매칭이 만료되었습니다."),
     RANK_MATCHING_FINISHED(HttpStatus.BAD_REQUEST, "RANKM4009", "종료된 도전입니다."),
 
-    // SongPack Errors
-    SONG_PACK_NOT_FOUND(HttpStatus.NOT_FOUND, "SONGP4001", "존재하지 않는 곡 팩입니다."),
-    SONG_PACK_TIER_NOT_MATCHED_MATCHING(HttpStatus.BAD_REQUEST, "SONGP4002", "매칭과 일치하지않는 티어의 곡 팩 입니다."),
-
     // Attempt Errors
     ATTEMPT_NOT_FOUND(HttpStatus.NOT_FOUND, "ATTEMPT4001", "존재하지 않는 시도 기록입니다."),
     DUPLICATE_SONG_ATTEMPT(HttpStatus.BAD_REQUEST, "ATTEMPT4002", "이미 시도한 곡입니다."),
@@ -99,6 +95,9 @@ public enum ErrorStatus implements BaseErrorCode {
     APPLICANT_ACCEPT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "BAND_RECRUITMENT_5002", "지원자 승인 처리 중 오류가 발생했습니다."),
     RECRUITMENT_APPLICANT_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "BAND_RECRUITMENT_5003", "지원 정보 삭제 중 오류가 발생했습니다."),
     RECRUITMENT_INSTRUMENT_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "BAND_RECRUITMENT_5004", "악기 포지션 삭제 중 오류가 발생했습니다."),
+
+    // SongPack Errors
+    SONG_PACK_NOT_FOUND(HttpStatus.NOT_FOUND, "SONGP4001", "존재하지 않는 곡 팩입니다."),
 
     // Song 관련 오류
     SONG_NOT_FOUND(HttpStatus.NOT_FOUND, "SONG4001", "존재하지 않는 곡입니다."),

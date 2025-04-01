@@ -19,8 +19,6 @@ echo -e "D::::::::::::DDD               GGG::::::GGG:::G     D::::::::::::DDD"
 echo -e "DDDDDDDDDDDDD                     GGGGGG   GGGG     DDDDDDDDDDDDD"
 
 
-docker network create ding-ga-ding-network
-
 # 파일 삭제 명령어
 echo -e "\e[1;34m🔧 Shut Down: 현재 실행 중인 환경을 닫는 중 입니다.. 🔧\e[0m"  # 파란색, 볼드 텍스트
 docker-compose -f docker-compose.dev.mock.yaml down

@@ -103,10 +103,6 @@ public class SongInstrumentPack extends BaseEntity {
         song.setSongInstrumentPack(this);
     }
 
-    public boolean hasSongByInstrument(SongByInstrument songByInstrument) {
-        return songByInstruments.contains(songByInstrument);
-    }
-
     // 팩 정보 업데이트
     public void updatePackInfo(String packName) {
         if (packName == null || packName.isEmpty()) {

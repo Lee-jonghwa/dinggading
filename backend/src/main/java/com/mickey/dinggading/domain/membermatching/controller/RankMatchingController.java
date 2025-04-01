@@ -48,6 +48,22 @@ public class RankMatchingController implements RankMatchingApi {
     }
 
     /**
+     * GET /api/rank-matchings/{instrument}/available : 도전 가능한 랭크 매칭 조회 현재 로그인한 회원이 도전 가능한 랭크 매칭 정보를 조회합니다.
+     *
+     * @param instrument 악기 종류 필터링 (VOCAL, GUITAR, DRUM, BASS) (required)
+     * @return 도전 가능한 랭크 매칭 응답 (status code 200) or 인증되지 않은 요청입니다. (status code 401)
+     */
+    @Override
+    public ResponseEntity<?> getAvailableRankMatchings(String instrument) {
+        UUID currentUser = securityUtil.getCurrentMemberId();
+        Instrument instrumentEnum = Instrument.valueOf(instrument.toUpperCase());
+        Map<String, Object> availableMatchings = rankMatchingService.getAvailableRankMatchings(
+                currentUser, instrumentEnum
+        );
+        return ResponseEntity.ok(availableMatchings);
+    }
+
+    /**
      * GET /api/rank-matchings/{rank_matching_id} : 랭크 매칭 상세 정보 조회 특정 랭크 매칭의 상세 정보를 조회합니다.
      *
      * @param rankMatchingId 랭크 매칭 ID (required)

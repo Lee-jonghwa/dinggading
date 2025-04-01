@@ -43,9 +43,6 @@ public enum ErrorStatus implements BaseErrorCode {
     ANALYSIS_IN_PROGRESS(HttpStatus.ACCEPTED, "ANALYSIS2001", "분석이 진행 중입니다."),
     ANALYSIS_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "ANALYSIS5001", "음성 분석에 실패했습니다."),
 
-    // 일반적인 응답
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "COMMON401", "인증이 필요합니다."),
-
     // 회원 관련 오류
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4001", "존재하지 않는 계정입니다."),
     // 일반적인 응답
@@ -108,7 +105,19 @@ public enum ErrorStatus implements BaseErrorCode {
     DUPLICATE_INSTRUMENT_TIER_COMBINATION(HttpStatus.BAD_REQUEST, "SONG4005", "이미 동일한 악기와 티어 조합이 존재합니다."),
     INVALID_INSTRUMENT(HttpStatus.BAD_REQUEST, "SONG4006", "유효하지 않은 악기입니다."),
     INVALID_TIER(HttpStatus.BAD_REQUEST, "SONG4007", "유효하지 않은 티어입니다."),
-    PACK_INSTRUMENT_MISMATCH(HttpStatus.BAD_REQUEST, "SONG4008", "선택한 팩의 악기가 요청과 일치하지 않습니다.");
+    PACK_INSTRUMENT_MISMATCH(HttpStatus.BAD_REQUEST, "SONG4008", "선택한 팩의 악기가 요청과 일치하지 않습니다."),
+
+    // 채팅방 관련 에러
+    CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT4001", "요청한 채팅방을 찾을 수 없습니다."),
+    CHATROOM_ACCESS_DENIED(HttpStatus.FORBIDDEN, "CHAT4002", "채팅방에 접근할 권한이 없습니다."),
+    CHATROOM_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "CHAT4003", "이미 존재하는 채팅방입니다."),
+    CHATROOM_PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT4004", "채팅방 참가자를 찾을 수 없습니다."),
+    CHATROOM_MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT4005", "채팅 메시지를 찾을 수 없습니다."),
+    CHATROOM_NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT4006", "채팅방 공지를 찾을 수 없습니다."),
+    CHATROOM_SETTING_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT4007", "채팅방 설정을 찾을 수 없습니다."),
+
+    NOTICE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "NOTICE4001", "공지에 접근할 권한이 없습니다."),
+    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTICE4002", "공지를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

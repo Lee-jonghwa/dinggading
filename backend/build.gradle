@@ -88,10 +88,20 @@ dependencies {
     /* 헬스 체크 START*/
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+    /* MongoDB */
+    implementation ('org.springframework.boot:spring-boot-starter-data-mongodb')
+    /* MongoDB End */
+
     // 테스트할 때는 빼주기
     configurations {
         testImplementation.exclude module: 'spring-boot-starter-actuator'
     }
+
+    /* websocket */
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.webjars:webjars-locator-core'
+    implementation 'org.webjars:sockjs-client:1.5.1'
+    implementation 'org.webjars:stomp-websocket:2.3.4'
 }
 
 sourceSets {

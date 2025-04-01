@@ -1,13 +1,13 @@
 package com.mickey.dinggading.util;
 
 import com.mickey.dinggading.base.status.ErrorStatus;
-import java.util.UUID;
-
 import com.mickey.dinggading.exception.ExceptionHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -22,7 +22,7 @@ public class SecurityUtil {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             log.error("Authorization 헤더가 없거나 Bearer 토큰이 아닙니다.");
-            throw new ExceptionHandler(ErrorStatus.UNAUTHORIZED);
+            throw new ExceptionHandler(ErrorStatus._UNAUTHORIZED);
         }
 
         // JWTUtil을 사용하여 토큰에서 memberId 추출
@@ -33,7 +33,7 @@ public class SecurityUtil {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             log.error("Authorization 헤더가 없거나 Bearer 토큰이 아닙니다.");
-            throw new ExceptionHandler(ErrorStatus.UNAUTHORIZED);
+            throw new ExceptionHandler(ErrorStatus._UNAUTHORIZED);
         }
 
         return jwtUtil.getUsername(authorizationHeader);

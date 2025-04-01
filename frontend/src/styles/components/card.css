@@ -2,9 +2,9 @@
   border: 5px solid; 
   display: flex;
   width: 30vw;
-  min-width: 452px;
-  height: 95vh;
-  min-height: 855px;
+  min-width: 455px;
+  height: 85vh;
+  min-height: 600px;
   transition: transform 0.3s ease-in-out;
 }
 

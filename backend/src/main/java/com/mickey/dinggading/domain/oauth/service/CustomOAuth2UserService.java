@@ -2,13 +2,9 @@ package com.mickey.dinggading.domain.oauth.service;
 
 import com.mickey.dinggading.domain.member.model.entity.Member;
 import com.mickey.dinggading.domain.member.repository.MemberRepository;
-import com.mickey.dinggading.domain.memberrank.repository.MemberRankRepository;
 import com.mickey.dinggading.domain.oauth.MemberPrincipal;
-import com.mickey.dinggading.util.SecurityUtil;
 import com.mickey.dinggading.domain.oauth.provider.GoogleOAuth2UserInfo;
 import com.mickey.dinggading.util.GenerateRandomNickname;
-import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -31,7 +27,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     // http://localhost:8080/oauth2/authorization/google
 
     private final MemberRepository memberRepository;
-    private final MemberRankRepository memberRankRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {

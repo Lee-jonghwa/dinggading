@@ -127,7 +127,7 @@ components:
 
     Genre:
       type: string
-      enum: [ROCK, JAZZ, DANCE, HIPHOP, POP]
+      enum: [HARDROCK, PSYCHEDELIC, ELECTRONICPOP, SYNTHPOP, FUNK, SURFROCK, JAZZ, DANCE, HIPHOP, POP]
       description: "밴드 장르"
 
     Sns:
@@ -220,7 +220,7 @@ components:
           description: "악기별 담당자 존재 여부"
         contact:
           type: array
-          items: 
+          items:
             $ref: "#/components/schemas/ContactDTO"
         bandMember:
           type: array

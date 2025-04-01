@@ -105,3 +105,20 @@ minio:
   access-key: ${MINIO_USERNAME}
   secret-key: ${MINIO_PASSWORD}
   bucket: ${MINIO_BUCKET}
+
+
+rabbitmq:
+  audio-analysis-request-queue:
+    name: audio-analysis-request
+  audio-analysis-response-queue:
+    name: audio-analysis-response
+  audio-analysis-request-exchange:
+    name: audio-analysis-request-exchange
+  audio-analysis-response-exchange:
+    name: audio-analysis-response-exchange
+  audio-analysis-request:
+    routing:
+      key: audio.analysis.request
+  audio-analysis-response:
+    routing:
+      key: audio.analysis.response

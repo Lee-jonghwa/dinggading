@@ -1,14 +1,9 @@
 'use client'
-import { NextPage } from "next"
 
-const Mypage: NextPage = () => {
+export default function Mypage () {
 
   return (
-    <div> 
-      <h1> Mypage </h1>
+    <div></div>
 
-    </div>
   )
 }
-
-export default Mypage

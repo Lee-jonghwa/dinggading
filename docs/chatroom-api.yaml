@@ -258,9 +258,6 @@ components:
     ChatMessageDTO:
       type: object
       properties:
-        chatMessageId:
-          type: string
-          description: "메시지 ID"
         chatRoomId:
           type: string
           description: "채팅방 ID"

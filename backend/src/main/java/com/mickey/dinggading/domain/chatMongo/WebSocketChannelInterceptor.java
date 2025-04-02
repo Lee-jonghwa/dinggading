@@ -1,7 +1,6 @@
 package com.mickey.dinggading.domain.chatMongo;
 
 import com.mickey.dinggading.base.status.ErrorStatus;
-import com.mickey.dinggading.domain.chatMongo.repository.MongoChatRoomParticipantRepository;
 import com.mickey.dinggading.domain.chatMongo.repository.MongoChatRoomRepository;
 import com.mickey.dinggading.exception.ExceptionHandler;
 import com.mickey.dinggading.util.JWTUtil;
@@ -31,8 +30,8 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
             String destination = accessor.getDestination();
             
             // /topic/chat/{roomId} 형식에서 roomId 추출
-            if (destination != null && destination.startsWith("/topic/chat/")) {
-                String roomId = destination.substring("/topic/chat/".length());
+            if (destination != null && destination.startsWith("/topic/chatrooms/")) {
+                String roomId = destination.substring("/topic/chatrooms/".length());
 
                 // 토큰에서 사용자 ID 추출
                 String authHeader = accessor.getFirstNativeHeader("Authorization");

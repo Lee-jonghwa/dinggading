@@ -28,7 +28,6 @@ public class ChatMessageMongo {
     private String memberNickname;
     private String memberProfileUrl;
 
-    private String messageId;
     private String message;
     private MessageType messageType;
     private Integer readCount;
@@ -39,8 +38,8 @@ public class ChatMessageMongo {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public ChatMessageMongo(String chatRoomId, String memberId, String memberNickname,
-                            String memberProfileUrl, String message, MessageType messageType) {
+    public ChatMessageMongo (String chatRoomId, String memberId, String memberNickname, String memberProfileUrl,
+                            String message, MessageType messageType) {
         this.chatRoomId = chatRoomId;
         this.memberId = memberId;
         this.memberNickname = memberNickname;
@@ -49,7 +48,7 @@ public class ChatMessageMongo {
         this.messageType = messageType;
         this.readCount = 0;
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = this.createdAt;
+        this.updatedAt = LocalDateTime.now();
     }
 
     public void incrementReadCount() {

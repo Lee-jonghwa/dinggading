@@ -119,10 +119,22 @@ components:
           type: integer
           format: int64
           description: "알림 고유 식별자"
+        chatRoomId:
+          type: string
+          description: "채팅방 ID"
+        messageId:
+          type: string
+          description: "채팅 메시지 ID"
         senderId:
           type: string
           format: uuid
           description: "발신자 ID"
+        senderNickname:
+          type: string
+          description: "발신자 닉네임"
+        senderProfileUrl:
+          type: string
+          description: "발신자 프로필 사진"
         receiverId:
           type: string
           format: uuid
@@ -146,14 +158,14 @@ components:
         createdAt:
           type: string
           format: date-time
-          description: "알림 생성 일시"
+          description: "생성 일시"
+
       required:
         - notificationId
         - receiverId
         - message
         - readOrNot
         - type
-        - createdAt
       example:
         notificationId: 123
         senderId: "123e4567-e89b-12d3-a456-426614174000"
@@ -163,7 +175,6 @@ components:
         type: "RECRUITMENT"
         acceptUrl: "/api/band-requests/123/accept"
         rejectUrl: "/api/band-requests/123/reject"
-        createdAt: "2023-03-15T14:30:00Z"
 
     GoogleAuthRequest:
       type: object

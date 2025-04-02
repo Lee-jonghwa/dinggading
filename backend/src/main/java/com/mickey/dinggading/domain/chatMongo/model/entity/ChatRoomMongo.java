@@ -29,7 +29,6 @@ public class ChatRoomMongo {
     private List<ChatRoomParticipantMongo> participants = new ArrayList<>();
     private List<ChatMessageMongo> messages = new ArrayList<>();
     private List<ChatRoomSettingMongo> settings = new ArrayList<>();
-    private List<ChatNoticeMongo> notices = new ArrayList<>();
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

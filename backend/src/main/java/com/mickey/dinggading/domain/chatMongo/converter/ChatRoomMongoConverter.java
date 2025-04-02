@@ -1,10 +1,8 @@
 package com.mickey.dinggading.domain.chatMongo.converter;
 
 import com.mickey.dinggading.domain.chatMongo.model.entity.ChatMessageMongo;
-import com.mickey.dinggading.domain.chatMongo.model.entity.ChatNoticeMongo;
 import com.mickey.dinggading.domain.chatMongo.model.entity.ChatRoomMongo;
 import com.mickey.dinggading.model.ChatMessageDTO;
-import com.mickey.dinggading.model.ChatNoticeDTO;
 import com.mickey.dinggading.model.ChatRoomDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -23,6 +21,7 @@ public class ChatRoomMongoConverter {
                 .latestChatDate(chatroom.getLatestChatDate() != null ?
                         chatroom.getLatestChatDate() : null)
                 .participantCount(chatroom.getParticipants().size())
+                .title(chatroom.getSettings().get(0).getTitle())
                 .build();
     }
 
@@ -32,7 +31,6 @@ public class ChatRoomMongoConverter {
         }
 
         return ChatMessageDTO.builder()
-                .chatMessageId(chatMessage.getMessageId())
                 .chatRoomId(chatMessage.getChatRoomId())
                 .senderId(memberId)
                 .senderNickname(chatMessage.getMemberNickname())
@@ -40,18 +38,6 @@ public class ChatRoomMongoConverter {
                 .message(chatMessage.getMessage())
                 .messageType(chatMessage.getMessageType())
                 .readCount(chatMessage.getReadCount())
-                .build();
-    }
-
-    public ChatNoticeDTO toNoticeDto(ChatNoticeMongo chatNotice, UUID memberId) {
-        return ChatNoticeDTO.builder()
-                .noticeId(chatNotice.getId())
-                .chatRoomId(chatNotice.getChatRoomId())
-                .content(chatNotice.getContent())
-                .authorId(memberId)
-                .pinned(chatNotice.getPinned())
-                .createdAt(chatNotice.getCreatedAt())
-                .updatedAt(chatNotice.getUpdatedAt())
                 .build();
     }
 }

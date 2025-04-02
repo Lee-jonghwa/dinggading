@@ -50,17 +50,6 @@ public class JWTUtil {
         return UUID.fromString(value.get("id").toString());
     }
 
-    // 토큰에서 사용자 로그인이메일 추출
-    public String getUsername(String header) {
-        String token = getToken(header);
-        Jws<Claims> claims = getClaimsJws(token);
-
-        Map<String, Object> value = claims.getPayload();
-        log.info("getUserName value : {}", value);
-
-        return value.get("username").toString();
-    }
-
     public void checkTokenValidation(String header) {
         if (header == null) throw new ExceptionHandler(ErrorStatus.TOKEN_NOT_FOUND);
         String token = getToken(header);

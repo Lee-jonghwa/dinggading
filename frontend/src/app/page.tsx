@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import type { NextPage } from 'next';
-
+import HorizontalScrollWrapper from '@/components/horizontalscrollwrapper';
 
 const Home: NextPage = () => {
   const [response, setResponse] = useState<string>('');
@@ -33,6 +33,7 @@ const Home: NextPage = () => {
   };
 
   return (
+    <HorizontalScrollWrapper>
     <div style={{ padding: '20px' }}>
       <h1>API </h1>
 
@@ -50,6 +51,7 @@ const Home: NextPage = () => {
         </div>
       )}
     </div>
+    </HorizontalScrollWrapper>
   );
 };
 

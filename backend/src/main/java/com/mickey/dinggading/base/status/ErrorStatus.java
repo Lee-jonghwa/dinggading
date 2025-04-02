@@ -117,7 +117,9 @@ public enum ErrorStatus implements BaseErrorCode {
     CHATROOM_SETTING_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT4007", "채팅방 설정을 찾을 수 없습니다."),
 
     NOTICE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "NOTICE4001", "공지에 접근할 권한이 없습니다."),
-    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTICE4002", "공지를 찾을 수 없습니다.");
+    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTICE4002", "공지를 찾을 수 없습니다."),
+
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFC4001", "알림을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

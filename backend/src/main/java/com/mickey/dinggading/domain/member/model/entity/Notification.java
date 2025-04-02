@@ -1,5 +1,8 @@
 package com.mickey.dinggading.domain.member.model.entity;
 
+import com.mickey.dinggading.base.BaseEntity;
+import com.mickey.dinggading.domain.chatMongo.model.entity.ChatMessageMongo;
+import com.mickey.dinggading.model.NotificationDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,21 +43,25 @@ public class Notification {
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     @Comment("알림 타입")
-    private NotificationType type;
-    
-    @Column(name = "accept_url")
-    @Comment("수락 시 사용할 URL")
-    private String acceptUrl;
-    
-    @Column(name = "reject_url")
-    @Comment("거절 시 사용할 URL")
-    private String rejectUrl;
-    
+    private NotificationDTO.TypeEnum type;
+
+    @Column(name = "chat_room_id", nullable = false)
+    @Comment("채팅방 ID")
+    private String chatRoomId;
+
+//    @Column(name = "accept_url")
+//    @Comment("수락 시 사용할 URL")
+//    private String acceptUrl;
+//
+//    @Column(name = "reject_url")
+//    @Comment("거절 시 사용할 URL")
+//    private String rejectUrl;
+//
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     @Comment("생성된 날자")
     private LocalDateTime createdAt;
-    
+
     public enum NotificationType {
         CHAT, FOLLOW, RECRUITMENT
     }
@@ -62,5 +69,15 @@ public class Notification {
     // Update methods
     public void markAsRead() {
         this.readOrNot = true;
+    }
+
+    public Notification (String chatRoomId, String message, Member sender, Member receiver, NotificationDTO.TypeEnum type, boolean readOrNot) {
+        this.chatRoomId = chatRoomId;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.message = message;
+        this.type = type;
+        this.readOrNot = readOrNot;
+        this.createdAt = LocalDateTime.now();
     }
 }

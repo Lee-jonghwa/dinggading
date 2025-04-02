@@ -7,11 +7,11 @@ import com.mickey.dinggading.domain.chatMongo.model.entity.ChatRoomMongo;
 import com.mickey.dinggading.domain.chatMongo.model.entity.ChatRoomParticipantMongo;
 import com.mickey.dinggading.domain.chatMongo.model.entity.ChatRoomSettingMongo;
 import com.mickey.dinggading.domain.chatMongo.repository.MongoChatMessageRepository;
-import com.mickey.dinggading.domain.chatMongo.repository.MongoChatRoomParticipantRepository;
 import com.mickey.dinggading.domain.chatMongo.repository.MongoChatRoomRepository;
 import com.mickey.dinggading.domain.chatMongo.repository.MongoChatRoomSettingRepository;
 import com.mickey.dinggading.domain.member.model.entity.Member;
 import com.mickey.dinggading.domain.member.repository.MemberRepository;
+import com.mickey.dinggading.domain.member.service.NotificationService;
 import com.mickey.dinggading.exception.ExceptionHandler;
 import com.mickey.dinggading.model.*;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,7 +47,10 @@ public class ChatRoomMongoServiceImpl implements ChatRoomMongoService {
     private final ChatRoomMongoConverter chatRoomMongoConverter;
     private final MongoChatRoomRepository mongoChatRoomRepository;
     private final MongoChatMessageRepository mongoChatMessageRepository;
+    private final NotificationService notificationService;
     private final MongoChatRoomSettingRepository mongoChatRoomSettingRepository;
+
+    public SseEmitter subscribe(UUID memberId) { return notificationService.subscribe(memberId); }
 
     @Override
     public List<ChatRoomDTO> getChatRoomsForUser(UUID currentUserId) {
@@ -94,6 +98,7 @@ public class ChatRoomMongoServiceImpl implements ChatRoomMongoService {
 
         // 채팅방 생성
         ChatRoomMongo newChatroom = new ChatRoomMongo(roomType);
+        subscribe(currentUserId);
 
         // 참가자 추가
         ChatRoomParticipantMongo currentUserParticipant = new ChatRoomParticipantMongo(newChatroom, currentUser, ParticipantRole.ADMIN);
@@ -104,8 +109,10 @@ public class ChatRoomMongoServiceImpl implements ChatRoomMongoService {
         if (!isSelfChat) {
             ChatRoomParticipantMongo targetUserParticipant = new ChatRoomParticipantMongo(newChatroom, targetUser, ParticipantRole.ADMIN);
             newChatroom.addParticipant(targetUserParticipant);
-            ChatRoomSettingMongo chatRoomSettingMongo2 = new ChatRoomSettingMongo(newChatroom, currentUser, targetUser.getNickname(), targetUser.getProfileImgUrl());
+            ChatRoomSettingMongo chatRoomSettingMongo2 = new ChatRoomSettingMongo(newChatroom, targetUser, targetUser.getNickname(), targetUser.getProfileImgUrl());
             newChatroom.addRoomSetting(chatRoomSettingMongo2);
+
+            subscribe(targetUserId);
         }
 
         ChatRoomMongo savedChatroom = mongoChatRoomRepository.save(newChatroom);
@@ -123,8 +130,7 @@ public class ChatRoomMongoServiceImpl implements ChatRoomMongoService {
     public ChatMessageDTO sendMessage(String roomId, UUID currentUserId, SendMessageRequest sendMessageRequest) {
 
         Member currentUser = getMember(currentUserId);
-        ChatRoomMongo chatRoom = mongoChatRoomRepository.findById(roomId)
-            .orElseThrow(() -> new ExceptionHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+        ChatRoomMongo chatRoom = getChatRoomMongo(roomId);
 
         // 참여 권한 확인 (MongoDB에서도 참여자 확인 필요)
         isParticipant(roomId, currentUserId);
@@ -139,27 +145,17 @@ public class ChatRoomMongoServiceImpl implements ChatRoomMongoService {
             sendMessageRequest.getMessageType()
         );
 
-        // MongoDB에서 ID 할당을 위한 코드
-        message = ChatMessageMongo.builder()
-            .chatRoomId(chatRoom.getId())
-            .messageId(UUID.randomUUID().toString())
-            .memberId(currentUserId.toString())
-            .memberNickname(currentUser.getNickname())
-            .memberProfileUrl(currentUser.getProfileImgUrl())
-            .message(sendMessageRequest.getMessage())
-            .messageType(sendMessageRequest.getMessageType())
-            .readCount(0)
-            .createdAt(LocalDateTime.now())
-            .updatedAt(LocalDateTime.now())
-            .build();
         ChatMessageMongo savedMessage = mongoChatMessageRepository.save(message);
 
         // 채팅방 최신 메시지 업데이트
+        // MongoDB 는 직접 Update 연산이 필요함
         Update update = new Update();
         update.set("latestChat", message.getMessage());
         update.set("latestChatDate", LocalDateTime.now());
 
+        // 업데이트 할 문서 쿼리 생성
         Query query = new Query(Criteria.where("_id").is(chatRoom.getId()));
+        // MongoDB 에 직접 업데이트 요청
         mongoTemplate.updateFirst(query, update, ChatRoomMongo.class);
 
         // 채팅방 참가자들의 읽지 않은 메시지 수 업데이트
@@ -176,7 +172,20 @@ public class ChatRoomMongoServiceImpl implements ChatRoomMongoService {
 
         messagingTemplate.convertAndSend("/topic/chatrooms/" + roomId, stompMessage);
 
-        log.info("메시지 전송 완료. 채팅방 ID: {}, 메시지 ID: {}", roomId, message.getMessageId());
+        // 채팅방 참가자들에게 알림 전송
+        chatRoom.getParticipants().forEach(participant -> {
+            if (!participant.getMemberId().equals(currentUserId.toString())) {
+                notificationService.createChatMessageNotification(
+                    roomId,
+                    currentUserId,
+                    UUID.fromString(participant.getMemberId()),
+                    savedMessage.getMessage(),
+                    savedMessage.getCreatedAt()
+                );
+            }
+        });
+
+        log.info("메시지 전송 완료. 채팅방 ID: {}, 메시지 : {}", roomId, message.getMessage());
         return chatRoomMongoConverter.toMessageDto(savedMessage, currentUserId);
     }
 
@@ -223,6 +232,8 @@ public class ChatRoomMongoServiceImpl implements ChatRoomMongoService {
 
         // 읽음 상태로 표시
         markAsRead(roomId, currentUserId);
+
+        notificationService.markChatRoomNotificationsAsRead(roomId, currentUserId);
 
         // DTO 변환 및 반환
         List<ChatMessageDTO> messageDTOs = messages.getContent().stream()
@@ -271,6 +282,10 @@ public class ChatRoomMongoServiceImpl implements ChatRoomMongoService {
     }
 
     private ChatRoomMongo getChatRoom(String roomId) {
+        return getChatRoomMongo(roomId);
+    }
+
+    private ChatRoomMongo getChatRoomMongo(String roomId) {
         ChatRoomMongo chatRoom = mongoChatRoomRepository.findById(roomId)
                 .orElseThrow(() -> {
                     log.error("채팅방을 찾을 수 없음. ID: {}", roomId);

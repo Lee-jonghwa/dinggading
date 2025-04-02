@@ -28,14 +28,4 @@ public class SecurityUtil {
         // JWTUtil을 사용하여 토큰에서 memberId 추출
         return jwtUtil.getMemberId(authorizationHeader);
     }
-
-    public String getCurrentUsername() {
-        String authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            log.error("Authorization 헤더가 없거나 Bearer 토큰이 아닙니다.");
-            throw new ExceptionHandler(ErrorStatus._UNAUTHORIZED);
-        }
-
-        return jwtUtil.getUsername(authorizationHeader);
-    }
 }

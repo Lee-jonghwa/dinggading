@@ -140,6 +140,7 @@ public class ChatRoomMongoController implements ChatRoomApi {
         Pageable pageable = PageRequest.of(0, 100);
         Page<ChatMessageDTO> messages = (Page<ChatMessageDTO>) chatRoomMongoService.getChatMessages(roomId, currentUserId, pageable);
         log.info("채팅방 메시지 히스토리 조회 성공. 채팅방 ID: {}, 메시지 수: {}", roomId, messages.getContent().size());
+        log.info(messages.getContent().toString());
 
         return ResponseEntity.ok(messages);
     }

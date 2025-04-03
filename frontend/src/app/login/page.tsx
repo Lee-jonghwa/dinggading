@@ -10,7 +10,7 @@ const Login: NextPage = () => {
     // const scope = 'profile email';
     
     // 여기가 중요합니다 - 문자열 제대로 정의
-    const authUrl = `http://${url}/oauth2/authorization/google`;
+    const authUrl = `https://j12e107.p.ssafy.io/oauth2/authorization/google`;
     window.location.href = authUrl;
   };
 

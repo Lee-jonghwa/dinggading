@@ -40,6 +40,10 @@ WORKDIR /app
 # Copy the JAR from the build stage
 COPY --from=build /app/backend/build/libs/*.jar app.jar
 
+# 타임존 패키지 설치 및 한국 시간 설정
+RUN apk add --no-cache tzdata
+ENV TZ=Asia/Seoul
+
 # Add a non-root user to run the application
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring

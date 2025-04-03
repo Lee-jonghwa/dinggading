@@ -44,4 +44,4 @@ COPY --from=build /app/backend/build/libs/*.jar app.jar
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-Duser.timezone=Asia/Seou", "-jar", "/app/app.jar"]

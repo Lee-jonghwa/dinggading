@@ -62,4 +62,4 @@ echo -e "\e[1;32m✅ Building: 개발 환경을 구성하는 중 입니다...✅
 
 docker-compose -f docker-compose.dev.yaml down
 
-docker-compose -f docker-compose.dev.yaml up -d --build
+docker-compose -f docker-compose.dev.yaml up "$@"

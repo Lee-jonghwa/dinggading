@@ -44,6 +44,8 @@ echo -e "\e[1;34m🔧 Codegen을 실행합니다. 🔧\e[0m"
 
 ./codegen.sh
 
+docker-compose -f docker-compose.dev.yaml down
+
 # 포트 8080을 사용하는 프로세스의 PID 찾기
 PID=$(netstat -ano | grep ":8080" | grep "LISTENING" | awk '{print $5}')
 
@@ -60,6 +62,5 @@ fi
 # 클린업 완료 및 빌드 시작
 echo -e "\e[1;32m✅ Building: 개발 환경을 구성하는 중 입니다...✅\e[0m"
 
-docker-compose -f docker-compose.dev.yaml down
 
 docker-compose -f docker-compose.dev.yaml up "$@"

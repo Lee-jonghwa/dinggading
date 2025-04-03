@@ -2,7 +2,7 @@
 import { NextPage } from 'next';
 
 const Login: NextPage = () => {
-  const url = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://localhost:8080';
+  //const url = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://localhost:8080';
   const googleLogin = () => {
     // 이 변수들은 실제로 사용되지 않으므로 제거해도 됩니다
     // const clientId = '748370350960-nmharc155g4t38lu25aa3vabncj4msgp.apps.googleusercontent.com';

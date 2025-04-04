@@ -1,0 +1,90 @@
+.pageContainer  {
+  display: flex; 
+  flex-direction: row;
+  align-items: center;
+  height: 100vh;
+  gap: 2rem;
+
+}
+
+.songInfo {
+  /* border: 5px solid salmon; */
+  display: flex; 
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 30rem;
+  height: 90vh;
+  gap: 2rem;
+}
+
+.songText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.songName {
+  font-size: 2rem;
+}
+
+.artist {
+  font-size: 1.5rem;
+}
+
+.imageField {
+  /* border: 5px solid blue; */
+  display: flex; 
+  justify-content: center;
+  align-items: center;
+  height: 50%;
+
+}
+
+.controller {
+  border: 5px solid blueviolet;
+  display: flex; 
+  gap: 2rem;
+}
+
+.leftThing {
+  display: flex; 
+}
+
+.icon {
+  border: 5px solid lightblue;
+  display: flex; 
+}
+
+.playingInfo {
+  /* border: 5px solid blue; */
+  display: flex; 
+  flex-direction: column;
+  flex: 1;
+  /* width: 100%; */
+  align-items: center;
+  gap: 2rem;
+}
+
+.songWave {
+  background-color: darkgrey;
+  /* border: 5px solid; */
+  border-radius: 5px;
+  display: flex; 
+  width: 80%;
+}
+
+.userWave  {
+  background-color: darkgrey;
+  /* border: 5px solid; */
+  border-radius: 5px;
+  display: flex; 
+  width: 80%;
+  padding: 1rem;
+}
+
+.challengeButton {
+  padding: 1rem;
+  border-radius: 5px;
+}

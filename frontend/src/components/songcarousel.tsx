@@ -3,12 +3,15 @@
 import React, { useState } from 'react'
 import Songcard from "@/components/songcard"
 import styles from './songcarousel.module.css'
+import Image from 'next/image'
+import chevronLeft from "@/assets/chevron-left.svg"
+import { getYouTubeThumbnail } from '@/utils/getYoutubeThumbnail'
 
 interface Song {
   songId: number
   title: string 
   artist: string
-  description : string
+  description? : string
   youtubeUrl : string
 }
 
@@ -32,12 +35,12 @@ export default function SongCarousel({ songs }: SongCarouselProps) {
     )
   }
 
-  // youtube 썸네일 활용해 이미지 구하기 
-  const getYouTubeThumbnail = (url: string): string | null => {
-    const match = url.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/);
-    const thumbnailUrl = match ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : null;
-    return thumbnailUrl
-  }
+  // // youtube 썸네일 활용해 이미지 구하기 
+  // const getYouTubeThumbnail = (url: string): string | null => {
+  //   const match = url.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/);
+  //   const thumbnailUrl = match ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : null;
+  //   return thumbnailUrl
+  // }
 
   const bgImage = getYouTubeThumbnail(songs[currentIndex]?.youtubeUrl)
   console.log("songcarousel.tsx/ bgImage : ", bgImage)
@@ -63,7 +66,11 @@ export default function SongCarousel({ songs }: SongCarouselProps) {
             disabled={currentIndex === 0}
             className={styles.prevButton}
             >
-            ▲
+            <Image 
+              src={chevronLeft}
+              alt='to next'
+              style={{transform : "rotate(90deg)"}}
+            />
           </button>
         </div>
 
@@ -79,6 +86,9 @@ export default function SongCarousel({ songs }: SongCarouselProps) {
             // className={styles.largerCard}
             thumbnailImg={getYouTubeThumbnail(songs[currentIndex].youtubeUrl) || ""}
             />
+          <div className={styles.soundTest}>
+            음향 테스트
+          </div>
         </div>
 
         <div className={styles.navigationButtons}>
@@ -87,7 +97,11 @@ export default function SongCarousel({ songs }: SongCarouselProps) {
             disabled={currentIndex === songs.length - 1}
             className={styles.nextButton}
             >
-            ▼
+            <Image 
+              src={chevronLeft}
+              alt='to next'
+              style={{transform : "rotate(-90deg)"}}
+            />
           </button>
         </div>
 

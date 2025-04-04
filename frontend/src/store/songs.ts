@@ -1,58 +1,77 @@
-import axios from "axios"
+'use client'
+
 import { create } from "zustand"
+import { GetSongsByTierTierEnum, SongApi, SongApiGetSongsByTierRequest } from "@generated/api"
+import { useConfigStore } from "./config"
 
-// instrument , tier 를 정하고 요청하면 백에서 곡 팩을 response해준다. 
-// 곡 팩 안에는 title, description, artist가 있다. 
-// title 을 기준으로 도전 페이지로 넘기면 되겠다. 
-
-
+// 타입 정의
 interface Song {
-  songId : number
-  title : string 
-  description : string 
-  artist : string
-  youtubeUrl : string
+  songId: number
+  title: string
+  artist: string
+  youtubeUrl: string
+  description?: string  // description을 옵셔널 필드로 변경
+  audioUrl?: string 
+  waveforUrl?: string 
 }
 
-interface SongsStore {
-  songs : Song[], 
-  loading : boolean, 
-  error : string | null , 
-  fetchSongs : (instrument : string, tier : string) => Promise<void> 
+interface SongsState {
+  songs: Song[]
+  loading: boolean
+  error: string | null
+  fetchSongs: (tier: string) => Promise<void>
 }
 
-export const useSongsStore = create<SongsStore>((set) => ({
-  songs : [] , 
-  loading : false , 
-  error : null , 
-
-  // fetchSongs 에서 할 일 : instrument, tier를 알면 그에 맞는 song list를 불러오기. 
-  fetchSongs : async (instrument , tier) => {
-    console.log("songs.ts/fetchSongs 실행")
-    set({loading : true, error : null})
+// Zustand store 생성
+export const useSongsStore = create<SongsState>((set) => ({
+  songs: [],
+  loading: false,
+  error: null,
+  
+  fetchSongs: async (tier: string) => {
+    set({ loading: true, error: null })
+    
     try {
-      const response = await axios.get(`http://localhost:8081/api/songs/by-tier/${tier}`, {
-        params : { instrument , tier}, 
-        headers : {
-          Authorization : `Bearer YOUR_ACCESS_TOKEN`
-        }
-      })
-      console.log("songs.ts/fetchSongs 실행 성공, response : ", response.data.content )
-      set({ songs : response.data.content , loading : false })
-    } catch (error : unknown) {
-      if (axios.isAxiosError(error)) {
-        console.log("songs.ts/axiosError : ", error)
-        set({
-          error : error.message || "데이터를 불러오지 못했습니다.", 
-          loading : false
-        })
-      } else {
-        console.log("songs.ts/unknownError : ", error)
-        set({
-          error : "알 수 없는 오류가 발생했습니다.", 
-          loading : false
-        })
+      // configStore에서 apiConfig를 가져오는 방식 수정
+      // Zustand store 내부에서는 다른 store의 hook을 직접 사용할 수 없음
+      const configStore = useConfigStore.getState()
+      const apiConfig = configStore.apiConfig
+      
+      // SongApi 인스턴스 생성
+      const songApi = new SongApi(apiConfig)
+      
+      // API 요청 파라미터 설정
+      const params: SongApiGetSongsByTierRequest = {
+        tier: tier as GetSongsByTierTierEnum
       }
+      
+      // API 호출
+      const response = await songApi.getSongsByTier(params)
+      console.log("songs.ts getSongsByTier response:", response)
+      
+      // 타입 호환성을 위해 필요한 필드 변환
+      const formattedSongs = response.data.content.map(songDTO => ({
+        songId: songDTO.songId,
+        title: songDTO.title,
+        description: songDTO.description || '',  // undefined인 경우 빈 문자열로 대체
+        artist: songDTO.artist,
+        youtubeUrl: songDTO.youtubeUrl
+      }));
+      
+      // 성공 시 상태 업데이트
+      set({ 
+        songs: formattedSongs,
+        loading: false,
+        error: null
+      })
+    } catch (error) {
+      console.error("songs.ts getSongsByTier error:", error)
+      
+      // 에러 발생 시 상태 업데이트
+      set({ 
+        loading: false,
+        error: error instanceof Error ? error.message : "Unknown error occurred"
+      })
     }
   }
 }))

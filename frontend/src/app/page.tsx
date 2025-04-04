@@ -2,6 +2,12 @@
 import { useState } from 'react';
 import type { NextPage } from 'next';
 import HorizontalScrollWrapper from '@/components/horizontalscrollwrapper';
+import { RankMatchingApi, RankMatchingApiCreateRankMatchingRequest } from '@generated/api';
+import { CreateRankMatchingRequestDTO } from '@generated/model';
+import { useConfigStore } from '@/store/config';
+// import { RankMatchingApi, RankMatchingApiCreateRankMatchingRequest } from '@generated/api';
+// import { CreateRankMatchingRequestDTO } from '@generated/model';
+// import { Configuration } from '@generated/configuration';
 
 const Home: NextPage = () => {
   const [response, setResponse] = useState<string>('');
@@ -11,9 +17,23 @@ const Home: NextPage = () => {
   console.log("page.tsx", mode);
   console.log("page.tsx", url);
 
+  // config 경로 결정 
+  const { apiConfig } = useConfigStore()
 
-
-  // /src/app/page.tsx
+  const firstRankRequest: CreateRankMatchingRequestDTO = {
+    songInstrumentPackId: 123,
+    instrument: 'BASS',
+    rankType: 'FIRST'
+  };
+  const request :RankMatchingApiCreateRankMatchingRequest = {
+    createRankMatchingRequestDTO: firstRankRequest
+  }
+  const api = new RankMatchingApi(apiConfig);
+  api.createRankMatching(request).then((res) => {
+    console.log(res.data);
+  }).then((err) => {
+    console.log(err);
+  });
 
   const testApi = async () => {
     setLoading(true);

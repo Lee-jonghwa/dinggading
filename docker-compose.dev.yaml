@@ -1,4 +1,22 @@
 services:
+<<<<<<< HEAD
+  # next:
+  #   platform: linux/amd64
+  #   restart: unless-stopped
+  #   build:
+  #     context: .
+  #     dockerfile: ./infra/dockerfiles/frontend.Dockerfile
+  #     args:
+  #       - STAGE=development
+  #       - NEXT_PUBLIC_API_BASE_URL=spring:8080
+  #       - NEXT_PUBLIC_ENV_MODE=DEVELOP_LOCAL
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - ding-ga-ding-network
+
+=======
+>>>>>>> ade38209a0d503e148c42cfdcb2a943510e3c1e6
   spring:
     platform: linux/amd64
     restart: unless-stopped

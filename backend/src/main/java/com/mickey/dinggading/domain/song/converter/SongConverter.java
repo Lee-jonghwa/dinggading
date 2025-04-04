@@ -1,7 +1,6 @@
 package com.mickey.dinggading.domain.song.converter;
 
 import com.mickey.dinggading.domain.memberrank.model.Song;
-import com.mickey.dinggading.model.CreateSongRequestDTO;
 import com.mickey.dinggading.model.SongBasicDTO;
 import com.mickey.dinggading.model.SongByInstrumentDTO;
 import com.mickey.dinggading.model.SongDTO;
@@ -38,19 +37,6 @@ public class SongConverter {
         }
 
         return dto;
-    }
-
-    public Song toEntity(CreateSongRequestDTO dto) {
-        if (dto == null) {
-            return null;
-        }
-
-        return Song.createSong(
-                dto.getTitle(),
-                dto.getArtist(),
-                dto.getDescription(),
-                dto.getYoutubeUrl()
-        );
     }
 
     /**

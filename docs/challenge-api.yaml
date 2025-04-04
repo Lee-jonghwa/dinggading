@@ -755,21 +755,6 @@ components:
         availableDefence: false
         availableFirst: false
 
-    CreateSongByInstrumentRequestDTO:
-      type: object
-      properties:
-        instrument:
-          type: string
-          enum: [ VOCAL, GUITAR, DRUM, BASS ]
-          description: "악기 유형"
-          example: "GUITAR"
-        songInstrumentPackId:
-          type: integer
-          format: int64
-          description: "악기 팩 아이디"
-          example: 1
-      required:
-        - instrument
         
     OngoingMatchingDTO:
       type: object
@@ -1463,33 +1448,6 @@ components:
             songByInstrumentId: 456
             recordUrl: "https://storage.example.com/recordings/user123_song456.mp3"
 
-    CreateSongByInstrumentRequest:
-      required: true
-      content:
-        multipart/form-data:
-          schema:
-            type: object
-            properties:
-              songByInstrumentInfo:
-                $ref: '#/components/schemas/CreateSongByInstrumentRequestDTO'
-              audioFile:
-                type: string
-                format: binary
-                description: "녹음 파일 (mp3, wav 형식)"
-            required:
-              - songByInstrumentInfo
-              - audioFile
-          example:
-            summary: "노래 데이터 예시"
-            value:
-              songByInstrumentInfo: |
-                {
-                  "instrument": "VOCAL",
-                  "songInstrumentPackId": "12",
-                }
-              audioFile: "[이진 오디오 파일 데이터]"
-
-
 
     CreateRankMatchingRequest:
       required: true
@@ -1811,27 +1769,6 @@ paths:
         '200':
           $ref: '#/components/responses/PageSongResponse'
 
-    post:
-      tags:
-        - Song
-      operationId: createSong
-      summary: "새로운 곡 등록"
-      description: "새로운 곡을 등록합니다."
-      deprecated: true
-      security:
-        - BearerAuth: []
-      requestBody:
-        $ref: '#/components/requestBodies/CreateSongRequest'
-      responses:
-        '201':
-          $ref: '#/components/responses/SongResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-
   /songs/{songId}/instruments:
     get:
       tags:
@@ -1845,28 +1782,6 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/SongByInstrumentsResponse'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-
-    post:
-      tags:
-        - Song
-      operationId: addSongInstrument
-      summary: "특정 곡에 악기별 연주 정보 추가"
-      description: "기존 곡에 새로운 악기별 연주 정보를 추가합니다."
-      parameters:
-        - $ref: '#/components/parameters/SongId'
-      requestBody:
-        $ref: '#/components/requestBodies/CreateSongByInstrumentRequest'
-      responses:
-        '201':
-          $ref: '#/components/responses/SongByInstrumentResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
 

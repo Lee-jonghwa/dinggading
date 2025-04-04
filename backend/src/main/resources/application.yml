@@ -2,7 +2,7 @@ spring:
   application:
     name: dinggading
     oauth2:
-      redirectUri: https://j12e107.p.ssafy.io/login
+      redirectUri: https://j12e107.p.ssafy.io/oauth/callback
       failureRedirectUri: https://j12e107.p.ssafy.io/login
 
   data:

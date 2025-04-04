@@ -50,8 +50,6 @@ public class ChatRoomMongoServiceImpl implements ChatRoomMongoService {
     private final NotificationService notificationService;
     private final MongoChatRoomSettingRepository mongoChatRoomSettingRepository;
 
-    public SseEmitter subscribe(UUID memberId) { return notificationService.subscribe(memberId); }
-
     @Override
     public List<ChatRoomDTO> getChatRoomsForUser(UUID currentUserId) {
         List<ChatRoomMongo> chatRooms = mongoChatRoomRepository.findByParticipantsMemberId(currentUserId.toString());
@@ -98,7 +96,6 @@ public class ChatRoomMongoServiceImpl implements ChatRoomMongoService {
 
         // 채팅방 생성
         ChatRoomMongo newChatroom = new ChatRoomMongo(roomType);
-        subscribe(currentUserId);
 
         // 참가자 추가
         ChatRoomParticipantMongo currentUserParticipant = new ChatRoomParticipantMongo(newChatroom, currentUser, ParticipantRole.ADMIN);
@@ -111,8 +108,6 @@ public class ChatRoomMongoServiceImpl implements ChatRoomMongoService {
             newChatroom.addParticipant(targetUserParticipant);
             ChatRoomSettingMongo chatRoomSettingMongo2 = new ChatRoomSettingMongo(newChatroom, targetUser, targetUser.getNickname(), targetUser.getProfileImgUrl());
             newChatroom.addRoomSetting(chatRoomSettingMongo2);
-
-            subscribe(targetUserId);
         }
 
         ChatRoomMongo savedChatroom = mongoChatRoomRepository.save(newChatroom);

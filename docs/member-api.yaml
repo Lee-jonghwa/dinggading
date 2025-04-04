@@ -685,6 +685,13 @@ paths:
       operationId: getNotifications
       summary: "알림 목록 조회"
       description: "현재 로그인한 사용자의 알림 목록을 조회합니다. size, page를 쿼리 파라미터로 전달하여 페이징 처리가 가능하며, type 파라미터로 알림 유형을 필터링할 수 있습니다."
+      parameters:
+        - name: unreadOnly
+          in: query
+          description: "읽은 메세지만 조회할건지, 안 읽은 메세지도도 조회할건지"
+          required: false
+          schema:
+            type: boolean
       security:
         - BearerAuth: []
       x-spring-paginated: true
@@ -749,150 +756,150 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
-  /api/notifications/{notificationId}/read:
-    put:
-      tags:
-        - Notification
-      operationId: markNotificationAsRead
-      summary: "알림 읽음 처리"
-      description: "특정 알림을 읽음 상태로 변경합니다."
-      security:
-        - BearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/NotificationId'
-      responses:
-        '200':
-          description: "알림 읽음 처리 성공"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotificationDTO'
-              example:
-                notificationId: 123
-                senderId: "123e4567-e89b-12d3-a456-426614174000"
-                receiverId: "123e4567-e89b-12d3-a456-426614174001"
-                message: "밴드에 가입 요청이 있습니다."
-                readOrNot: true
-                type: "RECRUITMENT"
-                acceptUrl: "/api/band-requests/123/accept"
-                rejectUrl: "/api/band-requests/123/reject"
-                createdAt: "2023-03-15T14:30:00Z"
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          description: "알림 읽음 처리 권한이 없습니다."
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ProblemDetail'
-                  - type: object
-                    properties:
-                      title:
-                        type: string
-                        example: "알림 읽음 처리 권한이 없습니다."
-        '404':
-          description: "알림을 찾을 수 없습니다."
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ProblemDetail'
-                  - type: object
-                    properties:
-                      title:
-                        type: string
-                        example: "알림을 찾을 수 없습니다."
+  # /api/notifications/{notificationId}/read:
+  #   put:
+  #     tags:
+  #       - Notification
+  #     operationId: markNotificationAsRead
+  #     summary: "알림 읽음 처리"
+  #     description: "특정 알림을 읽음 상태로 변경합니다."
+  #     security:
+  #       - BearerAuth: []
+  #     parameters:
+  #       - $ref: '#/components/parameters/NotificationId'
+  #     responses:
+  #       '200':
+  #         description: "알림 읽음 처리 성공"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/NotificationDTO'
+  #             example:
+  #               notificationId: 123
+  #               senderId: "123e4567-e89b-12d3-a456-426614174000"
+  #               receiverId: "123e4567-e89b-12d3-a456-426614174001"
+  #               message: "밴드에 가입 요청이 있습니다."
+  #               readOrNot: true
+  #               type: "RECRUITMENT"
+  #               acceptUrl: "/api/band-requests/123/accept"
+  #               rejectUrl: "/api/band-requests/123/reject"
+  #               createdAt: "2023-03-15T14:30:00Z"
+  #       '401':
+  #         $ref: '#/components/responses/UnauthorizedError'
+  #       '403':
+  #         description: "알림 읽음 처리 권한이 없습니다."
+  #         content:
+  #           application/json:
+  #             schema:
+  #               allOf:
+  #                 - $ref: '#/components/schemas/ProblemDetail'
+  #                 - type: object
+  #                   properties:
+  #                     title:
+  #                       type: string
+  #                       example: "알림 읽음 처리 권한이 없습니다."
+  #       '404':
+  #         description: "알림을 찾을 수 없습니다."
+  #         content:
+  #           application/json:
+  #             schema:
+  #               allOf:
+  #                 - $ref: '#/components/schemas/ProblemDetail'
+  #                 - type: object
+  #                   properties:
+  #                     title:
+  #                       type: string
+  #                       example: "알림을 찾을 수 없습니다."
 
-  /api/notifications/accept/{notificationId}:
-    post:
-      tags:
-        - Notification
-      operationId: acceptNotification
-      summary: "알림 수락"
-      description: "밴드 가입 요청 등의 알림을 수락합니다."
-      deprecated: true
-      security:
-        - BearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/NotificationId'
-      responses:
-        '200':
-          description: "알림 수락 성공"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotificationDTO'
-              example:
-                notificationId: 123
-                senderId: "123e4567-e89b-12d3-a456-426614174000"
-                receiverId: "123e4567-e89b-12d3-a456-426614174001"
-                message: "밴드 가입 요청이 수락되었습니다."
-                readOrNot: true
-                type: "RECRUITMENT"
-                createdAt: "2023-03-15T14:30:00Z"
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+  # /api/notifications/accept/{notificationId}:
+  #   post:
+  #     tags:
+  #       - Notification
+  #     operationId: acceptNotification
+  #     summary: "알림 수락"
+  #     description: "밴드 가입 요청 등의 알림을 수락합니다."
+  #     deprecated: true
+  #     security:
+  #       - BearerAuth: []
+  #     parameters:
+  #       - $ref: '#/components/parameters/NotificationId'
+  #     responses:
+  #       '200':
+  #         description: "알림 수락 성공"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/NotificationDTO'
+  #             example:
+  #               notificationId: 123
+  #               senderId: "123e4567-e89b-12d3-a456-426614174000"
+  #               receiverId: "123e4567-e89b-12d3-a456-426614174001"
+  #               message: "밴드 가입 요청이 수락되었습니다."
+  #               readOrNot: true
+  #               type: "RECRUITMENT"
+  #               createdAt: "2023-03-15T14:30:00Z"
+  #       '401':
+  #         $ref: '#/components/responses/UnauthorizedError'
+  #       '403':
+  #         $ref: '#/components/responses/ForbiddenError'
+  #       '404':
+  #         $ref: '#/components/responses/NotFoundException'
 
-  /api/notifications/reject/{notificationId}:
-    post:
-      tags:
-        - Notification
-      operationId: rejectNotification
-      summary: "알림 거절"
-      description: "밴드 가입 요청 등의 알림을 거절합니다."
-      deprecated: true
-      security:
-        - BearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/NotificationId'
-      responses:
-        '200':
-          description: "알림 거절 성공"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotificationDTO'
-              example:
-                notificationId: 123
-                senderId: "123e4567-e89b-12d3-a456-426614174000"
-                receiverId: "123e4567-e89b-12d3-a456-426614174001"
-                message: "밴드 가입 요청이 거절되었습니다."
-                readOrNot: true
-                type: "RECRUITMENT"
-                createdAt: "2023-03-15T14:30:00Z"
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+  # /api/notifications/reject/{notificationId}:
+  #   post:
+  #     tags:
+  #       - Notification
+  #     operationId: rejectNotification
+  #     summary: "알림 거절"
+  #     description: "밴드 가입 요청 등의 알림을 거절합니다."
+  #     deprecated: true
+  #     security:
+  #       - BearerAuth: []
+  #     parameters:
+  #       - $ref: '#/components/parameters/NotificationId'
+  #     responses:
+  #       '200':
+  #         description: "알림 거절 성공"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/NotificationDTO'
+  #             example:
+  #               notificationId: 123
+  #               senderId: "123e4567-e89b-12d3-a456-426614174000"
+  #               receiverId: "123e4567-e89b-12d3-a456-426614174001"
+  #               message: "밴드 가입 요청이 거절되었습니다."
+  #               readOrNot: true
+  #               type: "RECRUITMENT"
+  #               createdAt: "2023-03-15T14:30:00Z"
+  #       '401':
+  #         $ref: '#/components/responses/UnauthorizedError'
+  #       '403':
+  #         $ref: '#/components/responses/ForbiddenError'
+  #       '404':
+  #         $ref: '#/components/responses/NotFoundException'
 
-  /api/notifications/{notificationId}:
-    delete:
-      tags:
-        - Notification
-      operationId: deleteNotification
-      summary: "알림 삭제"
-      description: "특정 알림을 삭제합니다."
-      deprecated: true
-      security:
-        - BearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/NotificationId'
-      responses:
-        '204':
-          description: "알림 삭제 성공"
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+  # /api/notifications/{notificationId}:
+  #   delete:
+  #     tags:
+  #       - Notification
+  #     operationId: deleteNotification
+  #     summary: "알림 삭제"
+  #     description: "특정 알림을 삭제합니다."
+  #     deprecated: true
+  #     security:
+  #       - BearerAuth: []
+  #     parameters:
+  #       - $ref: '#/components/parameters/NotificationId'
+  #     responses:
+  #       '204':
+  #         description: "알림 삭제 성공"
+  #       '401':
+  #         $ref: '#/components/responses/UnauthorizedError'
+  #       '403':
+  #         $ref: '#/components/responses/ForbiddenError'
+  #       '404':
+  #         $ref: '#/components/responses/NotFoundException'
 
 security:
   - BearerAuth: []

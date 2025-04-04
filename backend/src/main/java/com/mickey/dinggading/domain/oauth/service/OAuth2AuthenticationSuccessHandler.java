@@ -55,10 +55,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         log.info("jwtToken: {}", jwtToken);
 
         response.setHeader("Authorization", "Bearer " + jwtToken.getAccessToken());
-
+        log.info("uri {}", redirectUri);
         // 토큰과 사용자 정보를 함께 전달
         // URL 파라미터 인코딩
-        String redirectUrl = UriComponentsBuilder.fromUriString(redirectUri)
+        String redirectUrl = UriComponentsBuilder.fromUriString("https://j12e107.p.ssafy.io/login")
                 .queryParam("token", jwtToken.getAccessToken())
                 .queryParam("loginId", member.getUsername())
                 .queryParam("nickname", member.getNickname())

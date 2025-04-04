@@ -4,17 +4,21 @@ import com.mickey.dinggading.base.status.ErrorStatus;
 import com.mickey.dinggading.domain.member.model.entity.Member;
 import com.mickey.dinggading.domain.member.model.entity.Token;
 import com.mickey.dinggading.domain.member.repository.MemberRepository;
+import com.mickey.dinggading.domain.member.service.NotificationService;
 import com.mickey.dinggading.domain.oauth.MemberPrincipal;
 import com.mickey.dinggading.exception.ExceptionHandler;
 import com.mickey.dinggading.util.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
@@ -24,6 +28,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private final MemberRepository memberRepository;
     private final JWTUtil jwtUtil;
+    private final NotificationService notificationService;
+
+    public SseEmitter subscribe(UUID memberId) { return notificationService.subscribe(memberId); }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -33,6 +40,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         MemberPrincipal userPrincipal = (MemberPrincipal) authentication.getPrincipal();
         Member member = memberRepository.findByUsername(userPrincipal.getUsername())
                 .orElseThrow(() -> new ExceptionHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        // 사용자 로그인 시 알림 설정
+        subscribe(member.getMemberId());
 
         // 토큰 생성
         Token jwtToken = jwtUtil.createAccessToken(member);

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -34,7 +35,10 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationConverter notificationConverter;
 
-    private static final long SSE_TIMEOUT = 60 * 60 * 1000L * 24 * 365; // 1년
+    private static final long SSE_TIMEOUT = 60 * 60 * 1000L * 2; // 2시간
+
+    // 사용자별 SSE 연결 시간을 저장
+    private final Map<UUID, LocalDateTime> connectionStartTimes = new ConcurrentHashMap<>();
 
     @Override
     public SseEmitter subscribe(UUID memberId) {
@@ -79,6 +83,8 @@ public class NotificationServiceImpl implements NotificationService {
         // emitter 저장
         emitters.put(memberId, emitter);
         log.info("SSE 구독 완료: 사용자 {}, 현재 연결 수: {}", memberId, emitters.size());
+
+        connectionStartTimes.put(memberId, LocalDateTime.now());
 
         return emitter;
     }
@@ -196,5 +202,22 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         return notifications.map(notificationConverter::fromEntity);
+    }
+
+    // 사용자가 현재 우리 사이트에 접속 중인지 체크해서 SSE 연결 유지 혹은 제거
+    @Scheduled(fixedRate = 900000) // 15분마다 실행
+    public void sendHeartbeat() {
+        emitters.forEach((memberId, emitter) -> {
+            try {
+                emitter.send(SseEmitter.event()
+                    .name("heartbeat")
+                    .data("ping"));
+                log.debug("하트비트 전송 성공: 사용자 {}", memberId);
+            } catch (IOException e) {
+                log.error("하트비트 전송 실패, 연결 종료: 사용자 {}", memberId);
+                emitter.complete();
+                emitters.remove(memberId);
+            }
+        });
     }
 }

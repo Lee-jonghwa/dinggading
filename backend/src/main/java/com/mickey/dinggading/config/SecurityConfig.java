@@ -1,6 +1,7 @@
 package com.mickey.dinggading.config;
 
 import com.mickey.dinggading.domain.member.repository.MemberRepository;
+import com.mickey.dinggading.domain.member.service.NotificationService;
 import com.mickey.dinggading.domain.oauth.service.CustomOAuth2UserService;
 import com.mickey.dinggading.domain.oauth.service.OAuth2AuthenticationFailureHandler;
 import com.mickey.dinggading.domain.oauth.service.OAuth2AuthenticationSuccessHandler;
@@ -28,6 +29,7 @@ public class SecurityConfig {
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
     private final JWTUtil jwtUtil;
+    private final NotificationService notificationService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, MemberRepository memberRepository)
@@ -59,7 +61,7 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService))
-                        .successHandler(new OAuth2AuthenticationSuccessHandler(memberRepository, jwtUtil))
+                        .successHandler(new OAuth2AuthenticationSuccessHandler(memberRepository, jwtUtil, notificationService))
                         .failureHandler(oAuth2AuthenticationFailureHandler)
                 );
 

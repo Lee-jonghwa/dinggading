@@ -96,10 +96,6 @@ components:
     RecordCreateRequestDTO:
       type: object
       properties:
-        memberId:
-          type: string
-          format: uuid
-          description: "회원 ID"
         attemptId:
           type: integer
           format: int64
@@ -112,7 +108,6 @@ components:
           type: string
           description: "녹음 제목"
       required:
-        - memberId
         - dtype
         - title
   
@@ -223,7 +218,7 @@ security:
   - BearerAuth: []
 
 paths:
-  /api/records:
+  /api/records/me:
     post:
       tags:
         - Record

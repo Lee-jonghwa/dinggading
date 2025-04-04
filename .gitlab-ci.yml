@@ -54,7 +54,7 @@ test_backend:
   before_script:
     - ls -la ./backend/generated
   script:
-    - docker buildx build -t ${PROJECT_NAME}-spring-test --target test -f ./infra/dockerfiles/backend.Dockerfile --build-arg PLATFORM=linux/amd64 --platform linux/amd64 .
+    - docker buildx build -t ${PROJECT_NAME}-spring-test --target test --no-cache -f ./infra/dockerfiles/backend.Dockerfile --build-arg PLATFORM=linux/amd64 --platform linux/amd64 .
     - docker run --rm ${PROJECT_NAME}-spring-test
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'

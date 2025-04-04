@@ -4,6 +4,7 @@ import com.mickey.dinggading.api.RecordApi;
 import com.mickey.dinggading.domain.record.service.RecordService;
 import com.mickey.dinggading.model.RecordCreateRequestDTO;
 import com.mickey.dinggading.model.RecordDTO;
+import com.mickey.dinggading.util.SecurityUtil;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,18 +20,21 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class RecordController implements RecordApi {
     private final RecordService recordService;
+    private final SecurityUtil securityUtil;
 
     /**
-     * POST /api/records : 녹음 생성 새로운 연주 녹음을 업로드합니다.
+     * POST /api/records/me : 녹음 생성 새로운 연주 녹음을 업로드합니다. 업로드가 끝나면 분석이 바로 시작됩니다.
      *
      * @param recordInfo (required)
      * @param audioFile  녹음 파일 (mp3, wav 형식) (required)
-     * @return 녹음 생성 결과 (status code 201) or 잘못된 요청 (status code 400) or 인증 실패 (status code 401)
+     * @return RecordDTO 녹음 생성 결과 (status code 201) or 잘못된 요청 (status code 400) or 인증 실패 (status code 401)
      */
     @Override
     public ResponseEntity<?> createRecord(RecordCreateRequestDTO recordInfo, MultipartFile audioFile) {
-        log.info("녹음 생성 요청: memberId = {}, dtype = {}", recordInfo.getMemberId(), recordInfo.getDtype());
-        RecordDTO createdRecord = recordService.createRecord(recordInfo, audioFile);
+        UUID memberId = securityUtil.getCurrentMemberId();
+        log.info("녹음 생성 요청: dtype = {}", recordInfo.getDtype());
+
+        RecordDTO createdRecord = recordService.createRecord(recordInfo, memberId, audioFile);
         return new ResponseEntity<>(createdRecord, HttpStatus.CREATED);
     }
 

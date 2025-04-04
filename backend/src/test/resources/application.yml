@@ -97,3 +97,7 @@ rabbitmq:
   audio-analysis-response:
     routing:
       key: audio.analysis.response
+
+openvidu:
+  secret: test
+  url: http://test

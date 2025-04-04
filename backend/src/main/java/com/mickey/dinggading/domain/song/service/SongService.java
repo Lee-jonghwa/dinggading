@@ -12,7 +12,7 @@ import com.mickey.dinggading.domain.song.repository.SongByInstrumentRepository;
 import com.mickey.dinggading.domain.song.repository.SongInstrumentPackRepository;
 import com.mickey.dinggading.domain.song.repository.SongRepository;
 import com.mickey.dinggading.exception.ExceptionHandler;
-import com.mickey.dinggading.model.AddSongInstrumentRequest;
+import com.mickey.dinggading.model.CreateSongByInstrumentRequestDTO;
 import com.mickey.dinggading.model.CreateSongRequestDTO;
 import com.mickey.dinggading.model.CreateSongRequestDTOInstrumentsInner;
 import com.mickey.dinggading.model.SongByInstrumentDTO;
@@ -129,7 +129,7 @@ public class SongService {
      * 기존 곡에 특정 악기 버전을 추가합니다.
      */
     @Transactional
-    public SongByInstrumentDTO addSongInstrument(Long songId, AddSongInstrumentRequest request) {
+    public SongByInstrumentDTO addSongInstrument(Long songId, CreateSongByInstrumentRequestDTO request) {
         log.info("곡에 악기 버전 추가. 곡 ID: {}, 악기: {}", songId, request.getInstrument());
 
         // 곡 존재 확인
@@ -143,7 +143,7 @@ public class SongService {
         SongInstrumentPack pack = findPackByInstrument(instrument);
 
         // 악기 버전 추가 및 저장
-        addInstrumentToSong(song, instrument, request.getMediaUrl(), pack);
+//        addInstrumentToSong(song, instrument, request.(), pack);
 
         // 추가된 악기 버전 찾기
         SongByInstrument addedInstrument = findAddedInstrument(song, instrument);

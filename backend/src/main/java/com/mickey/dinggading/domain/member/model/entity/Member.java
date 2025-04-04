@@ -48,7 +48,7 @@ public class Member extends BaseEntity {
     @Comment("즐겨찾기 된 밴드")
     private Long favoriteBandId;
 
-    @Column(name = "profile_img_url", nullable = false)
+    @Column(name = "profile_img_url", nullable = true)
     @Comment("프로필 이미지")
     private String profileImgUrl;
 

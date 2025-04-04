@@ -12,6 +12,8 @@ import com.mickey.dinggading.domain.record.model.Record;
 import com.mickey.dinggading.domain.record.repository.AudioRecordRepository;
 import com.mickey.dinggading.exception.ExceptionHandler;
 import com.mickey.dinggading.infra.minio.AudioFileService;
+import com.mickey.dinggading.infra.minio.MinioProperties;
+import com.mickey.dinggading.infra.minio.MinioService;
 import com.mickey.dinggading.infra.rabbitmq.dto.MessageDTO;
 import com.mickey.dinggading.infra.rabbitmq.producer.JsonMessageProducer;
 import com.mickey.dinggading.model.RecordCreateRequestDTO;
@@ -20,21 +22,27 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecordService {
+    private static final int DEFAULT_EXPIRY_SECONDS = 3600;
+
     private final JsonMessageProducer jsonMessageProducer;
     private final AudioRecordRepository audioRecordRepository;
     private final MemberRepository memberRepository;
     private final AttemptRepository attemptRepository;
     private final AudioFileService audioFileService;
     private final RecordConverter recordConverter;
+    private final MinioProperties minioProperties;
+    private final MinioService minioService;
 
     /**
      * 새로운 녹음을 생성합니다.
@@ -44,13 +52,13 @@ public class RecordService {
      * @return 생성된 녹음 정보
      */
     @Transactional
-    public RecordDTO createRecord(RecordCreateRequestDTO recordInfo, MultipartFile audioFile) {
+    public RecordDTO createRecord(RecordCreateRequestDTO recordInfo, UUID memberId, MultipartFile audioFile) {
         if (audioFile == null || audioFile.isEmpty()) {
             throw new ExceptionHandler(ErrorStatus.INVALID_AUDIO_FILE);
         }
 
         // 멤버 조회
-        Member member = memberRepository.findById(recordInfo.getMemberId())
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ExceptionHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         // 도전 정보 조회 (없을 수 있음)
@@ -64,7 +72,7 @@ public class RecordService {
         String recordUrl = audioFileService.uploadAudioFile(
                 audioFile,
                 recordInfo.getDtype().getValue(),
-                recordInfo.getMemberId().toString()
+                memberId.toString()
         );
 
         // 레코드 엔티티 생성
@@ -87,14 +95,28 @@ public class RecordService {
     private void sendAudioAnalyzeMessage(RecordCreateRequestDTO recordInfo, Attempt attempt, Record savedRecord,
                                          Member member) {
         Song song = getSongIdFromAttempt(attempt.getAttemptId());
+
+        String userRecordSongUrl = minioService.generatePresignedUrl(
+                minioProperties.getBucketName(),
+                savedRecord.getRecordUrl(),
+                DEFAULT_EXPIRY_SECONDS
+        );
+        String originalSongUrl = minioService.generatePresignedUrl(
+                minioProperties.getBucketName(),
+                attempt.getSongByInstrument().getSongByInstrumentFilename(),
+                DEFAULT_EXPIRY_SECONDS
+        );
+
         // URL, 노래 제목, 악기
         HashMap<String, Object> payload = new HashMap<>();
         payload.put("title", recordInfo.getTitle());
         payload.put("songTitle", song.getTitle());
         payload.put("songId", song.getSongId());
-        payload.put("recordUrl", savedRecord.getRecordUrl());
+        payload.put("recordUrl", userRecordSongUrl);
+        payload.put("originalSongUrl", originalSongUrl);
 
         MessageDTO message = new MessageDTO(payload, member.getMemberId(), LocalDateTime.now());
+
         jsonMessageProducer.sendJsonMessage(message);
     }
 

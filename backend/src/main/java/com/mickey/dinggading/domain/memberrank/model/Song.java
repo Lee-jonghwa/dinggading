@@ -43,6 +43,9 @@ public class Song extends BaseEntity {
     @Column(name = "youtube_url", nullable = false, length = 255)
     private String youtubeUrl;
 
+    @Column(name = "filename", nullable = true, length = 255)
+    private String filename;
+
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SongByInstrument> songByInstruments = new ArrayList<>();
 

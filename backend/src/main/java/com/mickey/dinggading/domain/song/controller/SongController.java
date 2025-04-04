@@ -2,7 +2,7 @@ package com.mickey.dinggading.domain.song.controller;
 
 import com.mickey.dinggading.api.SongApi;
 import com.mickey.dinggading.domain.song.service.SongService;
-import com.mickey.dinggading.model.AddSongInstrumentRequest;
+import com.mickey.dinggading.model.CreateSongByInstrumentRequestDTO;
 import com.mickey.dinggading.model.CreateSongRequestDTO;
 import com.mickey.dinggading.model.SongByInstrumentDTO;
 import com.mickey.dinggading.model.SongDTO;
@@ -14,26 +14,29 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 public class SongController implements SongApi {
-
     private final SongService songService;
 
     /**
      * POST /songs/{songId}/instruments : 특정 곡에 악기별 연주 정보 추가 기존 곡에 새로운 악기별 연주 정보를 추가합니다.
      *
-     * @param songId                   곡 ID (required)
-     * @param addSongInstrumentRequest 악기 정보 (required)
-     * @return SongByInstrumentDTO 악기별 곡 상세 정보 응답 (status code 201)
+     * @param songId               곡 ID (required)
+     * @param songByInstrumentInfo (required)
+     * @param audioFile            녹음 파일 (mp3, wav 형식) (required)
+     * @return SongByInstrumentDTO 악기별 곡 상세 정보 응답 (status code 201) or 잘못된 요청입니다. (status code 400) or 인증되지 않은 요청입니다.
+     * (status code 401) or 권한이 없는 요청입니다. (status code 403) or 요청한 리소스를 찾을 수 없습니다. (status code 404)
      */
     @Override
-    public ResponseEntity<?> addSongInstrument(Long songId, AddSongInstrumentRequest addSongInstrumentRequest) {
-        log.info("곡에 악기 추가 요청. 곡 ID: {}, 악기: {}", songId, addSongInstrumentRequest.getInstrument());
+    public ResponseEntity<?> addSongInstrument(Long songId, CreateSongByInstrumentRequestDTO songByInstrumentInfo,
+                                               MultipartFile audioFile) {
+        log.info("곡에 악기 추가 요청. 곡 ID: {}, 악기: {}", songId, songByInstrumentInfo.getInstrument());
 
-        SongByInstrumentDTO result = songService.addSongInstrument(songId, addSongInstrumentRequest);
+        SongByInstrumentDTO result = songService.addSongInstrument(songId, songByInstrumentInfo);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

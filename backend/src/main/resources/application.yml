@@ -16,6 +16,7 @@ spring:
       password: ${MONGO_INITDB_ROOT_PASSWORD}
       database: ${MONGO_INITDB_DATABASE}
       authentication-database: admin
+
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
@@ -65,6 +66,12 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: ${JPA_DDL_AUTO}
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      data-locations: classpath:song.sql
+      mode: ${SQL_INIT_MODE}
 
   datasource:
     url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?serverTimezone=UTC&useUniCode=yes&characterEncoding=UTF-8
@@ -93,13 +100,6 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
-logging:
-  level:
-    root: info
-    com.mickey: ${LOGGING_LEVEL}
-    # org.springframework.jdbc.datasource.DataSourceUtils: OFF
-    # com.p6spy: OFF
-    # p6spy: OFF
 ai:
   service:
     url: ${SPRING_AI_SERVICE_URL}
@@ -130,3 +130,7 @@ rabbitmq:
   audio-analysis-response:
     routing:
       key: audio.analysis.response
+
+openvidu:
+  secret: ${OPENVIDU_SECRET}
+  url: https://${OPENVIDU_HOST}:${OPENVIDU_PORT}/openvidu

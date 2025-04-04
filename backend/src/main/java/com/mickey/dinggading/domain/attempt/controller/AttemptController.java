@@ -44,9 +44,9 @@ public class AttemptController implements AttemptApi {
         UUID currentId = securityUtil.getCurrentMemberId();
 
         // 시도 기록 생성 및 분석 요청
-        Long attemptId = attemptService.createAttempt(requestDTO, currentId);
+        AttemptDTO attempt = attemptService.createAttempt(requestDTO, currentId);
 
-        return new ResponseEntity<>(attemptId, HttpStatus.CREATED);
+        return new ResponseEntity<>(attempt, HttpStatus.CREATED);
     }
 
     @GetMapping("/api/attempts/test")

@@ -6,6 +6,7 @@ import com.mickey.dinggading.domain.oauth.service.OAuth2AuthenticationFailureHan
 import com.mickey.dinggading.domain.oauth.service.OAuth2AuthenticationSuccessHandler;
 import com.mickey.dinggading.util.JWTAuthenticationFilter;
 import com.mickey.dinggading.util.JWTUtil;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,8 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -71,7 +70,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8080", "http://localhost:18513",
+        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3001", "http://localhost:8080",
+                "http://localhost:18513",
                 "http://localhost:18512", "http://127.0.0.1:5500", "http://192.168.30.180:5500"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));

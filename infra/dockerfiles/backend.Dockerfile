@@ -26,7 +26,7 @@ CMD ["./gradlew", "bootRun", "--no-daemon"]
 # Test stage for running tests
 FROM development as test
 WORKDIR /app/backend
-CMD ["./gradlew", "test", "--no-daemon"]
+CMD ["./gradlew", "test", "--no-daemon", "-Dorg.gradle.jvmargs=-Djdk.internal.disableMetrics=true"]
 
 # Build stage for creating the JAR
 FROM development as build

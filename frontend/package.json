@@ -24,7 +24,15 @@
     "three": "^0.174.0",
     "use-local-storage": "^3.0.0",
     "zustand": "^5.0.3",
-    "sharp": "^0.32.6"
+    "sharp": "^0.32.6",
+
+
+
+
+
+
+    "bootstrap": "^5.3.3",
+    "openvidu-browser": "2.31.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

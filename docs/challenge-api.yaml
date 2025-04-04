@@ -755,6 +755,22 @@ components:
         availableDefence: false
         availableFirst: false
 
+    CreateSongByInstrumentRequestDTO:
+      type: object
+      properties:
+        instrument:
+          type: string
+          enum: [ VOCAL, GUITAR, DRUM, BASS ]
+          description: "악기 유형"
+          example: "GUITAR"
+        songInstrumentPackId:
+          type: integer
+          format: int64
+          description: "악기 팩 아이디"
+          example: 1
+      required:
+        - instrument
+        
     OngoingMatchingDTO:
       type: object
       properties:
@@ -1450,22 +1466,30 @@ components:
     CreateSongByInstrumentRequest:
       required: true
       content:
-        application/json:
+        multipart/form-data:
           schema:
             type: object
             properties:
-              instrument:
+              songByInstrumentInfo:
+                $ref: '#/components/schemas/CreateSongByInstrumentRequestDTO'
+              audioFile:
                 type: string
-                enum: [ VOCAL, GUITAR, DRUM, BASS ]
-                description: "악기 유형"
-                example: "GUITAR"
-              mediaUrl:
-                type: string
-                description: "악기별 연주 음원 URL"
-                example: "https://dingading.com/media/songs/42/guitar.mp3"
+                format: binary
+                description: "녹음 파일 (mp3, wav 형식)"
             required:
-              - instrument
-              - mediaUrl
+              - songByInstrumentInfo
+              - audioFile
+          example:
+            summary: "노래 데이터 예시"
+            value:
+              songByInstrumentInfo: |
+                {
+                  "instrument": "VOCAL",
+                  "songInstrumentPackId": "12",
+                }
+              audioFile: "[이진 오디오 파일 데이터]"
+
+
 
     CreateRankMatchingRequest:
       required: true

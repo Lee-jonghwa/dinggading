@@ -1,0 +1,78 @@
+@token = {{token}}
+@instrument = VOCAL
+@rankMatchingId = {{rankMatchingId}}
+
+# 1. 로그인, 도전 생성,
+### 1. 유저 회원 가입
+
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+> {%
+    client.global.set("token", response.body.accessToken);
+    client.test("Validate", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### 2. 유저 실버로 도전
+POST {{baseUrl}}/api/rank-matchings
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "songInstrumentPackId": 21,
+  "instrument": "{{instrument}}",
+  "rankType": "CHALLENGE",
+  "targetTier": "SILVER"
+}
+
+> {%
+    client.global.set("rankMatchingId", response.body.rankMatchingId);
+    client.test("Validate", function () {
+        client.assert(response.status === 201, "Response status is not 200");
+    });
+%}
+
+### 3. 유저 도전 모드 시도
+POST {{baseUrl}}/api/attempts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "rankMatchingId": {{rankMatchingId}},
+  "songByInstrumentId": 26,
+  "recordUrl": "",
+  "gameType": "RANK"
+}
+
+> {%
+    client.global.set("attemptId", response.body.attemptId);
+    client.test("Validate", function () {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+%}
+
+### 4. 녹음 생성 (POST /api/records)
+POST {{baseUrl}}/api/records/me
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Authorization: Bearer {{token}}
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="recordInfo"
+Content-Type: application/json
+
+{
+  "attemptId": {{attemptId}},
+  "dtype": "CHALLENGE",
+  "title": "테스트 녹음"
+}
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="audioFile"; filename="sample.mp3"
+Content-Type: audio/mpeg
+
+< ./sample.mp3
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### 5. 유저 녹음 확인
+GET {{baseUrl}}/api/1

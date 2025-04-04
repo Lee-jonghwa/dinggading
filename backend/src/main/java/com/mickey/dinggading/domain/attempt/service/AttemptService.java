@@ -56,7 +56,7 @@ public class AttemptService {
      * @return 생성된 시도 ID
      */
     @Transactional
-    public Long createAttempt(CreateAttemptRequestDTO requestDTO, UUID memberId) {
+    public AttemptDTO createAttempt(CreateAttemptRequestDTO requestDTO, UUID memberId) {
         Long songByInstrumentId = requestDTO.getSongByInstrumentId();
         Long rankMatchingId = requestDTO.getRankMatchingId();
         GameType gameType = GameType.valueOf(requestDTO.getGameType().name());
@@ -82,7 +82,7 @@ public class AttemptService {
         Attempt save = attemptRepository.save(attempt);
         log.info("시도 기록 생성 완료: 시도 ID: {}", save.getAttemptId());
 
-        return save.getAttemptId();
+        return rankMatchingConverter.toDTO(save);
     }
 
     /**

@@ -74,8 +74,8 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3001", "http://localhost:8080",
                 "http://localhost:18513",
-                "http://localhost:18512", "http://127.0.0.1:5500", +
-                "https://j12e107.p.ssafy.io/"));
+                "http://localhost:18512", "http://127.0.0.1:5500",
+                "https://j12e107.p.ssafy.io"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
         config.setExposedHeaders(List.of("Authorization"));

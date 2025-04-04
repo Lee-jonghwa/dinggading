@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,14 +30,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final JWTUtil jwtUtil;
     private final NotificationService notificationService;
 
-    @Value("${application.oauth2.redirectUri:http://localhost:3000/login/oauth2/code/google}")
+    @Value("${spring.application.oauth2.redirectUri:http://localhost:3000/login/oauth2/code/google}")
     private String redirectUri;
 
-    public SseEmitter subscribe(UUID memberId) { return notificationService.subscribe(memberId); }
+    public SseEmitter subscribe(UUID memberId) {
+        return notificationService.subscribe(memberId);
+    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response, Authentication authentication) throws IOException {
+                                        HttpServletResponse response, Authentication authentication)
+            throws IOException {
 
         log.info("onAuthenticationSuccess 호출");
         MemberPrincipal userPrincipal = (MemberPrincipal) authentication.getPrincipal();

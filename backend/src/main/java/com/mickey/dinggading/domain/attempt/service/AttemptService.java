@@ -67,7 +67,7 @@ public class AttemptService {
 
         // 1. SongByInstrument 조회
         SongByInstrument songByInstrument = songByInstrumentRepository.findById(songByInstrumentId)
-                .get();
+                .orElseThrow(() -> new ExceptionHandler(ErrorStatus.SONG_BY_INSTRUMENT_NOT_FOUND));
 
         // 랭크 매칭 조회 (랭크 모드일 경우에만 사용됨)
         RankMatching rankMatching = null;

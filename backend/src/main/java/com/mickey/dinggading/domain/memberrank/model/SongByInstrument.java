@@ -43,8 +43,8 @@ public class SongByInstrument extends BaseEntity {
     @JoinColumn(name = "song_instrument_pack_id", nullable = false)
     private SongInstrumentPack songInstrumentPack;
 
-    @Column(name = "instrument_url", nullable = false, length = 255)
-    private String instrumentUrl;
+    @Column(name = "song_by_instrument_ex_filename", nullable = false, length = 255)
+    private String songByInstrumentExFilename;
 
     @Column(name = "song_by_instrument_filename", nullable = false)
     private String songByInstrumentFilename;
@@ -61,12 +61,17 @@ public class SongByInstrument extends BaseEntity {
     private List<Attempt> attempts = new ArrayList<>();
 
     // 생성자
-    private SongByInstrument(Song song, Instrument instrument, Tier tier,
-                             String instrumentUrl, SongInstrumentPack pack) {
+    private SongByInstrument(Song song,
+                             Instrument instrument,
+                             Tier tier,
+                             String songByInstrumentExFilename,
+                             String songByInstrumentFilename,
+                             SongInstrumentPack pack) {
         this.song = song;
         this.instrument = instrument;
         this.tier = tier;
-        this.instrumentUrl = instrumentUrl;
+        this.songByInstrumentExFilename = songByInstrumentExFilename;
+        this.songByInstrumentFilename = songByInstrumentFilename;
         this.songInstrumentPack = pack;
     }
 
@@ -74,7 +79,8 @@ public class SongByInstrument extends BaseEntity {
     public static SongByInstrument createSongByInstrument(Song song,
                                                           Instrument instrument,
                                                           Tier tier,
-                                                          String instrumentUrl,
+                                                          String songByInstrumentExFilename,
+                                                          String songByInstrumentFilename,
                                                           SongInstrumentPack pack) {
         if (song == null) {
             throw new IllegalArgumentException("곡은 필수입니다.");
@@ -85,7 +91,7 @@ public class SongByInstrument extends BaseEntity {
         if (tier == null) {
             throw new IllegalArgumentException("티어는 필수입니다.");
         }
-        if (instrumentUrl == null || instrumentUrl.isEmpty()) {
+        if (songByInstrumentExFilename == null || songByInstrumentExFilename.isEmpty()) {
             throw new IllegalArgumentException("악기 URL은 필수입니다.");
         }
 
@@ -94,13 +100,15 @@ public class SongByInstrument extends BaseEntity {
             throw new IllegalArgumentException("선택한 팩의 티어와 악기가 파라미터와 일치하지 않습니다.");
         }
 
-        SongByInstrument songByInstrument = new SongByInstrument(song, instrument, tier, instrumentUrl, pack);
+        return SongByInstrument.builder()
+                .song(song)
+                .instrument(instrument)
+                .tier(tier)
+                .songByInstrumentFilename(songByInstrumentFilename)
+                .songByInstrumentExFilename(songByInstrumentExFilename)
+                .songInstrumentPack(pack)
+                .build();
 
-        // 양방향 관계 설정을 위해 팩의 songs 컬렉션에 추가
-        // 이 부분은 SongInstrumentPack.addSong() 메소드에서 처리해야 하므로 주석 처리
-        // pack.getSongs().add(songByInstrument);
-
-        return songByInstrument;
     }
 
     // 악기 연주 URL 업데이트
@@ -108,7 +116,7 @@ public class SongByInstrument extends BaseEntity {
         if (instrumentUrl == null || instrumentUrl.isEmpty()) {
             throw new IllegalArgumentException("악기 URL은 필수입니다.");
         }
-        this.instrumentUrl = instrumentUrl;
+        this.songByInstrumentExFilename = instrumentUrl;
     }
 
     // 티어 난이도 변경

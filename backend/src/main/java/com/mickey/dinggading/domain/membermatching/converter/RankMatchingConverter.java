@@ -129,7 +129,7 @@ public class RankMatchingConverter {
                 .songByInstrumentId(songByInstrument.getSongByInstrumentId())
                 .songId(songByInstrument.getSongByInstrumentId())
                 .songInstrumentPackId(songByInstrument.getSongInstrumentPack().getSongInstrumentPackId())
-                .instrumentUrl(songByInstrument.getInstrumentUrl())
+                .instrumentUrl(songByInstrument.getSongByInstrumentExFilename())
                 .instrument(SongByInstrumentDTO.InstrumentEnum.valueOf(songByInstrument.getInstrument().name()))
                 .tier(TierEnum.valueOf(songByInstrument.getTier().name()))
                 .build();

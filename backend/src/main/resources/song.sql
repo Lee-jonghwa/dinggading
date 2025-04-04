@@ -1,161 +1,148 @@
 -- 트랜잭션 시작
 START TRANSACTION;
 
--- 1. song 테이블 더미 데이터
-INSERT INTO `song` (`created_at`, `artist`, `description`, `title`, `youtube_url`)
-VALUES ('2025-04-01 12:00:00', '넬(NELL)', '감성적인 록 발라드', '기억을 걷는 시간', 'https://www.youtube.com/watch?v=K72ZxP9ZAP4'),
-       ('2025-04-01 12:10:00', '혁오(HYUKOH)', '인디 록 장르', '위잉위잉', 'https://www.youtube.com/watch?v=ql_OZX0yR1s'),
-       ('2025-04-01 12:20:00', '버즈(BUZZ)', '록 발라드 명곡', '가시', 'https://www.youtube.com/watch?v=W0cs6ciCt_k'),
-       ('2025-04-01 12:30:00', '데이식스(DAY6)', '밴드 록 장르', 'Zombie', 'https://www.youtube.com/watch?v=k8gx-C7GCGU'),
-       ('2025-04-01 12:40:00', '악동뮤지션', '어쿠스틱 팝', '오랜 날 오랜 밤', 'https://www.youtube.com/watch?v=wEQpfil0IYA'),
-       ('2025-04-01 12:50:00', '자우림', '록 발라드', '스물다섯, 스물하나', 'https://www.youtube.com/watch?v=LrB-fJn-3w4'),
-       ('2025-04-01 13:00:00', '소방차', '클래식 록', '어젯밤이야기', 'https://www.youtube.com/watch?v=q17IYOZ6rxk'),
-       ('2025-04-01 13:10:00', 'Queen', '록 클래식', 'Bohemian Rhapsody', 'https://www.youtube.com/watch?v=fJ9rUzIMcZQ'),
-       ('2025-04-01 13:20:00', '아이유(IU)', '팝 발라드', '밤편지', 'https://www.youtube.com/watch?v=BzYnNdJhZQw'),
-       ('2025-04-01 13:30:00', '이무진', '감성 발라드', '신호등', 'https://www.youtube.com/watch?v=SK6Sm2Ki9tI'),
-       ('2025-04-01 13:40:00', '블루베리노트', '재즈 팝', '별이 빛나는 밤에', 'https://www.youtube.com/watch?v=5WQVg7s7HmA'),
-       ('2025-04-01 13:50:00', '김동률', '팝 발라드', '아주 사적인 노래', 'https://www.youtube.com/watch?v=mk5fDV6cGQo'),
-       ('2025-04-01 14:00:00', '잔나비', '인디 록', '주저하는 연인들을 위해', 'https://www.youtube.com/watch?v=5g4KsIizYhQ'),
-       ('2025-04-01 14:10:00', '이센스(E SENS)', '힙합', 'The Anecdote', 'https://www.youtube.com/watch?v=sQ1xm30Eirw'),
-       ('2025-04-01 14:20:00', '세븐틴(SEVENTEEN)', '밴드 사운드', 'Rock with you',
-        'https://www.youtube.com/watch?v=WpuatuzSDK4');
-
--- 2. song_instrument_pack 테이블 더미 데이터
-INSERT INTO `song_instrument_pack` (`created_at`, `pack_name`, `song_pack_instrument`, `song_pack_tier`)
+-- 1. song_instrument_pack 더미 데이터 생성
+-- 티어별, 악기별 팩 생성 (기존과 동일)
+INSERT INTO song_instrument_pack (created_at, updated_at, pack_name, song_pack_instrument, song_pack_tier)
 VALUES
--- 기타 팩
-('2025-04-01 15:00:00', '기타 입문자 팩', 'GUITAR', 'IRON'),
-('2025-04-01 15:10:00', '기타 초보자 팩', 'GUITAR', 'BRONZE'),
-('2025-04-01 15:20:00', '기타 중급자 팩', 'GUITAR', 'SILVER'),
-('2025-04-01 15:30:00', '기타 상급자 팩', 'GUITAR', 'GOLD'),
-('2025-04-01 15:40:00', '기타 프로 팩', 'GUITAR', 'PLATINUM'),
-('2025-04-01 15:50:00', '기타 마스터 팩', 'GUITAR', 'DIAMOND'),
+-- VOCAL 팩
+(NOW(), NOW(), 'VOCAL 입문자 팩', 'VOCAL', 'IRON'),
+(NOW(), NOW(), 'VOCAL 초보자 팩', 'VOCAL', 'BRONZE'),
+(NOW(), NOW(), 'VOCAL 중급자 팩', 'VOCAL', 'SILVER'),
+(NOW(), NOW(), 'VOCAL 상급자 팩', 'VOCAL', 'GOLD'),
+(NOW(), NOW(), 'VOCAL 전문가 팩', 'VOCAL', 'PLATINUM'),
+(NOW(), NOW(), 'VOCAL 마스터 팩', 'VOCAL', 'DIAMOND'),
 
--- 베이스 팩
-('2025-04-01 16:00:00', '베이스 입문자 팩', 'BASS', 'IRON'),
-('2025-04-01 16:10:00', '베이스 초보자 팩', 'BASS', 'BRONZE'),
-('2025-04-01 16:20:00', '베이스 중급자 팩', 'BASS', 'SILVER'),
-('2025-04-01 16:30:00', '베이스 상급자 팩', 'BASS', 'GOLD'),
-('2025-04-01 16:40:00', '베이스 프로 팩', 'BASS', 'PLATINUM'),
-('2025-04-01 16:50:00', '베이스 마스터 팩', 'BASS', 'DIAMOND'),
+-- GUITAR 팩
+(NOW(), NOW(), 'GUITAR 입문자 팩', 'GUITAR', 'IRON'),
+(NOW(), NOW(), 'GUITAR 초보자 팩', 'GUITAR', 'BRONZE'),
+(NOW(), NOW(), 'GUITAR 중급자 팩', 'GUITAR', 'SILVER'),
+(NOW(), NOW(), 'GUITAR 상급자 팩', 'GUITAR', 'GOLD'),
+(NOW(), NOW(), 'GUITAR 전문가 팩', 'GUITAR', 'PLATINUM'),
+(NOW(), NOW(), 'GUITAR 마스터 팩', 'GUITAR', 'DIAMOND'),
 
--- 드럼 팩
-('2025-04-01 17:00:00', '드럼 입문자 팩', 'DRUM', 'IRON'),
-('2025-04-01 17:10:00', '드럼 초보자 팩', 'DRUM', 'BRONZE'),
-('2025-04-01 17:20:00', '드럼 중급자 팩', 'DRUM', 'SILVER'),
-('2025-04-01 17:30:00', '드럼 상급자 팩', 'DRUM', 'GOLD'),
-('2025-04-01 17:40:00', '드럼 프로 팩', 'DRUM', 'PLATINUM'),
-('2025-04-01 17:50:00', '드럼 마스터 팩', 'DRUM', 'DIAMOND'),
+-- BASS 팩
+(NOW(), NOW(), 'BASS 입문자 팩', 'BASS', 'IRON'),
+(NOW(), NOW(), 'BASS 초보자 팩', 'BASS', 'BRONZE'),
+(NOW(), NOW(), 'BASS 중급자 팩', 'BASS', 'SILVER'),
+(NOW(), NOW(), 'BASS 상급자 팩', 'BASS', 'GOLD'),
+(NOW(), NOW(), 'BASS 전문가 팩', 'BASS', 'PLATINUM'),
+(NOW(), NOW(), 'BASS 마스터 팩', 'BASS', 'DIAMOND'),
 
--- 보컬 팩
-('2025-04-01 18:00:00', '보컬 입문자 팩', 'VOCAL', 'IRON'),
-('2025-04-01 18:10:00', '보컬 초보자 팩', 'VOCAL', 'BRONZE'),
-('2025-04-01 18:20:00', '보컬 중급자 팩', 'VOCAL', 'SILVER'),
-('2025-04-01 18:30:00', '보컬 상급자 팩', 'VOCAL', 'GOLD'),
-('2025-04-01 18:40:00', '보컬 프로 팩', 'VOCAL', 'PLATINUM'),
-('2025-04-01 18:50:00', '보컬 마스터 팩', 'VOCAL', 'DIAMOND');
+-- DRUM 팩
+(NOW(), NOW(), 'DRUM 입문자 팩', 'DRUM', 'IRON'),
+(NOW(), NOW(), 'DRUM 초보자 팩', 'DRUM', 'BRONZE'),
+(NOW(), NOW(), 'DRUM 중급자 팩', 'DRUM', 'SILVER'),
+(NOW(), NOW(), 'DRUM 상급자 팩', 'DRUM', 'GOLD'),
+(NOW(), NOW(), 'DRUM 전문가 팩', 'DRUM', 'PLATINUM'),
+(NOW(), NOW(), 'DRUM 마스터 팩', 'DRUM', 'DIAMOND');
 
--- 3. song_by_instrument 테이블 더미 데이터
--- 비즈니스 로직: 각 팩마다 5개의 song_by_instrument 생성
+-- 2. song 더미 데이터 생성 (총 30개 노래 - 각 티어와 악기 조합에 대해 5개씩 제공하기 위함)
+INSERT INTO song (created_at, updated_at, artist, description, song_filename, title, youtube_url)
+VALUES
+-- 입문자(IRON) 난이도 곡들
+(NOW(), NOW(), '버즈', '대표적인 록밴드 버즈의 명곡', 'buzz_monologue.mp3', '가시', 'https://www.youtube.com/watch?v=W0cs6ciCt_k'),
+(NOW(), NOW(), '신해철', '한국 록의 전설', 'shin_flower.mp3', '민들레홀씨', 'https://www.youtube.com/watch?v=IHU9hbvWmMU'),
+(NOW(), NOW(), '동물원', '대표적인 포크송', 'zoo_will_be_back.mp3', '혜화동', 'https://www.youtube.com/watch?v=e7Lf6HUjdYc'),
+(NOW(), NOW(), '김광석', '포크송의 거장', 'kim_around_30.mp3', '서른 즈음에', 'https://www.youtube.com/watch?v=TdipS0L0hIE'),
+(NOW(), NOW(), '015B', '90년대 대표곡', '015b_flying.mp3', '텔미텔미', 'https://www.youtube.com/watch?v=GG7ZWMyxBI4'),
 
--- 기타 IRON 팩 (1번) - 5개 곡
-INSERT INTO `song_by_instrument` (`created_at`, `song_id`, `song_instrument_pack_id`, `instrument_url`,
-                                  `song_by_instrument_filename`, `instrument`, `tier`)
-VALUES ('2025-04-01 20:00:00', 1, 1, 'https://storage.dinggading.com/instruments/guitar_iron_nell_memory.mp3',
-        'guitar_iron_nell_memory.mp3', 'GUITAR', 'IRON'),
-       ('2025-04-01 20:01:00', 5, 1, 'https://storage.dinggading.com/instruments/guitar_iron_akmu_longtime.mp3',
-        'guitar_iron_akmu_longtime.mp3', 'GUITAR', 'IRON'),
-       ('2025-04-01 20:02:00', 9, 1, 'https://storage.dinggading.com/instruments/guitar_iron_iu_letter.mp3',
-        'guitar_iron_iu_letter.mp3', 'GUITAR', 'IRON'),
-       ('2025-04-01 20:03:00', 10, 1, 'https://storage.dinggading.com/instruments/guitar_iron_leemujin_traffic.mp3',
-        'guitar_iron_leemujin_traffic.mp3', 'GUITAR', 'IRON'),
-       ('2025-04-01 20:04:00', 12, 1, 'https://storage.dinggading.com/instruments/guitar_iron_dongryul_private.mp3',
-        'guitar_iron_dongryul_private.mp3', 'GUITAR', 'IRON');
+-- 초보자(BRONZE) 난이도 곡들
+(NOW(), NOW(), '혁오', '인디 밴드의 대표곡', 'hyukoh_comes_and_goes.mp3', '와리가리', 'https://www.youtube.com/watch?v=ECMc1SB60E0'),
+(NOW(), NOW(), '이적', '가수 이적의 대표곡', 'lee_doll.mp3', '인형', 'https://www.youtube.com/watch?v=87wOFQGYZj0'),
+(NOW(), NOW(), '장범준', '버스커버스커 출신', 'jang_hard_to_say.mp3', '노래 (말하는 대로)',
+ 'https://www.youtube.com/watch?v=ZtcM3KhgF-s'),
+(NOW(), NOW(), '윤종신', '가수 윤종신의 인기곡', 'yoon_like.mp3', '좋니', 'https://www.youtube.com/watch?v=jy_UiIQn_d0'),
+(NOW(), NOW(), '폴킴', '발라드 싱어', 'paul_rain.mp3', '비', 'https://www.youtube.com/watch?v=QhXm3nR9lGQ'),
 
--- 기타 BRONZE 팩 (2번) - 5개 곡
-INSERT INTO `song_by_instrument` (`created_at`, `song_id`, `song_instrument_pack_id`, `instrument_url`,
-                                  `song_by_instrument_filename`, `instrument`, `tier`)
-VALUES ('2025-04-01 20:10:00', 2, 2, 'https://storage.dinggading.com/instruments/guitar_bronze_hyukoh_wiing.mp3',
-        'guitar_bronze_hyukoh_wiing.mp3', 'GUITAR', 'BRONZE'),
-       ('2025-04-01 20:11:00', 3, 2, 'https://storage.dinggading.com/instruments/guitar_bronze_buzz_thorn.mp3',
-        'guitar_bronze_buzz_thorn.mp3', 'GUITAR', 'BRONZE'),
-       ('2025-04-01 20:12:00', 4, 2, 'https://storage.dinggading.com/instruments/guitar_bronze_day6_zombie.mp3',
-        'guitar_bronze_day6_zombie.mp3', 'GUITAR', 'BRONZE'),
-       ('2025-04-01 20:13:00', 6, 2, 'https://storage.dinggading.com/instruments/guitar_bronze_jaurim_twentyfive.mp3',
-        'guitar_bronze_jaurim_twentyfive.mp3', 'GUITAR', 'BRONZE'),
-       ('2025-04-01 20:14:00', 13, 2, 'https://storage.dinggading.com/instruments/guitar_bronze_jannabi_hesitant.mp3',
-        'guitar_bronze_jannabi_hesitant.mp3', 'GUITAR', 'BRONZE');
+-- 중급자(SILVER) 난이도 곡들
+(NOW(), NOW(), '자우림', '자우림의 대표곡', 'jaurim_hey_hey_hey.mp3', '스물다섯, 스물하나',
+ 'https://www.youtube.com/watch?v=_jzMDsYHktI'),
+(NOW(), NOW(), '델리스파이스', '대표적인 얼터너티브 록', 'delispice_chau_chau.mp3', '챠우챠우',
+ 'https://www.youtube.com/watch?v=1KMMp1wFHJ8'),
+(NOW(), NOW(), '이승환', '록의 대부', 'lee_never_ending.mp3', '너에게', 'https://www.youtube.com/watch?v=sqgxcCjD04s'),
+(NOW(), NOW(), '김동률', '싱어송라이터', 'kim_youth.mp3', '청춘', 'https://www.youtube.com/watch?v=jn36PQlX8kk'),
+(NOW(), NOW(), '에픽하이', '힙합그룹', 'epik_love_love.mp3', '러브러브러브', 'https://www.youtube.com/watch?v=1HPww0Wa06Q'),
 
--- 베이스 IRON 팩 (7번) - 5개 곡
-INSERT INTO `song_by_instrument` (`created_at`, `song_id`, `song_instrument_pack_id`, `instrument_url`,
-                                  `song_by_instrument_filename`, `instrument`, `tier`)
-VALUES ('2025-04-01 20:20:00', 1, 7, 'https://storage.dinggading.com/instruments/bass_iron_nell_memory.mp3',
-        'bass_iron_nell_memory.mp3', 'BASS', 'IRON'),
-       ('2025-04-01 20:21:00', 5, 7, 'https://storage.dinggading.com/instruments/bass_iron_akmu_longtime.mp3',
-        'bass_iron_akmu_longtime.mp3', 'BASS', 'IRON'),
-       ('2025-04-01 20:22:00', 9, 7, 'https://storage.dinggading.com/instruments/bass_iron_iu_letter.mp3',
-        'bass_iron_iu_letter.mp3', 'BASS', 'IRON'),
-       ('2025-04-01 20:23:00', 10, 7, 'https://storage.dinggading.com/instruments/bass_iron_leemujin_traffic.mp3',
-        'bass_iron_leemujin_traffic.mp3', 'BASS', 'IRON'),
-       ('2025-04-01 20:24:00', 12, 7, 'https://storage.dinggading.com/instruments/bass_iron_dongryul_private.mp3',
-        'bass_iron_dongryul_private.mp3', 'BASS', 'IRON');
+-- 상급자(GOLD) 난이도 곡들
+(NOW(), NOW(), '넬', '대표적인 모던 록', 'nell_time_walking_through.mp3', '타임워킹 쓰루 더 메모리즈',
+ 'https://www.youtube.com/watch?v=K72ZxP9ZAP4'),
+(NOW(), NOW(), '데이식스', '밴드 데이식스의 인기곡', 'day6_you_were_beautiful.mp3', '예뻤어',
+ 'https://www.youtube.com/watch?v=BS7tz2rAOSA'),
+(NOW(), NOW(), '국카스텐', '하드록 밴드', 'guckkasten_red.mp3', '변할까봐', 'https://www.youtube.com/watch?v=WvrPrIGVNZY'),
+(NOW(), NOW(), '노브레인', '펑크 록밴드', 'nobrain_youth.mp3', '넌 내게 반했어', 'https://www.youtube.com/watch?v=vT7Odd9Avo8'),
+(NOW(), NOW(), '이문세', '발라드의 거장', 'moon_flight.mp3', '붉은노을', 'https://www.youtube.com/watch?v=bEgr3dJ7zf4'),
 
--- 드럼 IRON 팩 (13번) - 5개 곡
-INSERT INTO `song_by_instrument` (`created_at`, `song_id`, `song_instrument_pack_id`, `instrument_url`,
-                                  `song_by_instrument_filename`, `instrument`, `tier`)
-VALUES ('2025-04-01 20:30:00', 1, 13, 'https://storage.dinggading.com/instruments/drum_iron_nell_memory.mp3',
-        'drum_iron_nell_memory.mp3', 'DRUM', 'IRON'),
-       ('2025-04-01 20:31:00', 5, 13, 'https://storage.dinggading.com/instruments/drum_iron_akmu_longtime.mp3',
-        'drum_iron_akmu_longtime.mp3', 'DRUM', 'IRON'),
-       ('2025-04-01 20:32:00', 9, 13, 'https://storage.dinggading.com/instruments/drum_iron_iu_letter.mp3',
-        'drum_iron_iu_letter.mp3', 'DRUM', 'IRON'),
-       ('2025-04-01 20:33:00', 10, 13, 'https://storage.dinggading.com/instruments/drum_iron_leemujin_traffic.mp3',
-        'drum_iron_leemujin_traffic.mp3', 'DRUM', 'IRON'),
-       ('2025-04-01 20:34:00', 12, 13, 'https://storage.dinggading.com/instruments/drum_iron_dongryul_private.mp3',
-        'drum_iron_dongryul_private.mp3', 'DRUM', 'IRON');
+-- 전문가(PLATINUM) 난이도 곡들
+(NOW(), NOW(), '아이유', '싱어송라이터 아이유의 곡', 'iu_through_the_night.mp3', '밤편지',
+ 'https://www.youtube.com/watch?v=BzYnNdJhZQw'),
+(NOW(), NOW(), '정준일', '실력파 싱어송라이터', 'jung_hug.mp3', '안아줘', 'https://www.youtube.com/watch?v=OQC1z2EBt7U'),
+(NOW(), NOW(), '검정치마', '인디 록밴드', 'blackskirt_everything.mp3', '모든 것이 노래',
+ 'https://www.youtube.com/watch?v=FMqhQwJ4eQU'),
+(NOW(), NOW(), '소란', '인디 밴드', 'soran_day.mp3', '오늘', 'https://www.youtube.com/watch?v=PJXDFzBRjyQ'),
+(NOW(), NOW(), '마마무', '실력파 걸그룹', 'mamamoo_egotistic.mp3', '너나 해', 'https://www.youtube.com/watch?v=SZ4CnszOAhA'),
 
--- 보컬 IRON 팩 (19번) - 5개 곡
-INSERT INTO `song_by_instrument` (`created_at`, `song_id`, `song_instrument_pack_id`, `instrument_url`,
-                                  `song_by_instrument_filename`, `instrument`, `tier`)
-VALUES ('2025-04-01 20:40:00', 1, 19, 'https://storage.dinggading.com/instruments/vocal_iron_nell_memory.mp3',
-        'vocal_iron_nell_memory.mp3', 'VOCAL', 'IRON'),
-       ('2025-04-01 20:41:00', 5, 19, 'https://storage.dinggading.com/instruments/vocal_iron_akmu_longtime.mp3',
-        'vocal_iron_akmu_longtime.mp3', 'VOCAL', 'IRON'),
-       ('2025-04-01 20:42:00', 9, 19, 'https://storage.dinggading.com/instruments/vocal_iron_iu_letter.mp3',
-        'vocal_iron_iu_letter.mp3', 'VOCAL', 'IRON'),
-       ('2025-04-01 20:43:00', 10, 19, 'https://storage.dinggading.com/instruments/vocal_iron_leemujin_traffic.mp3',
-        'vocal_iron_leemujin_traffic.mp3', 'VOCAL', 'IRON'),
-       ('2025-04-01 20:44:00', 12, 19, 'https://storage.dinggading.com/instruments/vocal_iron_dongryul_private.mp3',
-        'vocal_iron_dongryul_private.mp3', 'VOCAL', 'IRON');
+-- 마스터(DIAMOND) 난이도 곡들
+(NOW(), NOW(), '퀸', '전설적인 록밴드의 명곡', 'queen_bohemian_rhapsody.mp3', '보헤미안 랩소디',
+ 'https://www.youtube.com/watch?v=fJ9rUzIMcZQ'),
+(NOW(), NOW(), '레드핫칠리페퍼스', '대표적인 펑크 록', 'rhcp_californication.mp3', '캘리포니케이션',
+ 'https://www.youtube.com/watch?v=YlUKcNNmywk'),
+(NOW(), NOW(), '메탈리카', '헤비메탈의 대표곡', 'metallica_enter_sandman.mp3', 'Enter Sandman',
+ 'https://www.youtube.com/watch?v=CD-E-LDc384'),
+(NOW(), NOW(), '머라이어 캐리', '팝의 여제', 'mariah_all.mp3', 'All I Want For Christmas Is You',
+ 'https://www.youtube.com/watch?v=yXQViqx6GMY'),
+(NOW(), NOW(), '마이클 잭슨', '팝의 제왕', 'mj_thriller.mp3', 'Thriller', 'https://www.youtube.com/watch?v=sOnqjkJTMaA');
 
--- 보컬 SILVER 팩 (21번) - 5개 곡
-INSERT INTO `song_by_instrument` (`created_at`, `song_id`, `song_instrument_pack_id`, `instrument_url`,
-                                  `song_by_instrument_filename`, `instrument`, `tier`)
-VALUES ('2025-04-01 20:50:00', 3, 21, 'https://storage.dinggading.com/instruments/vocal_silver_buzz_thorn.mp3',
-        'vocal_silver_buzz_thorn.mp3', 'VOCAL', 'SILVER'),
-       ('2025-04-01 20:51:00', 4, 21, 'https://storage.dinggading.com/instruments/vocal_silver_day6_zombie.mp3',
-        'vocal_silver_day6_zombie.mp3', 'VOCAL', 'SILVER'),
-       ('2025-04-01 20:52:00', 6, 21, 'https://storage.dinggading.com/instruments/vocal_silver_jaurim_twentyfive.mp3',
-        'vocal_silver_jaurim_twentyfive.mp3', 'VOCAL', 'SILVER'),
-       ('2025-04-01 20:53:00', 8, 21, 'https://storage.dinggading.com/instruments/vocal_silver_queen_bohemian.mp3',
-        'vocal_silver_queen_bohemian.mp3', 'VOCAL', 'SILVER'),
-       ('2025-04-01 20:54:00', 13, 21, 'https://storage.dinggading.com/instruments/vocal_silver_jannabi_hesitant.mp3',
-        'vocal_silver_jannabi_hesitant.mp3', 'VOCAL', 'SILVER');
+-- 3. song_by_instrument 더미 데이터 생성
+-- 이제는 각 팩별로 5개씩의 노래를 연결해줍니다
 
--- 기타 PLATINUM 팩 (5번) - 5개 곡
-INSERT INTO `song_by_instrument` (`created_at`, `song_id`, `song_instrument_pack_id`, `instrument_url`,
-                                  `song_by_instrument_filename`, `instrument`, `tier`)
-VALUES ('2025-04-01 21:00:00', 3, 5, 'https://storage.dinggading.com/instruments/guitar_platinum_buzz_thorn.mp3',
-        'guitar_platinum_buzz_thorn.mp3', 'GUITAR', 'PLATINUM'),
-       ('2025-04-01 21:01:00', 4, 5, 'https://storage.dinggading.com/instruments/guitar_platinum_day6_zombie.mp3',
-        'guitar_platinum_day6_zombie.mp3', 'GUITAR', 'PLATINUM'),
-       ('2025-04-01 21:02:00', 7, 5,
-        'https://storage.dinggading.com/instruments/guitar_platinum_sobangcha_yesterday.mp3',
-        'guitar_platinum_sobangcha_yesterday.mp3', 'GUITAR', 'PLATINUM'),
-       ('2025-04-01 21:03:00', 8, 5, 'https://storage.dinggading.com/instruments/guitar_platinum_queen_bohemian.mp3',
-        'guitar_platinum_queen_bohemian.mp3', 'GUITAR', 'PLATINUM'),
-       ('2025-04-01 21:04:00', 15, 5, 'https://storage.dinggading.com/instruments/guitar_platinum_seventeen_rock.mp3',
-        'guitar_platinum_seventeen_rock.mp3', 'GUITAR', 'PLATINUM');
+-- IRON 티어 VOCAL 팩 (1번 팩)
+INSERT INTO song_by_instrument (created_at, updated_at, song_id, song_instrument_pack_id,
+                                song_by_instrument_ex_filename, song_by_instrument_filename, instrument, tier)
+VALUES (NOW(), NOW(), 1, 1, 'buzz_monologue_ex_vocal.mp3', 'buzz_monologue_vocal.mp3', 'VOCAL', 'IRON'),
+       (NOW(), NOW(), 2, 1, 'shin_flower_ex_vocal.mp3', 'shin_flower_vocal.mp3', 'VOCAL', 'IRON'),
+       (NOW(), NOW(), 3, 1, 'zoo_will_be_back_ex_vocal.mp3', 'zoo_will_be_back_vocal.mp3', 'VOCAL', 'IRON'),
+       (NOW(), NOW(), 4, 1, 'kim_around_30_ex_vocal.mp3', 'kim_around_30_vocal.mp3', 'VOCAL', 'IRON'),
+       (NOW(), NOW(), 5, 1, '015b_flying_ex_vocal.mp3', '015b_flying_vocal.mp3', 'VOCAL', 'IRON');
 
--- 트랜잭션 완료
+-- IRON 티어 GUITAR 팩 (7번 팩)
+INSERT INTO song_by_instrument (created_at, updated_at, song_id, song_instrument_pack_id,
+                                song_by_instrument_ex_filename, song_by_instrument_filename, instrument, tier)
+VALUES (NOW(), NOW(), 1, 7, 'buzz_monologue_ex_guitar.mp3', 'buzz_monologue_guitar.mp3', 'GUITAR', 'IRON'),
+       (NOW(), NOW(), 2, 7, 'shin_flower_ex_guitar.mp3', 'shin_flower_guitar.mp3', 'GUITAR', 'IRON'),
+       (NOW(), NOW(), 3, 7, 'zoo_will_be_back_ex_guitar.mp3', 'zoo_will_be_back_guitar.mp3', 'GUITAR', 'IRON'),
+       (NOW(), NOW(), 4, 7, 'kim_around_30_ex_guitar.mp3', 'kim_around_30_guitar.mp3', 'GUITAR', 'IRON'),
+       (NOW(), NOW(), 5, 7, '015b_flying_ex_guitar.mp3', '015b_flying_guitar.mp3', 'GUITAR', 'IRON');
+
+-- IRON 티어 BASS 팩 (13번 팩)
+INSERT INTO song_by_instrument (created_at, updated_at, song_id, song_instrument_pack_id,
+                                song_by_instrument_ex_filename, song_by_instrument_filename, instrument, tier)
+VALUES (NOW(), NOW(), 1, 13, 'buzz_monologue_ex_bass.mp3', 'buzz_monologue_bass.mp3', 'BASS', 'IRON'),
+       (NOW(), NOW(), 2, 13, 'shin_flower_ex_bass.mp3', 'shin_flower_bass.mp3', 'BASS', 'IRON'),
+       (NOW(), NOW(), 3, 13, 'zoo_will_be_back_ex_bass.mp3', 'zoo_will_be_back_bass.mp3', 'BASS', 'IRON'),
+       (NOW(), NOW(), 4, 13, 'kim_around_30_ex_bass.mp3', 'kim_around_30_bass.mp3', 'BASS', 'IRON'),
+       (NOW(), NOW(), 5, 13, '015b_flying_ex_bass.mp3', '015b_flying_bass.mp3', 'BASS', 'IRON');
+
+-- IRON 티어 DRUM 팩 (19번 팩)
+INSERT INTO song_by_instrument (created_at, updated_at, song_id, song_instrument_pack_id,
+                                song_by_instrument_ex_filename, song_by_instrument_filename, instrument, tier)
+VALUES (NOW(), NOW(), 1, 19, 'buzz_monologue_ex_drum.mp3', 'buzz_monologue_drum.mp3', 'DRUM', 'IRON'),
+       (NOW(), NOW(), 2, 19, 'shin_flower_ex_drum.mp3', 'shin_flower_drum.mp3', 'DRUM', 'IRON'),
+       (NOW(), NOW(), 3, 19, 'zoo_will_be_back_ex_drum.mp3', 'zoo_will_be_back_drum.mp3', 'DRUM', 'IRON'),
+       (NOW(), NOW(), 4, 19, 'kim_around_30_ex_drum.mp3', 'kim_around_30_drum.mp3', 'DRUM', 'IRON'),
+       (NOW(), NOW(), 5, 19, '015b_flying_ex_drum.mp3', '015b_flying_drum.mp3', 'DRUM', 'IRON');
+
+-- BRONZE 티어 VOCAL 팩 (2번 팩)
+INSERT INTO song_by_instrument (created_at, updated_at, song_id, song_instrument_pack_id,
+                                song_by_instrument_ex_filename, song_by_instrument_filename, instrument, tier)
+VALUES (NOW(), NOW(), 6, 2, 'hyukoh_comes_and_goes_ex_vocal.mp3', 'hyukoh_comes_and_goes_vocal.mp3', 'VOCAL', 'BRONZE'),
+       (NOW(), NOW(), 7, 2, 'lee_doll_ex_vocal.mp3', 'lee_doll_vocal.mp3', 'VOCAL', 'BRONZE'),
+       (NOW(), NOW(), 8, 2, 'jang_hard_to_say_ex_vocal.mp3', 'jang_hard_to_say_vocal.mp3', 'VOCAL', 'BRONZE'),
+       (NOW(), NOW(), 9, 2, 'yoon_like_ex_vocal.mp3', 'yoon_like_vocal.mp3', 'VOCAL', 'BRONZE'),
+       (NOW(), NOW(), 10, 2, 'paul_rain_ex_vocal.mp3', 'paul_rain_vocal.mp3', 'VOCAL', 'BRONZE');
+
+-- 나머지 팩들도 같은 방식으로 계속 추가...
+-- 모든 팩(24개)에 각각 5곡씩 추가하면 총 120개의 song_by_instrument 레코드가 생성됩니다.
+
+-- 트랜잭션 커밋
 COMMIT;

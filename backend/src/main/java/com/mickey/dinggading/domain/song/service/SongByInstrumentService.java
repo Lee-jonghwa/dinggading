@@ -1,10 +1,6 @@
 package com.mickey.dinggading.domain.song.service;
 
-import com.mickey.dinggading.domain.memberrank.model.Instrument;
-import com.mickey.dinggading.domain.memberrank.model.Song;
 import com.mickey.dinggading.domain.memberrank.model.SongByInstrument;
-import com.mickey.dinggading.domain.memberrank.model.SongInstrumentPack;
-import com.mickey.dinggading.domain.memberrank.model.Tier;
 import com.mickey.dinggading.domain.song.converter.SongByInstrumentConverter;
 import com.mickey.dinggading.domain.song.repository.SongByInstrumentRepository;
 import com.mickey.dinggading.domain.song.repository.SongInstrumentPackRepository;
@@ -55,43 +51,6 @@ public class SongByInstrumentService {
 
         List<SongByInstrument> songByInstruments = songByInstrumentRepository.findBySongSongId(songId);
         return songByInstrumentConverter.toDtoList(songByInstruments, true);
-    }
-
-    /**
-     * 특정 곡에 새로운 악기별 버전 추가
-     *
-     * @param songId        곡 ID
-     * @param instrument    악기 타입
-     * @param tier          티어 등급
-     * @param instrumentUrl 악기별 연주 URL
-     * @param packId        팩 ID
-     * @return 생성된 악기별 곡 버전의 ID
-     */
-    @Transactional
-    public Long addInstrumentVersion(Long songId, String instrumentStr, String tierStr, String instrumentUrl,
-                                     Long packId) {
-        Instrument instrument = Instrument.valueOf(instrumentStr);
-        Tier tier = Tier.valueOf(tierStr);
-
-        Song song = songRepository.findById(songId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 곡입니다. ID: " + songId));
-
-        SongInstrumentPack pack = songInstrumentPackRepository.findById(packId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팩입니다. ID: " + packId));
-
-        // 도메인 모델의 메서드를 활용하여 악기별 버전 추가
-        song.addInstrumentVersion(instrument, tier, instrumentUrl, pack);
-
-        // 변경사항 저장 및 새로 추가된 악기별 버전의 ID 반환
-        songRepository.save(song);
-
-        // 추가된 악기별 버전의 ID 조회
-        return songByInstrumentRepository.findBySongSongIdAndInstrument(songId, instrument)
-                .stream()
-                .filter(sbi -> sbi.getTier() == tier)
-                .findFirst()
-                .map(SongByInstrument::getSongByInstrumentId)
-                .orElseThrow(() -> new IllegalStateException("악기별 버전 추가에 실패했습니다."));
     }
 
     /**

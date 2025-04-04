@@ -26,7 +26,7 @@ public class SongByInstrumentConverter {
                 .songByInstrumentId(entity.getSongByInstrumentId())
                 .songId(entity.getSong().getSongId())
                 .songInstrumentPackId(entity.getSongInstrumentPack().getSongInstrumentPackId())
-                .instrumentUrl(entity.getInstrumentUrl())
+                .instrumentUrl(entity.getSongByInstrumentExFilename())
                 .instrument(InstrumentEnum.valueOf(entity.getInstrument().name()))
                 .tier(TierEnum.valueOf(entity.getTier().name()))
                 .build();
@@ -55,7 +55,7 @@ public class SongByInstrumentConverter {
                 .songByInstrumentId(songByInstrument.getSongByInstrumentId())
                 .songId(songByInstrument.getSong().getSongId())
                 .songInstrumentPackId(songByInstrument.getSongInstrumentPack().getSongInstrumentPackId())
-                .instrumentUrl(songByInstrument.getInstrumentUrl())
+                .instrumentUrl(songByInstrument.getSongByInstrumentExFilename())
                 .instrument(InstrumentEnum.valueOf(songByInstrument.getInstrument().name()))
                 .tier(TierEnum.valueOf(songByInstrument.getTier().name()));
 

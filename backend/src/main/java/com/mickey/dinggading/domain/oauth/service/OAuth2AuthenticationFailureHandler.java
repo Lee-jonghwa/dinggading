@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -14,10 +15,13 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
+
+    @Value("${application.oauth2.failureRedirectUri:http://localhost:3000/login}")
+    private String redirectUri;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request,
@@ -38,7 +42,7 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
         log.error("Error Message: {}", errorMessage);
 
         String encodedMessage = URLEncoder.encode(errorMessage, StandardCharsets.UTF_8);
-        String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/login")
+        String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
                 .queryParam("error", encodedMessage)
                 .build()
                 .toUriString();

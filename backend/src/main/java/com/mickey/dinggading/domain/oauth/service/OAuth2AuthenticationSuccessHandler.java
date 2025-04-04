@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final MemberRepository memberRepository;
     private final JWTUtil jwtUtil;
     private final NotificationService notificationService;
+
+    @Value("${application.oauth2.redirectUri:http://localhost:3000/login/oauth2/code/google}")
+    private String redirectUri;
 
     public SseEmitter subscribe(UUID memberId) { return notificationService.subscribe(memberId); }
 
@@ -52,7 +56,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         // 토큰과 사용자 정보를 함께 전달
         // URL 파라미터 인코딩
-        String redirectUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/login/oauth2/code/google")
+        String redirectUrl = UriComponentsBuilder.fromUriString(redirectUri)
                 .queryParam("token", jwtToken.getAccessToken())
                 .queryParam("loginId", member.getUsername())
                 .queryParam("nickname", member.getNickname())

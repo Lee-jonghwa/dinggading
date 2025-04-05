@@ -38,6 +38,7 @@ public class ChatRoomMongoConverter {
                 .message(chatMessage.getMessage())
                 .messageType(chatMessage.getMessageType())
                 .readCount(chatMessage.getReadCount())
+                .writedAt(chatMessage.getCreatedAt())
                 .build();
     }
 }

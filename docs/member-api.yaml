@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: 딩가딩 Member API
   version: 1.0.0
-  description: '회원, 팔로우, 알림 관련 API 명세서'
+  description: "회원, 팔로우, 알림 관련 API 명세서"
   contact:
     email: qkrwnsgh71w@gmail.com
 
@@ -112,6 +112,11 @@ components:
         followedUserId: "123e4567-e89b-12d3-a456-426614174001"
         followedEachother: false
 
+    NotificationType:
+      type: string
+      enum: [CHAT, FOLLOW, RECRUITMENT, RANK]
+      description: "알림 타입"
+
     NotificationDTO:
       type: object
       properties:
@@ -146,8 +151,7 @@ components:
           type: boolean
           description: "알림 읽음 여부"
         type:
-          type: string
-          enum: [CHAT, FOLLOW, RECRUITMENT]
+          $ref: "#/components/schemas/NotificationType"
           description: "알림 타입"
         acceptUrl:
           type: string
@@ -292,28 +296,28 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/MemberDTO'
+            $ref: "#/components/schemas/MemberDTO"
 
     FollowResponse:
       description: "팔로우 정보 응답"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/FollowDTO'
+            $ref: "#/components/schemas/FollowDTO"
 
     NotificationResponse:
       description: "알림 정보 응답"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/NotificationDTO'
+            $ref: "#/components/schemas/NotificationDTO"
 
     AuthTokenResponse:
       description: "인증 토큰 응답"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AuthResponse'
+            $ref: "#/components/schemas/AuthResponse"
 
     PageMemberResponse:
       description: "회원 목록 페이지 응답"
@@ -325,7 +329,7 @@ components:
               content:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MemberDTO'
+                  $ref: "#/components/schemas/MemberDTO"
               pageable:
                 type: object
                 properties:
@@ -360,7 +364,7 @@ components:
               content:
                 type: array
                 items:
-                  $ref: '#/components/schemas/NotificationDTO'
+                  $ref: "#/components/schemas/NotificationDTO"
               pageable:
                 type: object
                 properties:
@@ -391,7 +395,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ProblemDetail'
+              - $ref: "#/components/schemas/ProblemDetail"
               - type: object
                 properties:
                   title:
@@ -404,7 +408,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ProblemDetail'
+              - $ref: "#/components/schemas/ProblemDetail"
               - type: object
                 properties:
                   title:
@@ -417,7 +421,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ProblemDetail'
+              - $ref: "#/components/schemas/ProblemDetail"
               - type: object
                 properties:
                   title:
@@ -430,7 +434,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ProblemDetail'
+              - $ref: "#/components/schemas/ProblemDetail"
               - type: object
                 properties:
                   title:
@@ -443,21 +447,21 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GoogleAuthRequest'
+            $ref: "#/components/schemas/GoogleAuthRequest"
 
     UpdateMemberRequestBody:
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UpdateMemberRequest'
+            $ref: "#/components/schemas/UpdateMemberRequest"
 
     FollowRequestBody:
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/FollowRequest'
+            $ref: "#/components/schemas/FollowRequest"
 
 paths:
   /api/auth/google:
@@ -468,12 +472,12 @@ paths:
       summary: "구글 OAuth2 인증"
       description: "구글 OAuth2 인증 후 사용자 등록 및 JWT 토큰을 발급합니다. 처음 로그인하는 사용자는 자동으로 회원 가입됩니다."
       requestBody:
-        $ref: '#/components/requestBodies/GoogleAuthRequestBody'
+        $ref: "#/components/requestBodies/GoogleAuthRequestBody"
       responses:
-        '200':
-          $ref: '#/components/responses/AuthTokenResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
+        "200":
+          $ref: "#/components/responses/AuthTokenResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
 
   /api/members/me:
     get:
@@ -485,10 +489,10 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
-          $ref: '#/components/responses/MemberResponse'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+        "200":
+          $ref: "#/components/responses/MemberResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /api/members/{memberId}:
     get:
@@ -499,12 +503,12 @@ paths:
       description: "특정 회원의 상세 정보를 조회합니다."
       deprecated: true
       parameters:
-        - $ref: '#/components/parameters/MemberId'
+        - $ref: "#/components/parameters/MemberId"
       responses:
-        '200':
-          $ref: '#/components/responses/MemberResponse'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "200":
+          $ref: "#/components/responses/MemberResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
     put:
       tags:
@@ -514,22 +518,22 @@ paths:
       description: "회원의 프로필 정보(닉네임, 프로필 이미지 등)를 수정합니다."
       deprecated: true
       parameters:
-        - $ref: '#/components/parameters/MemberId'
+        - $ref: "#/components/parameters/MemberId"
       security:
         - BearerAuth: []
       requestBody:
-        $ref: '#/components/requestBodies/UpdateMemberRequestBody'
+        $ref: "#/components/requestBodies/UpdateMemberRequestBody"
       responses:
-        '200':
-          $ref: '#/components/responses/MemberResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "200":
+          $ref: "#/components/responses/MemberResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
   /api/members/favorite-band/{bandId}:
     put:
@@ -540,16 +544,16 @@ paths:
       description: "사용자의 즐겨찾기 밴드를 설정합니다."
       deprecated: true
       parameters:
-        - $ref: '#/components/parameters/BandId'
+        - $ref: "#/components/parameters/BandId"
       security:
         - BearerAuth: []
       responses:
-        '200':
-          $ref: '#/components/responses/MemberResponse'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "200":
+          $ref: "#/components/responses/MemberResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
   /api/follows:
     post:
@@ -561,42 +565,42 @@ paths:
       security:
         - BearerAuth: []
       requestBody:
-        $ref: '#/components/requestBodies/FollowRequestBody'
+        $ref: "#/components/requestBodies/FollowRequestBody"
       responses:
-        '201':
+        "201":
           description: "팔로우 성공"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FollowDTO'
+                $ref: "#/components/schemas/FollowDTO"
               example:
                 followId: 123
                 followingUserId: "123e4567-e89b-12d3-a456-426614174000"
                 followedUserId: "123e4567-e89b-12d3-a456-426614174001"
                 followedEachother: false
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
           description: "팔로우할 사용자를 찾을 수 없습니다."
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ProblemDetail'
+                  - $ref: "#/components/schemas/ProblemDetail"
                   - type: object
                     properties:
                       title:
                         type: string
                         example: "팔로우할 사용자를 찾을 수 없습니다."
-        '409':
+        "409":
           description: "이미 팔로우한 사용자입니다."
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ProblemDetail'
+                  - $ref: "#/components/schemas/ProblemDetail"
                   - type: object
                     properties:
                       title:
@@ -613,31 +617,31 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/FollowId'
+        - $ref: "#/components/parameters/FollowId"
       responses:
-        '204':
+        "204":
           description: "팔로우 취소 성공"
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
           description: "팔로우 취소 권한이 없습니다."
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ProblemDetail'
+                  - $ref: "#/components/schemas/ProblemDetail"
                   - type: object
                     properties:
                       title:
                         type: string
                         example: "팔로우 취소 권한이 없습니다."
-        '404':
+        "404":
           description: "팔로우 정보를 찾을 수 없습니다."
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ProblemDetail'
+                  - $ref: "#/components/schemas/ProblemDetail"
                   - type: object
                     properties:
                       title:
@@ -653,13 +657,13 @@ paths:
       description: "특정 회원을 팔로우하는 사용자 목록을 조회합니다. size, page를 쿼리 파라미터로 전달하여 페이징 처리가 가능합니다."
       deprecated: true
       parameters:
-        - $ref: '#/components/parameters/MemberId'
+        - $ref: "#/components/parameters/MemberId"
       x-spring-paginated: true
       responses:
-        '200':
-          $ref: '#/components/responses/PageMemberResponse'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "200":
+          $ref: "#/components/responses/PageMemberResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
   /api/members/{memberId}/followings:
     get:
@@ -670,13 +674,13 @@ paths:
       description: "특정 회원이 팔로우하는 사용자 목록을 조회합니다. size, page를 쿼리 파라미터로 전달하여 페이징 처리가 가능합니다."
       deprecated: true
       parameters:
-        - $ref: '#/components/parameters/MemberId'
+        - $ref: "#/components/parameters/MemberId"
       x-spring-paginated: true
       responses:
-        '200':
-          $ref: '#/components/responses/PageMemberResponse'
-        '404':
-          $ref: '#/components/responses/NotFoundException'
+        "200":
+          $ref: "#/components/responses/PageMemberResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundException"
 
   /api/notifications:
     get:
@@ -696,7 +700,7 @@ paths:
         - BearerAuth: []
       x-spring-paginated: true
       responses:
-        '200':
+        "200":
           description: "알림 목록 응답"
           content:
             application/json:
@@ -706,7 +710,7 @@ paths:
                   content:
                     type: array
                     items:
-                      $ref: '#/components/schemas/NotificationDTO'
+                      $ref: "#/components/schemas/NotificationDTO"
                   pageable:
                     type: object
                     properties:
@@ -753,8 +757,8 @@ paths:
                   size: 10
                   totalElements: 25
                   totalPages: 3
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   # /api/notifications/{notificationId}/read:
   #   put:

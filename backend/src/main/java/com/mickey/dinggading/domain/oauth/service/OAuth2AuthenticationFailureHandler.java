@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -20,8 +21,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    @Value("${application.oauth2.failureRedirectUri:http://localhost:3000/login}")
-    private String redirectUri;
+    private final Environment environment;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request,
@@ -38,6 +38,9 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
         } else {
             errorMessage = exception.getMessage();
         }
+
+        String redirectUri = environment.getProperty("oauth2.redirectUri") == null ?
+                "https://j12e107.p.ssafy.io/login" : environment.getProperty("oauth2.redirectUri");
 
         log.error("Error Message: {}", errorMessage);
 

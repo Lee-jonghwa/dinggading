@@ -1,9 +1,6 @@
 spring:
   application:
     name: dinggading
-    oauth2:
-      redirectUri: https://j12e107.p.ssafy.io/login
-      failureRedirectUri: https://j12e107.p.ssafy.io/login
 
   data:
     mongodb:
@@ -44,7 +41,7 @@ spring:
           google:
             client-id: ${GOOGLE_ID}
             client-secret: ${GOOGLE_SECRET}
-            redirect-uri: https://j12e107.p.ssafy.io/login/oauth2/code/google
+            redirect-uri: ${REDIRECT_URI}/login/oauth2/code/google
             scope:
               - profile
               - email
@@ -137,4 +134,7 @@ rabbitmq:
 
 openvidu:
   secret: ${OPENVIDU_SECRET}
-  url: https://${OPENVIDU_HOST}:${OPENVIDU_PORT}/
+  url: https://${OPENVIDU_HOST}:${OPENVIDU_PORT}
+
+oauth2:
+  redirectUri: ${REDIRECT_URI}

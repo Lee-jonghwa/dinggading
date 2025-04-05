@@ -101,8 +101,8 @@ spring:
   servlet:
     multipart:
       enabled: true
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 200MB
+      max-request-size: 200MB
 
 ai:
   service:
@@ -137,4 +137,4 @@ rabbitmq:
 
 openvidu:
   secret: ${OPENVIDU_SECRET}
-  url: https://${OPENVIDU_HOST}:${OPENVIDU_PORT}/openvidu
+  url: https://${OPENVIDU_HOST}:${OPENVIDU_PORT}/

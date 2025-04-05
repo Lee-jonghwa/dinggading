@@ -2,7 +2,6 @@ package com.mickey.dinggading.infra.rabbitmq.consumer;
 
 import com.mickey.dinggading.domain.attempt.service.AttemptService;
 import com.mickey.dinggading.infra.rabbitmq.dto.MessageDTO;
-import com.mickey.dinggading.model.AttemptDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -18,13 +17,16 @@ public class JsonMessageConsumer {
     @RabbitListener(queues = "${rabbitmq.audio-analysis-response-queue.name}")
     public void receiveJsonMessage(MessageDTO messageDto) {
         log.info("Received JSON message: {}", messageDto);
-        AttemptDTO attemptDTO = (AttemptDTO) messageDto.getContent();
+        Long attemptId = messageDto.getAttemptId();
+        Integer beatScore = messageDto.getBeat_score();
+        Integer tuneScore = messageDto.getTune_score();
+        Integer toneScore = messageDto.getTone_score();
 
         attemptService.updateAttemptScore(
-                attemptDTO.getAttemptId(),
-                attemptDTO.getBeatScore(),
-                attemptDTO.getTuneScore(),
-                attemptDTO.getToneScore()
+                attemptId,
+                beatScore,
+                tuneScore,
+                toneScore
         );
         // SSE 요청
     }

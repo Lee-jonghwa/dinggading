@@ -12,14 +12,16 @@ COPY ./backend/gradlew .
 COPY ./backend/gradle gradle
 COPY ./backend/build.gradle .
 COPY ./backend/settings.gradle .
-COPY ./backend/src src
-COPY ./backend/generated .
 
 # gradlew에 실행 권한 부여
 RUN chmod +x ./gradlew
 
 # Cache dependencies
 RUN ./gradlew dependencies --no-daemon || return 0
+
+# Now copy the source code (which changes frequently)
+COPY ./backend/src src
+COPY ./backend/generated .
 
 CMD ["./gradlew", "bootRun", "--no-daemon"]
 

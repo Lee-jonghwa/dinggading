@@ -15,6 +15,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -29,9 +30,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final MemberRepository memberRepository;
     private final JWTUtil jwtUtil;
     private final NotificationService notificationService;
-
-    @Value("${spring.application.oauth2.redirectUri:http://localhost:3000/login/oauth2/code/google}")
-    private String redirectUri;
+    private final Environment environment;
 
     public SseEmitter subscribe(UUID memberId) {
         return notificationService.subscribe(memberId);
@@ -54,11 +53,15 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         Token jwtToken = jwtUtil.createAccessToken(member);
         log.info("jwtToken: {}", jwtToken);
 
+        String redirectUri = environment.getProperty("oauth2.redirectUri") == null ?
+                "https://j12e107.p.ssafy.io/login" : environment.getProperty("oauth2.redirectUri");
+
         response.setHeader("Authorization", "Bearer " + jwtToken.getAccessToken());
         log.info("uri {}", redirectUri);
+
         // 토큰과 사용자 정보를 함께 전달
         // URL 파라미터 인코딩
-        String redirectUrl = UriComponentsBuilder.fromUriString("https://j12e107.p.ssafy.io/login")
+        String redirectUrl = UriComponentsBuilder.fromUriString(redirectUri)
                 .queryParam("token", jwtToken.getAccessToken())
                 .queryParam("loginId", member.getUsername())
                 .queryParam("nickname", member.getNickname())

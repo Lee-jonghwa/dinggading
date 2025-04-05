@@ -7,7 +7,9 @@ import com.mickey.dinggading.domain.member.model.entity.Notification;
 import com.mickey.dinggading.domain.member.repository.MemberRepository;
 import com.mickey.dinggading.domain.member.repository.NotificationRepository;
 import com.mickey.dinggading.exception.ExceptionHandler;
+import com.mickey.dinggading.infra.rabbitmq.dto.MessageDTO;
 import com.mickey.dinggading.model.NotificationDTO;
+import com.mickey.dinggading.model.NotificationType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -109,7 +111,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         // 알림 엔티티 생성 및 저장
-        Notification notification = new Notification(chatRoomId, notificationContent, sender, receiver, NotificationDTO.TypeEnum.CHAT, false);
+        Notification notification = new Notification(chatRoomId, notificationContent, sender, receiver, NotificationType.CHAT, false);
 
         Notification savedNotification = notificationRepository.save(notification);
         log.info("새 메시지 알림 생성 완료: ID {}", savedNotification.getNotificationId());
@@ -118,6 +120,27 @@ public class NotificationServiceImpl implements NotificationService {
         sendNotification(receiverId, notificationConverter.fromEntity(savedNotification));
 
         return notificationConverter.fromEntity(savedNotification);
+    }
+
+    @Override
+    public void createTierMessageNotification(UUID rankerId, MessageDTO message) {
+
+        log.debug("새 메시지 알림 생성 시작: 메시지 {}, 랭커{}", message, rankerId);
+
+        Member member = getMember(rankerId);
+
+        String notificationContent = "티어 분석이 완료되었습니다. 확인해보세요!";
+
+        // 알림 엔티티 생성 및 저장
+        Notification notification = new Notification(member, notificationContent, NotificationType.RANK, false);
+
+        Notification savedNotification = notificationRepository.save(notification);
+        log.info("새 메시지 알림 생성 완료: ID {}", savedNotification.getNotificationId());
+
+        // 실시간 알림 발송
+        sendNotification(rankerId, notificationConverter.fromEntity(savedNotification));
+
+        notificationConverter.fromEntity(savedNotification);
     }
 
     private Member getMember(UUID memberId) {

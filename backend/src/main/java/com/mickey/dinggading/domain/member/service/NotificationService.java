@@ -1,5 +1,6 @@
 package com.mickey.dinggading.domain.member.service;
 
+import com.mickey.dinggading.infra.rabbitmq.dto.MessageDTO;
 import com.mickey.dinggading.model.NotificationDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,4 +21,6 @@ public interface NotificationService {
     int markChatRoomNotificationsAsRead(String chatRoomId, UUID memberId);
 
     Page<NotificationDTO> getNotifications(UUID memberId, Pageable pageable, Boolean unreadOnly);
+
+    void createTierMessageNotification(UUID rankerId, MessageDTO message);
 }

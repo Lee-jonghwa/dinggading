@@ -196,6 +196,10 @@ deploy:
       optional: true
     - job: build_backend
       optional: true
+    - job: build_fastapi
+      optional: true
+    - job: build_celery_worker
+      optional: true
 
 
   image: alpine:latest

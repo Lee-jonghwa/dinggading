@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# VSCode, JetBrains
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# 데이터/모델/로그/테스트 파일
+*.log
+*.csv
+*.mp3
+*.wav
+*.zip
+*.tar.gz
+*.h5
+*.pt
+*.onnx
+*.pb
+__results__/
+tests/
+Result/
+data/
+large_files/
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.env
+
+# venvs
+.venv/
+venv/
+.tests/
+ai/venv/
+ai/.venv/
+#venv.bak/
+
+# Node
+node_modules/

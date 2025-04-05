@@ -24,3 +24,9 @@ Thumbs.db
 package.json
 package-lock.json
 node_modules
+
+# AI 관련 ignore
+/ai/venv/
+/ai/**/*.pyc
+/ai/tests/
+.pyc

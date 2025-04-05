@@ -15,11 +15,11 @@ services:
       - shared-data:/tmp:ro
     ports:
       - "8081:4010"
-    command: 'mock -h 0.0.0.0 /tmp/openapi.yaml'
+    command: "mock -h 0.0.0.0 /tmp/openapi.yaml"
 
     depends_on:
       openapi-merger:
         condition: service_completed_successfully
 
 volumes:
-  shared-data:  # 공유 볼륨 정의
+  shared-data: # 공유 볼륨 정의

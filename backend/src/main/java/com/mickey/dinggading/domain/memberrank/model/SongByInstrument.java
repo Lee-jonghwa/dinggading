@@ -49,6 +49,9 @@ public class SongByInstrument extends BaseEntity {
     @Column(name = "song_by_instrument_filename", nullable = false)
     private String songByInstrumentFilename;
 
+    @Column(name = "song_by_instrument_analysis_json", nullable = false)
+    private String songByInstrumentAnalysisJson;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "instrument", nullable = false)
     private Instrument instrument;
@@ -66,12 +69,14 @@ public class SongByInstrument extends BaseEntity {
                              Tier tier,
                              String songByInstrumentExFilename,
                              String songByInstrumentFilename,
+                             String songByInstrumentAnalysisJson,
                              SongInstrumentPack pack) {
         this.song = song;
         this.instrument = instrument;
         this.tier = tier;
         this.songByInstrumentExFilename = songByInstrumentExFilename;
         this.songByInstrumentFilename = songByInstrumentFilename;
+        this.songByInstrumentAnalysisJson = songByInstrumentAnalysisJson;
         this.songInstrumentPack = pack;
     }
 
@@ -81,6 +86,7 @@ public class SongByInstrument extends BaseEntity {
                                                           Tier tier,
                                                           String songByInstrumentExFilename,
                                                           String songByInstrumentFilename,
+                                                          String songByInstrumentAnalysisJson,
                                                           SongInstrumentPack pack) {
         if (song == null) {
             throw new IllegalArgumentException("곡은 필수입니다.");
@@ -106,6 +112,7 @@ public class SongByInstrument extends BaseEntity {
                 .tier(tier)
                 .songByInstrumentFilename(songByInstrumentFilename)
                 .songByInstrumentExFilename(songByInstrumentExFilename)
+                .songByInstrumentAnalysisJson(songByInstrumentAnalysisJson)
                 .songInstrumentPack(pack)
                 .build();
 

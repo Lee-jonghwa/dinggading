@@ -95,54 +95,80 @@ VALUES
 
 -- 3. song_by_instrument 더미 데이터 생성
 -- 이제는 각 팩별로 5개씩의 노래를 연결해줍니다
-
 -- IRON 티어 VOCAL 팩 (1번 팩)
 INSERT INTO song_by_instrument (created_at, updated_at, song_id, song_instrument_pack_id,
-                                song_by_instrument_ex_filename, song_by_instrument_filename, instrument, tier)
-VALUES (NOW(), NOW(), 1, 1, 'buzz_monologue_ex_vocal.mp3', 'buzz_monologue_vocal.mp3', 'VOCAL', 'IRON'),
-       (NOW(), NOW(), 2, 1, 'shin_flower_ex_vocal.mp3', 'shin_flower_vocal.mp3', 'VOCAL', 'IRON'),
-       (NOW(), NOW(), 3, 1, 'zoo_will_be_back_ex_vocal.mp3', 'zoo_will_be_back_vocal.mp3', 'VOCAL', 'IRON'),
-       (NOW(), NOW(), 4, 1, 'kim_around_30_ex_vocal.mp3', 'kim_around_30_vocal.mp3', 'VOCAL', 'IRON'),
-       (NOW(), NOW(), 5, 1, '015b_flying_ex_vocal.mp3', '015b_flying_vocal.mp3', 'VOCAL', 'IRON');
+                                song_by_instrument_ex_filename, song_by_instrument_filename,
+                                song_by_instrument_analysis_json, instrument, tier)
+VALUES (NOW(), NOW(), 1, 1, 'buzz_monologue_ex_vocal.mp3', 'buzz_monologue_vocal.mp3',
+        'buzz_monologue_vocal_analysis.json', 'VOCAL', 'IRON'),
+       (NOW(), NOW(), 2, 1, 'shin_flower_ex_vocal.mp3', 'shin_flower_vocal.mp3',
+        'shin_flower_vocal_analysis.json', 'VOCAL', 'IRON'),
+       (NOW(), NOW(), 3, 1, 'zoo_will_be_back_ex_vocal.mp3', 'zoo_will_be_back_vocal.mp3',
+        'zoo_will_be_back_vocal_analysis.json', 'VOCAL', 'IRON'),
+       (NOW(), NOW(), 4, 1, 'kim_around_30_ex_vocal.mp3', 'kim_around_30_vocal.mp3',
+        'kim_around_30_vocal_analysis.json', 'VOCAL', 'IRON'),
+       (NOW(), NOW(), 5, 1, '015b_flying_ex_vocal.mp3', '015b_flying_vocal.mp3',
+        '015b_flying_vocal_analysis.json', 'VOCAL', 'IRON');
 
 -- IRON 티어 GUITAR 팩 (7번 팩)
 INSERT INTO song_by_instrument (created_at, updated_at, song_id, song_instrument_pack_id,
-                                song_by_instrument_ex_filename, song_by_instrument_filename, instrument, tier)
-VALUES (NOW(), NOW(), 1, 7, 'buzz_monologue_ex_guitar.mp3', 'buzz_monologue_guitar.mp3', 'GUITAR', 'IRON'),
-       (NOW(), NOW(), 2, 7, 'shin_flower_ex_guitar.mp3', 'shin_flower_guitar.mp3', 'GUITAR', 'IRON'),
-       (NOW(), NOW(), 3, 7, 'zoo_will_be_back_ex_guitar.mp3', 'zoo_will_be_back_guitar.mp3', 'GUITAR', 'IRON'),
-       (NOW(), NOW(), 4, 7, 'kim_around_30_ex_guitar.mp3', 'kim_around_30_guitar.mp3', 'GUITAR', 'IRON'),
-       (NOW(), NOW(), 5, 7, '015b_flying_ex_guitar.mp3', '015b_flying_guitar.mp3', 'GUITAR', 'IRON');
+                                song_by_instrument_ex_filename, song_by_instrument_filename,
+                                song_by_instrument_analysis_json, instrument, tier)
+VALUES (NOW(), NOW(), 1, 7, 'buzz_monologue_ex_guitar.mp3', 'buzz_monologue_guitar.mp3',
+        'buzz_monologue_guitar_analysis.json', 'GUITAR', 'IRON'),
+       (NOW(), NOW(), 2, 7, 'shin_flower_ex_guitar.mp3', 'shin_flower_guitar.mp3',
+        'shin_flower_guitar_analysis.json', 'GUITAR', 'IRON'),
+       (NOW(), NOW(), 3, 7, 'zoo_will_be_back_ex_guitar.mp3', 'zoo_will_be_back_guitar.mp3',
+        'zoo_will_be_back_guitar_analysis.json', 'GUITAR', 'IRON'),
+       (NOW(), NOW(), 4, 7, 'kim_around_30_ex_guitar.mp3', 'kim_around_30_guitar.mp3',
+        'kim_around_30_guitar_analysis.json', 'GUITAR', 'IRON'),
+       (NOW(), NOW(), 5, 7, '015b_flying_ex_guitar.mp3', '015b_flying_guitar.mp3',
+        '015b_flying_guitar_analysis.json', 'GUITAR', 'IRON');
 
 -- IRON 티어 BASS 팩 (13번 팩)
 INSERT INTO song_by_instrument (created_at, updated_at, song_id, song_instrument_pack_id,
-                                song_by_instrument_ex_filename, song_by_instrument_filename, instrument, tier)
-VALUES (NOW(), NOW(), 1, 13, 'buzz_monologue_ex_bass.mp3', 'buzz_monologue_bass.mp3', 'BASS', 'IRON'),
-       (NOW(), NOW(), 2, 13, 'shin_flower_ex_bass.mp3', 'shin_flower_bass.mp3', 'BASS', 'IRON'),
-       (NOW(), NOW(), 3, 13, 'zoo_will_be_back_ex_bass.mp3', 'zoo_will_be_back_bass.mp3', 'BASS', 'IRON'),
-       (NOW(), NOW(), 4, 13, 'kim_around_30_ex_bass.mp3', 'kim_around_30_bass.mp3', 'BASS', 'IRON'),
-       (NOW(), NOW(), 5, 13, '015b_flying_ex_bass.mp3', '015b_flying_bass.mp3', 'BASS', 'IRON');
+                                song_by_instrument_ex_filename, song_by_instrument_filename,
+                                song_by_instrument_analysis_json, instrument, tier)
+VALUES (NOW(), NOW(), 1, 13, 'buzz_monologue_ex_bass.mp3', 'buzz_monologue_bass.mp3',
+        'buzz_monologue_bass_analysis.json', 'BASS', 'IRON'),
+       (NOW(), NOW(), 2, 13, 'shin_flower_ex_bass.mp3', 'shin_flower_bass.mp3',
+        'shin_flower_bass_analysis.json', 'BASS', 'IRON'),
+       (NOW(), NOW(), 3, 13, 'zoo_will_be_back_ex_bass.mp3', 'zoo_will_be_back_bass.mp3',
+        'zoo_will_be_back_bass_analysis.json', 'BASS', 'IRON'),
+       (NOW(), NOW(), 4, 13, 'kim_around_30_ex_bass.mp3', 'kim_around_30_bass.mp3',
+        'kim_around_30_bass_analysis.json', 'BASS', 'IRON'),
+       (NOW(), NOW(), 5, 13, '015b_flying_ex_bass.mp3', '015b_flying_bass.mp3',
+        '015b_flying_bass_analysis.json', 'BASS', 'IRON');
 
 -- IRON 티어 DRUM 팩 (19번 팩)
 INSERT INTO song_by_instrument (created_at, updated_at, song_id, song_instrument_pack_id,
-                                song_by_instrument_ex_filename, song_by_instrument_filename, instrument, tier)
-VALUES (NOW(), NOW(), 1, 19, 'buzz_monologue_ex_drum.mp3', 'buzz_monologue_drum.mp3', 'DRUM', 'IRON'),
-       (NOW(), NOW(), 2, 19, 'shin_flower_ex_drum.mp3', 'shin_flower_drum.mp3', 'DRUM', 'IRON'),
-       (NOW(), NOW(), 3, 19, 'zoo_will_be_back_ex_drum.mp3', 'zoo_will_be_back_drum.mp3', 'DRUM', 'IRON'),
-       (NOW(), NOW(), 4, 19, 'kim_around_30_ex_drum.mp3', 'kim_around_30_drum.mp3', 'DRUM', 'IRON'),
-       (NOW(), NOW(), 5, 19, '015b_flying_ex_drum.mp3', '015b_flying_drum.mp3', 'DRUM', 'IRON');
+                                song_by_instrument_ex_filename, song_by_instrument_filename,
+                                song_by_instrument_analysis_json, instrument, tier)
+VALUES (NOW(), NOW(), 1, 19, 'buzz_monologue_ex_drum.mp3', 'buzz_monologue_drum.mp3',
+        'buzz_monologue_drum_analysis.json', 'DRUM', 'IRON'),
+       (NOW(), NOW(), 2, 19, 'shin_flower_ex_drum.mp3', 'shin_flower_drum.mp3',
+        'shin_flower_drum_analysis.json', 'DRUM', 'IRON'),
+       (NOW(), NOW(), 3, 19, 'zoo_will_be_back_ex_drum.mp3', 'zoo_will_be_back_drum.mp3',
+        'zoo_will_be_back_drum_analysis.json', 'DRUM', 'IRON'),
+       (NOW(), NOW(), 4, 19, 'kim_around_30_ex_drum.mp3', 'kim_around_30_drum.mp3',
+        'kim_around_30_drum_analysis.json', 'DRUM', 'IRON'),
+       (NOW(), NOW(), 5, 19, '015b_flying_ex_drum.mp3', '015b_flying_drum.mp3',
+        '015b_flying_drum_analysis.json', 'DRUM', 'IRON');
 
 -- BRONZE 티어 VOCAL 팩 (2번 팩)
 INSERT INTO song_by_instrument (created_at, updated_at, song_id, song_instrument_pack_id,
-                                song_by_instrument_ex_filename, song_by_instrument_filename, instrument, tier)
-VALUES (NOW(), NOW(), 6, 2, 'hyukoh_comes_and_goes_ex_vocal.mp3', 'hyukoh_comes_and_goes_vocal.mp3', 'VOCAL', 'BRONZE'),
-       (NOW(), NOW(), 7, 2, 'lee_doll_ex_vocal.mp3', 'lee_doll_vocal.mp3', 'VOCAL', 'BRONZE'),
-       (NOW(), NOW(), 8, 2, 'jang_hard_to_say_ex_vocal.mp3', 'jang_hard_to_say_vocal.mp3', 'VOCAL', 'BRONZE'),
-       (NOW(), NOW(), 9, 2, 'yoon_like_ex_vocal.mp3', 'yoon_like_vocal.mp3', 'VOCAL', 'BRONZE'),
-       (NOW(), NOW(), 10, 2, 'paul_rain_ex_vocal.mp3', 'paul_rain_vocal.mp3', 'VOCAL', 'BRONZE');
-
--- 나머지 팩들도 같은 방식으로 계속 추가...
--- 모든 팩(24개)에 각각 5곡씩 추가하면 총 120개의 song_by_instrument 레코드가 생성됩니다.
+                                song_by_instrument_ex_filename, song_by_instrument_filename,
+                                song_by_instrument_analysis_json, instrument, tier)
+VALUES (NOW(), NOW(), 6, 2, 'hyukoh_comes_and_goes_ex_vocal.mp3', 'hyukoh_comes_and_goes_vocal.mp3',
+        'hyukoh_comes_and_goes_vocal_analysis.json', 'VOCAL', 'BRONZE'),
+       (NOW(), NOW(), 7, 2, 'lee_doll_ex_vocal.mp3', 'lee_doll_vocal.mp3',
+        'lee_doll_vocal_analysis.json', 'VOCAL', 'BRONZE'),
+       (NOW(), NOW(), 8, 2, 'jang_hard_to_say_ex_vocal.mp3', 'jang_hard_to_say_vocal.mp3',
+        'jang_hard_to_say_vocal_analysis.json', 'VOCAL', 'BRONZE'),
+       (NOW(), NOW(), 9, 2, 'yoon_like_ex_vocal.mp3', 'yoon_like_vocal.mp3',
+        'yoon_like_vocal_analysis.json', 'VOCAL', 'BRONZE'),
+       (NOW(), NOW(), 10, 2, 'paul_rain_ex_vocal.mp3', 'paul_rain_vocal.mp3',
+        'paul_rain_vocal_analysis.json', 'VOCAL', 'BRONZE');
 
 -- 트랜잭션 커밋
 COMMIT;

@@ -19,7 +19,6 @@ import com.mickey.dinggading.infra.rabbitmq.producer.JsonMessageProducer;
 import com.mickey.dinggading.model.RecordCreateRequestDTO;
 import com.mickey.dinggading.model.RecordDTO;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -103,19 +102,23 @@ public class RecordService {
         );
         String originalSongUrl = minioService.generatePresignedUrl(
                 minioProperties.getBucketName(),
-                attempt.getSongByInstrument().getSongByInstrumentFilename(),
+                attempt.getSongByInstrument().getSongByInstrumentAnalysisJson(),
                 DEFAULT_EXPIRY_SECONDS
         );
 
         // URL, 노래 제목, 악기
-        HashMap<String, Object> payload = new HashMap<>();
-        payload.put("title", recordInfo.getTitle());
-        payload.put("songTitle", song.getTitle());
-        payload.put("songId", song.getSongId());
-        payload.put("recordUrl", userRecordSongUrl);
-        payload.put("originalSongUrl", originalSongUrl);
+//        HashMap<String, Object> payload = new HashMap<>();
+//        payload.put("attemptId", attempt.getAttemptId());
+//        payload.put("recordFilename", userRecordSongUrl);
+//        payload.put("originalFilename", originalSongUrl);
 
-        MessageDTO message = new MessageDTO(payload, member.getMemberId(), LocalDateTime.now());
+        MessageDTO message = MessageDTO.builder()
+                .senderId(member.getMemberId())
+                .attemptId(Long.valueOf(attempt.getAttemptId().toString()))
+                .recordFilename(userRecordSongUrl)
+                .originalFilename(originalSongUrl)
+                .timestamp(LocalDateTime.now())
+                .build();
 
         jsonMessageProducer.sendJsonMessage(message);
     }

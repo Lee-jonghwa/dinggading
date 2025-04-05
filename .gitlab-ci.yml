@@ -58,7 +58,10 @@ test_backend:
     - docker run --rm ${PROJECT_NAME}-spring-test
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
-      when: always
+      changes:
+        - backend/**/*
+        - infra/dockerfiles/backend.Dockerfile
+      when: on_success
       allow_failure: false
   artifacts:
     paths:
@@ -79,7 +82,10 @@ test_frontend:
     - docker run --rm ${PROJECT_NAME}-next-test
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
-      when: always
+      changes:
+        - frontend/**/*
+        - infra/dockerfiles/frontend.Dockerfile
+      when: on_success
       allow_failure: false
   artifacts:
     paths:
@@ -108,9 +114,15 @@ build_backend:
     - docker push ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-spring:latest
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      changes:
+        - backend/**/*
+        - infra/dockerfiles/backend.Dockerfile
       when: on_success
       allow_failure: false
     - if: '$CI_COMMIT_BRANCH == "develop"'
+      changes:
+        - backend/**/*
+        - infra/dockerfiles/backend.Dockerfile
       when: on_success
       allow_failure: false
   tags:
@@ -136,9 +148,15 @@ build_frontend:
     - docker push ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-next:latest
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      changes:
+        - frontend/**/*
+        - infra/dockerfiles/frontend.Dockerfile
       when: on_success
       allow_failure: false
     - if: '$CI_COMMIT_BRANCH == "develop"'
+      changes:
+        - frontend/**/*
+        - infra/dockerfiles/frontend.Dockerfile
       when: on_success
       allow_failure: false
   tags:
@@ -155,6 +173,9 @@ build_fastapi:
     - docker push ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-fastapi:latest
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      changes:
+        - ai/**/*
+        - infra/dockerfiles/ai.Dockerfile
       when: on_success
       allow_failure: false
     - if: '$CI_COMMIT_BRANCH == "develop"'
@@ -177,6 +198,9 @@ build_celery_worker:
     - docker push ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-celery:latest
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      changes:
+        - ai/**/*
+        - infra/dockerfiles/ai.Dockerfile
       when: on_success
       allow_failure: false
     - if: '$CI_COMMIT_BRANCH == "develop"'

@@ -212,6 +212,50 @@ build_celery_worker:
   tags:
     - cicd
 
+# FastAPI 빌드 작업
+build_fastapi:
+  extends: .docker
+  stage: build
+  before_script:
+    - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+  script:
+    - docker buildx build -t ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-fastapi:latest --target production -f ./infra/dockerfiles/ai.Dockerfile --build-arg PLATFORM=linux/amd64 --build-arg STAGE=production --platform linux/amd64 .
+    - docker push ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-fastapi:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      when: on_success
+      allow_failure: false
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+      changes:
+        - ai/**/*
+        - infra/dockerfiles/ai.Dockerfile
+      when: on_success
+      allow_failure: false
+  tags:
+    - cicd
+
+# Celery Worker 빌드 작업
+build_celery_worker:
+  extends: .docker
+  stage: build
+  before_script:
+    - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+  script:
+    - docker buildx build -t ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-celery:latest --target production -f ./infra/dockerfiles/ai.Dockerfile --build-arg PLATFORM=linux/amd64 --build-arg STAGE=production --platform linux/amd64 .
+    - docker push ${DOCKER_HUB_USERNAME}/${PROJECT_NAME}-celery:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      when: on_success
+      allow_failure: false
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+      changes:
+        - ai/**/*
+        - infra/dockerfiles/ai.Dockerfile
+      when: on_success
+      allow_failure: false
+  tags:
+    - cicd
+
 # Deploy to production server
 deploy:
   stage: deploy

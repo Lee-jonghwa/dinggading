@@ -6,16 +6,42 @@ import { NextPage } from "next";
 import Image from "next/image";
 import ChevronLeft from "@/assets/chevron-left.svg";
 import ChevronRight from "@/assets/chevron-right.svg";
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
+import card1 from "@/app/3dtest/Mainpage/Drum_zoom.png"
+import card2 from "@/app/3dtest/Mainpage/Base_zoom.png"
+
+// 악기별 컴포넌트 임포트 (동적 컴포넌트로 변경)
+const DrumsCharacter = lazy(() => import("@/app/3dtest/Viewer/DrumModel"));
+const BassCharacter = lazy(() => import("@/app/3dtest/Viewer/BassModel"));
+const GuitarCharacter = lazy(() => import("@/app/3dtest/Viewer/GuitarModel"));
+const VocalsCharacter = lazy(() => import("@/app/3dtest/Viewer/VocalModel"));
 
 const Tier: NextPage = () => {
-  const [instrument, setInstrument] = useState("drums");
+  // instrument 타입을 명시적으로 정의
+  type InstrumentType = "Drum" | "Bass" | "Guitar" | "Vocal";
+  const [instrument, setInstrument] = useState<InstrumentType>("Drum");
+
+  // 현재 렌더링할 컴포넌트 결정
+  const renderCharacterComponent = () => {
+    switch (instrument) {
+      case "Drum":
+        return <DrumsCharacter />
+      case "Bass":
+        return <BassCharacter />
+      case "Guitar":
+        return <GuitarCharacter />
+      case "Vocal":
+        return <VocalsCharacter />
+      default:
+        return <DrumsCharacter />
+    }
+  };
 
   const changeInstrument = (direction: "left" | "right") => {
-    const instruments = ["drums", "bass", "guitar", "vocals"];
+    const instruments: InstrumentType[] = ["Drum", "Bass", "Guitar", "Vocal"];
     const currentIndex = instruments.indexOf(instrument);
     let nextIndex = currentIndex;
-
+    
     if (direction === "left") {
       nextIndex = currentIndex === 0 ? instruments.length - 1 : currentIndex - 1;
     } else if (direction === "right") {
@@ -31,7 +57,11 @@ const Tier: NextPage = () => {
           <div className={styles.changeInstrument} onClick={() => changeInstrument("left")}>
             <Image src={ChevronLeft} alt="changing instrument" />
           </div>
-          <div className={styles.playingPeople}>playing character</div>
+          <div className={styles.playingPeople}>
+            <Suspense fallback={<div>Loading...</div>}>
+              {renderCharacterComponent()}
+            </Suspense>
+          </div>
           <div className={styles.changeInstrument} onClick={() => changeInstrument("right")}>
             <Image src={ChevronRight} alt="change instrument" />
           </div>
@@ -46,21 +76,23 @@ const Tier: NextPage = () => {
           </div>
         </div>
       </div>
-      <div className={styles.toNext}>
+      {/* <div className={styles.toNext}>
         <Image src={ChevronRight} alt="to next area" style={{ opacity: 0.6 }} />
-      </div>
+      </div> */}
       <div className={styles.navArea}>
         <Card
           href={`/tier/${instrument}/challenge/`}
-          subText="내 티어를 방어하고 더 높은 티어에 도전하세요"
+          subText1="내 티어를 방어하고"
+          subText2="더 높은 티어에 도전하세요"
           titleText="도전하기"
-          image="#"
+          image={card1}
         />
         <Card
           href={`/tier/${instrument}/practice`}
-          subText="내 티어에 맞는 곡으로 연습하세요"
+          subText1="내 티어에 맞는 곡으로"
+          subText2="연습해보세요"
           titleText="연습하기"
-          image="#"
+          image={card2}
         />
       </div>
     </div>

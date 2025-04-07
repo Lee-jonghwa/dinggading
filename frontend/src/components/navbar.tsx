@@ -8,6 +8,7 @@ import Image from 'next/image'
 import hamburger from "@/assets/hamburger.svg"
 import chevronLeft from "@/assets/chevron-left.svg"
 import { usePathname } from 'next/navigation'
+import missA from "@/app/3dtest/Sub/Look.png"
 
 const Navbar: React.FC = () => {
 
@@ -54,8 +55,14 @@ const Navbar: React.FC = () => {
           <div className="nav-text">이달의 도전곡</div>
           <div className="nav-text">라이브 하우스</div>
         </div>
+        <div className="3dImage">
+          <Image
+            src={missA}
+            alt='miss A'
+            width={250}
+          />
+        </div>
       </div>
-      
     </div>
   )
 
@@ -66,7 +73,7 @@ const Navbar: React.FC = () => {
           {commonThings}
         </div>
       )
-    } else {
+    } else {  
       return (
         <div className='container' style={{width : "25rem"}}>
           {commonThings}

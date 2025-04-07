@@ -3,7 +3,8 @@
 import React from "react"
 import { useRouter } from "next/navigation"
 import "@/styles/components/logo.css"
-import Dingading from "@/assets/DINGADING.svg"
+// import Dingading from "@/assets/DINGADING.svg"
+import Dingading from "@/app/3dtest/Sub/Logo.png"
 import Image from "next/image"
 
 const Logo:React.FC = () => {
@@ -18,6 +19,8 @@ const Logo:React.FC = () => {
       <Image 
         src={Dingading}
         alt="dingading logo"
+        width={300}
+        style={{rotate : "90deg"}}
       />
     </div>
   )

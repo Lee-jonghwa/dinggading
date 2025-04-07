@@ -137,3 +137,4 @@ openvidu:
 
 oauth2:
   redirectUri: ${REDIRECT_URI}
+  frontRedirectUri: ${FRONT_REDIRECT_URI}

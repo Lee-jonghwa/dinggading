@@ -8,6 +8,7 @@ import com.mickey.dinggading.domain.livehouse.dto.ParticipantDTO;
 import com.mickey.dinggading.domain.livehouse.service.LivehouseService;
 import com.mickey.dinggading.util.SecurityUtil;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -81,5 +82,11 @@ public class LivehouseController {
     public ResponseEntity<List<ParticipantDTO>> listParticipants(@PathVariable Long livehouseId) {
         log.info("listParticipants - /livehouseId/participants 호출");
         return ResponseEntity.ok(livehouseService.listParticipants(livehouseId));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<LivehouseDTO>> searchLivehouses(@RequestParam("keyword") String keyword, Pageable pageable) {
+        log.info("searchLivehouses - /search/keyword 호출");
+        return ResponseEntity.ok(livehouseService.searchLivehouses(keyword, pageable));
     }
 }

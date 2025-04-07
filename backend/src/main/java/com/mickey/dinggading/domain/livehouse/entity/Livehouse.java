@@ -13,6 +13,8 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,6 +31,7 @@ import lombok.Setter;
 public class Livehouse {
 
     @Id
+    @Column(name="livehouse_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long livehouseId;
 
@@ -37,19 +40,19 @@ public class Livehouse {
 
     private String description;
 
-    @Column(nullable = false)
-    private Long hostId;
+    @Column(name="host_id", nullable = false)
+    private UUID hostId;
 
-    @Column(nullable = false)
+    @Column(name="host_nickname", nullable = false)
     private String hostNickname;
 
-    @Column(nullable = false)
+    @Column(name="session_id", nullable = false)
     private String sessionId;
 
-    @Column(nullable = false)
+    @Column(name="created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
+    @Column(name="max_participants", nullable = false)
     private Integer maxParticipants;
 
     @Column(nullable = false)

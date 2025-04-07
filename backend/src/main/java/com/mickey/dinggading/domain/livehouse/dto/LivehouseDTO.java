@@ -2,6 +2,8 @@ package com.mickey.dinggading.domain.livehouse.dto;
 
 import com.mickey.dinggading.domain.livehouse.entity.Livehouse;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +19,7 @@ public class LivehouseDTO {
     private Long livehouseId;
     private String title;
     private String description;
-    private Long hostId;
+    private UUID hostId;
     private String hostNickname;
     private LocalDateTime createdAt;
     private Integer participantCount;

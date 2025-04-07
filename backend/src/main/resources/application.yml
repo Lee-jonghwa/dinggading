@@ -115,7 +115,6 @@ minio:
   secret-key: ${MINIO_PASSWORD}
   bucket: ${MINIO_BUCKET}
 
-
 rabbitmq:
   audio-analysis-request-queue:
     name: audio-analysis-request

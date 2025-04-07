@@ -27,6 +27,8 @@ node_modules
 
 # AI 관련 ignore
 /ai/venv/
-/ai/**/*.pyc
 /ai/tests/
+/ai/__pycache__/
+/ai/**/*.pyc
+/ai/**/*.ipynb_checkpoints
 .pyc

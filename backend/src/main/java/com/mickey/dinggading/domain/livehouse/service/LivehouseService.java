@@ -1,4 +1,3 @@
-// 파일 경로: src/main/java/com/mickey/dinggading/domain/livehouse/service/LivehouseService.java
 package com.mickey.dinggading.domain.livehouse.service;
 
 import com.mickey.dinggading.base.status.ErrorStatus;
@@ -58,6 +57,12 @@ public class LivehouseService {
         } catch (OpenViduJavaClientException | OpenViduHttpException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Page<LivehouseDTO> searchLivehouses(String keyword, Pageable pageable) {
+        List<String> activeSessions = openVidu.getActiveSessions().stream().map(Session::getSessionId).toList();
+        return livehouseRepository.searchByKeyword(activeSessions, keyword, pageable)
+                .map(LivehouseDTO::fromEntity);
     }
 
     @Transactional(readOnly = true)

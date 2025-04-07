@@ -3,6 +3,7 @@ import Button from "@/components/button"
 import { useCountStore } from "@/store/count"
 import { Canvas } from "@react-three/fiber"
 import { Model } from "@/components/glbmodels"
+import TestMedal from "@/app/3dtest/Viewer/BRONZEBass"
 
 const Test = () => {
 
@@ -20,11 +21,14 @@ const Test = () => {
           {/* <Model glbPath="/models/Bronze.glb" scale={2}/> */}
           <Model glbPath="/models/Silver.glb" position={[0, 0, 2]} rotation={[0, Math.PI, 0]} scale={4} />
           {/* <Model glbPath="/models/Gold.glb" scale={2}/> */}
-        </Canvas>
-        </div>
+      </Canvas>
+      </div>
 
+      <div style={{width : '100px' , border : "5px solid", display:"flex", flexDirection:"column", alignItems: "center"}}>
+        <TestMedal /> 
+      </div>
 
-        <div className="count border-1">
+      <div className="count border-1">
         <p> store 테스트 코드  </p>
         <p>count : {count}</p>
         <div onClick={increment}>+</div> 

@@ -1,17 +1,16 @@
 import React, { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
-import { PlatinumVocal } from '../Vocal/PV_transfer'
+// import { OrbitControls } from '@react-three/drei'
+import { IronDrum } from '../../../assets/Drum/ID_transfer'
 
-export default function PlatinumVocalScene() {
+export default function IronDrumScene() {
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
+    <div style={{ width: '18rem', height: '24rem' }}>
       <Canvas 
         camera={{ 
-          position: [0, 0, 5], 
+          position: [0, 0, 2], 
           fov: 45 
         }}
-        style={{ background: '#22252d' }}
       >        
         {/* 방향성 조명 */}
         <directionalLight position={[0, 0, 60]} intensity={10}/>
@@ -22,11 +21,11 @@ export default function PlatinumVocalScene() {
 
         {/* 모델 로딩 중 대기 */}
         <Suspense fallback={null}>
-          <PlatinumVocal position={[0, 0, 0]} />
+          <IronDrum position={[0, -0.6, -0.5]} />
         </Suspense>
 
         {/* 모델 컨트롤 */}
-        <OrbitControls />
+        {/* <OrbitControls /> */}
       </Canvas>
     </div>
   )

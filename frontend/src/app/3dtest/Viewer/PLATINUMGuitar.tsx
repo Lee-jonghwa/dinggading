@@ -1,17 +1,16 @@
 import React, { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
-import { DiamondBass } from '../Bass/DB_transfer'
+// import { OrbitControls } from '@react-three/drei'
+import { PlatinumGuitar } from '../../../assets/Guitar/PG_transfer'
 
-export default function DiamondBassScene() {
+export default function PlatinumGuitarScene() {
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
+    <div style={{ width: '18rem', height: '24rem' }}>
       <Canvas 
         camera={{ 
-          position: [0, 0, 5], 
+          position: [0, 0, 2], 
           fov: 45 
         }}
-        style={{ background: '#22252d' }}
       >        
         {/* 방향성 조명 */}
         <directionalLight position={[0, 0, 60]} intensity={10}/>
@@ -22,11 +21,11 @@ export default function DiamondBassScene() {
 
         {/* 모델 로딩 중 대기 */}
         <Suspense fallback={null}>
-          <DiamondBass position={[0, 0, 0]} />
+          <PlatinumGuitar position={[0, -0.6, -0.5]} />
         </Suspense>
 
         {/* 모델 컨트롤 */}
-        <OrbitControls />
+        {/* <OrbitControls /> */}
       </Canvas>
     </div>
   )

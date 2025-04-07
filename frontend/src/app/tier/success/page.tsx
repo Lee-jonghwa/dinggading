@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import styles from "./successPage.module.css"
 import { useTierStore } from "@/store/tier"
-
+import SilverDrum from "@/app/3dtest/Viewer/SILVERDrum"
 
 export default function SuccessPage() {
   const router = useRouter()
@@ -18,16 +18,16 @@ export default function SuccessPage() {
     <div className={styles.successPage}>
       <div className={styles.pageContainer}>
         <div className={styles.left}>
-          <div className={styles.title}>        
+          <div className={styles.scoreSection}>
+            <div className={styles.unityArea}>
+              <SilverDrum />
+              {/* <Image src={Trophy} alt="Trophy" width={100} height={100} /> */}
+            </div>
+          </div>
+          <div className={styles.title}>
             <div className={styles.text}>
             🎉 축하합니다! {userTier}에 도달했습니다 🎉
             </div> 
-          </div>
-          <div className={styles.scoreSection}>
-            <div className={styles.unityArea}>
-              tier-icon-moving
-              {/* <Image src={Trophy} alt="Trophy" width={100} height={100} /> */}
-            </div>
           </div>
         </div>
         <div className={styles.right}>

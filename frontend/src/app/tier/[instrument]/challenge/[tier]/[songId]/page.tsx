@@ -63,7 +63,7 @@ export default function ChallengeBySongId() {
     alert('결과가 제출되었습니다.');
 
     // 성공 시 , 실패 시 
-    router.push(`/tier/${instrument}/challenge/${tier}/${songId}/success`)
+    router.push(`/tier/success`)
   };
   
   // 컴포넌트 언마운트 시 리소스 정리

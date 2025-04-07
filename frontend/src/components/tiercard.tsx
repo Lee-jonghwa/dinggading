@@ -1,15 +1,11 @@
 'use client'
 
-import Image, { StaticImageData } from "next/image"
+// import { StaticImageData } from "next/image"
 import styles from "./tiercard.module.css"
-import IronIcon from "@/assets/star.png"
-import BronzeIcon from "@/assets/star.png"
-import SilverIcon from "@/assets/star.png"
-import GoldIcon from "@/assets/star.png"
-import PlatinumIcon from "@/assets/star.png"
-import DiamondIcon from "@/assets/star.png"
 import { useParams, useRouter } from "next/navigation"
+import React from "react"
 
+// 티어별, 악기별 컴포넌트 동적 임포트
 interface TiercardProps {
   tier : string , 
   currentTier : string, 
@@ -17,64 +13,77 @@ interface TiercardProps {
 }
 
 export default function Tiercard ({ tier, currentTier, noticeThing} : TiercardProps) {
-
   const tierOrder = ['IRON', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'DIAMOND']
+  const instruments = ['Drum', 'Bass', 'Guitar', 'Vocal']
 
   const getTierStatus = () => {
     const currentIndex = tierOrder.indexOf(currentTier)
     const tierIndex = tierOrder.indexOf(tier)
      
     if (tierIndex === currentIndex) {
-      return {
-        isBlurred : false, navigateText : "방어하기", showNotice : true 
-      }
+      return { isBlurred : false, navigateText : "방어하기", showNotice : true }
     } else if (tierIndex === currentIndex + 1) {
-      return {
-        isBlurred : true, navigateText : "도전하기", showNotice : false 
-      }
+      return { isBlurred : true, navigateText : "도전하기", showNotice : false }
     } else if (tierIndex < currentIndex) {
-      return {
-        isBlurred : false, navigateText : "", showNotice : false 
-      }
+      return { isBlurred : false, navigateText : "", showNotice : false }
     } else {
-      return {
-        isBlurred : true, navigateText : "", showNotice : false 
-      }
+      return { isBlurred : true, navigateText : "", showNotice : false }
     }
   }
-
-  const getTierIcon = () => {
-    const tierIcons:Record<string, StaticImageData> = { // next/image에서 가져온 이미지는 StaticImageData 타입을 가진다.  
-      Iron: IronIcon,
-      Bronze: BronzeIcon,
-      Silver: SilverIcon,
-      Gold: GoldIcon,
-      Platinum: PlatinumIcon,
-      Diamond: DiamondIcon,
-    }
-    return tierIcons[tier] || IronIcon  // 기본값을 IronIcon으로 설정
-  }
-  
-  const tierStatus = getTierStatus() 
-  const tierIcon = getTierIcon() 
 
   const params = useParams() 
   const { instrument } = params
+
+  // 현재 선택된 악기가 유효한지 확인
+  const validInstrument = instruments.includes(String(instrument)) ? String(instrument) : 'Drum'
+
+  // 동적으로 컴포넌트를 가져오기 위한 React.lazy 컴포넌트
+  const [MedalComponent, setMedalComponent] = React.useState<React.ComponentType | null>(null)
+  const [loading, setLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    // 동적 임포트를 위한 함수
+    const loadMedalComponent = async () => {
+      try {
+        setLoading(true)
+        // 티어와 악기에 따라 동적으로 컴포넌트 임포트
+        const { default : LoadedComponent} = await import(`@/app/3dtest/Viewer/${tier}${validInstrument}`)
+        setMedalComponent(() => LoadedComponent)
+      } catch (error) {
+        console.error(`Failed to load component for ${tier}${validInstrument}:`, error)
+        // 기본 컴포넌트로 fallback
+        try {
+          const fallbackModule = await import('@/app/3dtest/Viewer/BRONZEDrum')
+          setMedalComponent(() => fallbackModule.default)
+        } catch (fallbackError) {
+          console.error('Failed to load fallback component:', fallbackError)
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadMedalComponent()
+  }, [tier, validInstrument])
+
+  const tierStatus = getTierStatus() 
 
   const router = useRouter()
 
   const toTier = () => {
     if (tier) router.push(`/tier/${instrument}/challenge/${tier}`)
-  } 
+  }
 
   return (
     <div className={styles.tiercard} onClick={toTier}>
       <div className={`${styles.icon} ${tierStatus.isBlurred ? styles.blurred : ''}`}>
-        <Image 
-          src={tierIcon}
-          alt="tier image"
-          className={styles.image}
-        /> 
+        <div style={{width: '10rem', display: "flex", flexDirection: "column", alignItems: "center"}}>
+          {loading ? (
+            <div>Loading...</div>
+          ) : (
+            MedalComponent && <MedalComponent />
+          )}
+        </div>
       </div>
       <div className={styles.text}>{tier}</div>
       <div className={styles.navigate}>{tierStatus.navigateText}</div>

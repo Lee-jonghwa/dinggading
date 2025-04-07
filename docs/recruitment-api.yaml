@@ -14,11 +14,7 @@ servers:
 
 tags:
   - name: Recruitment
-    description: 밴드 구인 관련 API - 개발전
-  - name: RecruitmentInstrument
-    description: 구인 악기 포지션 관련 API - 개발전
-  - name: RecruitmentApplicant
-    description: 구인 지원자 관련 API - 개발전
+    description: 밴드 구인 관련 API - 개발 완료
 
 components:
   securitySchemes:

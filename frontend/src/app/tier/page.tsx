@@ -7,8 +7,10 @@ import Image from "next/image";
 import ChevronLeft from "@/assets/chevron-left.svg";
 import ChevronRight from "@/assets/chevron-right.svg";
 import { useState, lazy, Suspense } from "react";
-import card1 from "@/app/3dtest/Mainpage/Drum_zoom.png"
-import card2 from "@/app/3dtest/Mainpage/Base_zoom.png"
+// import card1 from "@/app/3dtest/Mainpage/Drum_zoom.png"
+// import card2 from "@/app/3dtest/Mainpage/Base_zoom.png"
+import challenge from "@/assets/Challenge.png"
+import practice from "@/assets/Practice.png"
 
 // 악기별 컴포넌트 임포트 (동적 컴포넌트로 변경)
 const DrumsCharacter = lazy(() => import("@/app/3dtest/Viewer/DrumModel"));
@@ -85,14 +87,14 @@ const Tier: NextPage = () => {
           subText1="내 티어를 방어하고"
           subText2="더 높은 티어에 도전하세요"
           titleText="도전하기"
-          image={card1}
+          image={challenge}
         />
         <Card
           href={`/tier/${instrument}/practice`}
           subText1="내 티어에 맞는 곡으로"
           subText2="연습해보세요"
           titleText="연습하기"
-          image={card2}
+          image={practice}
         />
       </div>
     </div>

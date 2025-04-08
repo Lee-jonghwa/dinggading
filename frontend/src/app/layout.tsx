@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import QueryProvider from "@/components/providers/QueryProvider";
 import "./globals.css";
 import Navbar from "@/components/navbar";
+import AuthInitializer from "@/components/authiintializer";
 // import { useState } from "react"; // The React hook only works in a client component. 
 
 const geistSans = Geist({
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div className="layout-container">
+          <AuthInitializer /> 
           <Navbar /> 
           <div className="main-content">
             <QueryProvider>

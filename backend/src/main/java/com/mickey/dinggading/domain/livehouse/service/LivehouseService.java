@@ -1,7 +1,6 @@
 package com.mickey.dinggading.domain.livehouse.service;
 
 import com.mickey.dinggading.base.status.ErrorStatus;
-import com.mickey.dinggading.domain.livehouse.dto.CreateLivehouseRequestDTO;
 import com.mickey.dinggading.domain.livehouse.dto.LivehouseDTO;
 import com.mickey.dinggading.domain.livehouse.dto.LivehouseSessionDTO;
 import com.mickey.dinggading.domain.livehouse.dto.ParticipantDTO;
@@ -12,6 +11,7 @@ import com.mickey.dinggading.domain.livehouse.repository.ParticipantRepository;
 import com.mickey.dinggading.domain.member.model.entity.Member;
 import com.mickey.dinggading.domain.member.repository.MemberRepository;
 import com.mickey.dinggading.exception.ExceptionHandler;
+import com.mickey.dinggading.model.CreateLivehouseRequestDTO;
 import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +48,7 @@ public class LivehouseService {
 
         List<String> activeSessions = openVidu.getActiveSessions().stream().map(Session::getSessionId).toList();
         return livehouseRepository.findBySessionIdInOrderByParticipantCountDesc(activeSessions, pageable)
-            .map(LivehouseDTO::fromEntity);
+                .map(LivehouseDTO::fromEntity);
     }
 
     private void openViduFetch() {
@@ -68,15 +68,15 @@ public class LivehouseService {
     @Transactional(readOnly = true)
     public LivehouseDTO getLivehouse(Long livehouseId) {
         Livehouse livehouse = livehouseRepository.findById(livehouseId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "라이브하우스를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "라이브하우스를 찾을 수 없습니다."));
         return LivehouseDTO.fromEntity(livehouse);
     }
 
     @Transactional
-    public LivehouseSessionDTO createLivehouse(CreateLivehouseRequestDTO requestDTO, UUID memberId) {
+    public LivehouseSessionDTO createLivehouse(com.mickey.dinggading.model.CreateLivehouseRequestDTO requestDTO, UUID memberId) {
         try {
             Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new ExceptionHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                    .orElseThrow(() -> new ExceptionHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
             List<String> activeSessions = openVidu.getActiveSessions().stream().map(Session::getSessionId).toList();
             Optional<Livehouse> livehouse = livehouseRepository.findBySessionIdInAndHostId(activeSessions, member.getMemberId());
@@ -99,12 +99,12 @@ public class LivehouseService {
             Participant host = saveParticipant(newLivehouse, member, connection);
 
             return LivehouseSessionDTO.builder()
-                .livehouseId(newLivehouse.getLivehouseId())
-                .sessionId(sessionId)
-                .token(connection.getToken())
-                .participantId(host.getParticipantId())
-                .nickname(member.getNickname())
-                .build();
+                    .livehouseId(newLivehouse.getLivehouseId())
+                    .sessionId(sessionId)
+                    .token(connection.getToken())
+                    .participantId(host.getParticipantId())
+                    .nickname(member.getNickname())
+                    .build();
 
         } catch (OpenViduJavaClientException | OpenViduHttpException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "OpenVidu 서버 오류", e);
@@ -115,12 +115,12 @@ public class LivehouseService {
     private Participant saveParticipant(Livehouse newLivehouse, Member member, Connection connection) {
         // 호스트를 첫 번째 참여자로 등록
         Participant host = Participant.builder()
-            .livehouse(newLivehouse)
-            .nickname(member.getNickname())
-            .connectionId(connection.getConnectionId())
-            .isHost(true)
-            .joinedAt(LocalDateTime.now())
-            .build();
+                .livehouse(newLivehouse)
+                .nickname(member.getNickname())
+                .connectionId(connection.getConnectionId())
+                .isHost(true)
+                .joinedAt(LocalDateTime.now())
+                .build();
 
         participantRepository.save(host);
         return host;
@@ -130,15 +130,15 @@ public class LivehouseService {
     private Livehouse saveLivehouse(CreateLivehouseRequestDTO requestDTO, UUID memberId, Member member, String sessionId) {
         // 라이브하우스 엔티티 생성
         Livehouse newLivehouse = Livehouse.builder()
-            .title(requestDTO.getTitle())
-            .description(requestDTO.getDescription())
-            .hostId(memberId)
-            .hostNickname(member.getNickname())
-            .sessionId(sessionId)
-            .createdAt(LocalDateTime.now())
-            .maxParticipants(requestDTO.getMaxParticipants())
-            .status(Livehouse.LivehouseStatus.ACTIVE)
-            .build();
+                .title(requestDTO.getTitle())
+                .description(requestDTO.getDescription())
+                .hostId(memberId)
+                .hostNickname(member.getNickname())
+                .sessionId(sessionId)
+                .createdAt(LocalDateTime.now())
+                .maxParticipants(requestDTO.getMaxParticipants())
+                .status(Livehouse.LivehouseStatus.ACTIVE)
+                .build();
 
         livehouseRepository.save(newLivehouse);
         return newLivehouse;
@@ -151,13 +151,13 @@ public class LivehouseService {
 
         // 멤버 찾기
         Member member = memberRepository.findByMemberId(memberId)
-            .orElseThrow(() -> new ExceptionHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new ExceptionHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         List<String> activeSessions = openVidu.getActiveSessions().stream().map(Session::getSessionId).toList();
 
         // 세션이 살아있는 라이브 하우스인지 찾기
         Livehouse livehouse = livehouseRepository.findBySessionIdInAndLivehouseId(activeSessions, livehouseId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "라이브하우스를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "라이브하우스를 찾을 수 없습니다."));
 
         if (livehouse.getStatus() == Livehouse.LivehouseStatus.CLOSED) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "종료된 라이브하우스입니다.");
@@ -176,20 +176,20 @@ public class LivehouseService {
                 Participant participant = existingParticipant.get();
                 // 이미 참가 중인 경우 기존 정보 반환
                 return LivehouseSessionDTO.builder()
-                    .livehouseId(livehouse.getLivehouseId())
-                    .sessionId(livehouse.getSessionId())
-                    .participantId(existingParticipant.get().getParticipantId())
-                    .nickname(member.getNickname())
-                    .build();
+                        .livehouseId(livehouse.getLivehouseId())
+                        .sessionId(livehouse.getSessionId())
+                        .participantId(existingParticipant.get().getParticipantId())
+                        .nickname(member.getNickname())
+                        .build();
             }
 
             // 기존에 참가한 적 없다면 새로 참여자 등록
             Participant participant = Participant.builder()
-                .livehouse(livehouse)
-                .nickname(member.getNickname())
-                .isHost(false)
-                .joinedAt(LocalDateTime.now())
-                .build();
+                    .livehouse(livehouse)
+                    .nickname(member.getNickname())
+                    .isHost(false)
+                    .joinedAt(LocalDateTime.now())
+                    .build();
 
             participantRepository.save(participant);
 
@@ -199,10 +199,10 @@ public class LivehouseService {
             // 3. 연결 속성 설정 및 데이터 포함
             System.out.println("세션 " + sessionId + "에 대한 연결을 생성합니다.");
             ConnectionProperties properties = new ConnectionProperties.Builder()
-                .type(ConnectionType.WEBRTC)
-                .role(OpenViduRole.PUBLISHER)
-                .data(String.format("{\"nickname\": \"%s\"}", member.getNickname()))
-                .build();
+                    .type(ConnectionType.WEBRTC)
+                    .role(OpenViduRole.PUBLISHER)
+                    .data(String.format("{\"nickname\": \"%s\"}", member.getNickname()))
+                    .build();
 
             // 4. 세션에 대한 연결 생성
             Connection connection = session.createConnection(properties);
@@ -210,12 +210,12 @@ public class LivehouseService {
             System.out.println("생성된 토큰: " + token.substring(0, 20) + "...");
 
             return LivehouseSessionDTO.builder()
-                .livehouseId(livehouse.getLivehouseId())
-                .sessionId(sessionId)
-                .token(token)
-                .participantId(participant.getParticipantId())
-                .nickname(member.getNickname())
-                .build();
+                    .livehouseId(livehouse.getLivehouseId())
+                    .sessionId(sessionId)
+                    .token(token)
+                    .participantId(participant.getParticipantId())
+                    .nickname(member.getNickname())
+                    .build();
 
         } catch (OpenViduJavaClientException | OpenViduHttpException e) {
             e.printStackTrace(); // 스택 트레이스 출력
@@ -226,10 +226,10 @@ public class LivehouseService {
     @Transactional
     public void leaveLivehouse(Long livehouseId, Long participantId) {
         Livehouse livehouse = livehouseRepository.findById(livehouseId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "라이브하우스를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "라이브하우스를 찾을 수 없습니다."));
 
         Participant participant = participantRepository.findById(participantId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "참여자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "참여자를 찾을 수 없습니다."));
 
         if (!participant.getLivehouse().getLivehouseId().equals(livehouseId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 라이브하우스의 참여자가 아닙니다.");
@@ -248,10 +248,10 @@ public class LivehouseService {
     @Transactional
     public void closeLivehouse(Long livehouseId, Long participantId) {
         Livehouse livehouse = livehouseRepository.findById(livehouseId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "라이브하우스를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "라이브하우스를 찾을 수 없습니다."));
 
         Participant participant = participantRepository.findByParticipantId(participantId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "참여자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "참여자를 찾을 수 없습니다."));
 
         if (!participant.isHost()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "라이브하우스 종료 권한이 없습니다.");
@@ -268,26 +268,26 @@ public class LivehouseService {
         openViduFetch();
         log.info("session list -> {} ", openVidu.getActiveSessions().stream().map(Session::getSessionId).toList());
         Livehouse livehouse = livehouseRepository.findById(livehouseId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "라이브하우스를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "라이브하우스를 찾을 수 없습니다."));
         List<String> connectionList = openVidu.getActiveSession(livehouse.getSessionId())
-            .getConnections()
-            .stream()
-            .map(Connection::getConnectionId)
-            .toList();
+                .getConnections()
+                .stream()
+                .map(Connection::getConnectionId)
+                .toList();
 
         log.info("connection list -> {}", connectionList);
 
         return participantRepository.findByLivehouse(livehouse).stream()
-            .map(ParticipantDTO::fromEntity)
-            .collect(Collectors.toList());
+                .map(ParticipantDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 
     private Session createOpenViduSession() throws OpenViduJavaClientException, OpenViduHttpException {
         // 세션 속성 설정 - RecordingMode.MANUAL로 통일
         SessionProperties properties = new SessionProperties.Builder()
-            .mediaMode(MediaMode.ROUTED)
-            .recordingMode(RecordingMode.MANUAL)
-            .build();
+                .mediaMode(MediaMode.ROUTED)
+                .recordingMode(RecordingMode.MANUAL)
+                .build();
 
         // 세션 생성
         return openVidu.createSession(properties);
@@ -299,9 +299,9 @@ public class LivehouseService {
         }
 
         ConnectionProperties properties = new ConnectionProperties.Builder()
-            .type(ConnectionType.WEBRTC)
-            .role(OpenViduRole.PUBLISHER)
-            .build();
+                .type(ConnectionType.WEBRTC)
+                .role(OpenViduRole.PUBLISHER)
+                .build();
 
         return session.createConnection(properties);
     }

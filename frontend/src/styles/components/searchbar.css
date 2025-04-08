@@ -2,7 +2,7 @@
   background-color: white;
   display: flex;
   flex-direction: row;
-  margin: 1rem;
+  /* margin: 1rem; */
   padding: 0.5rem;
   border-radius: 5px;
   gap: 1rem;

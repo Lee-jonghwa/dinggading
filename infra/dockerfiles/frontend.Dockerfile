@@ -12,11 +12,14 @@ COPY ./frontend/package*.json ./
 
 # Install dependencies
 RUN npm install
+
 ARG NEXT_PUBLIC_API_BASE_URL=https://defaultvalue.example.com
 ARG NEXT_PUBLIC_ENV_MODE=DOCKER_FILE
+ARG NEXT_PUBLIC_API_OAUTH_URL=https://defaultvalue.example.com
 
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_ENV_MODE=$NEXT_PUBLIC_ENV_MODE
+ENV NEXT_PUBLIC_API_OAUTH_URL=$NEXT_PUBLIC_API_OAUTH_URL
 
 # Copy OpenAPI generated code if it exists
 COPY ./frontend/generated /app/generated
@@ -57,9 +60,12 @@ RUN npm install --production
 
 ARG NEXT_PUBLIC_API_BASE_URL=https://defaultvalue.example.com
 ARG NEXT_PUBLIC_ENV_MODE=DOCKER_FILE
+ARG NEXT_PUBLIC_API_OAUTH_URL=https://defaultvalue.example.com
 
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_ENV_MODE=$NEXT_PUBLIC_ENV_MODE
+ENV NEXT_PUBLIC_API_OAUTH_URL=$NEXT_PUBLIC_API_OAUTH_URL
+
 # Copy built assets from build stage
 COPY --from=build /app/frontend/.next ./.next
 COPY --from=build /app/frontend/public ./public

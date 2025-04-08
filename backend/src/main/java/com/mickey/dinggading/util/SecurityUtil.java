@@ -24,7 +24,6 @@ public class SecurityUtil {
             log.error("Authorization 헤더가 없거나 Bearer 토큰이 아닙니다.");
             throw new ExceptionHandler(ErrorStatus._UNAUTHORIZED);
         }
-
         // JWTUtil을 사용하여 토큰에서 memberId 추출
         return jwtUtil.getMemberId(authorizationHeader);
     }

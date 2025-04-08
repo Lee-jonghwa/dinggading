@@ -72,7 +72,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2rem;
+  /* gap: 2rem; */
 }
 
 .texts {
@@ -80,6 +80,10 @@
   flex-direction: column;
   gap: 2rem;
   padding: 2rem;
+}
+
+.nav-text {
+  font-size: large;
 }
 
 .end-line {

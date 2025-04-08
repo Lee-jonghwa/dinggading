@@ -16,12 +16,28 @@ import java.util.UUID;
 
 @Repository
 public interface LivehouseRepository extends JpaRepository<Livehouse, Long> {
-    Page<Livehouse> findBySessionIdIn(List<String> sessionIds, Pageable pageable);
+    @Query(value = "SELECT l.* FROM livehouses l " +
+            "LEFT JOIN participants p ON l.livehouse_id = p.livehouse_id " +
+            "WHERE l.session_id IN :sessionIds " +
+            "GROUP BY l.livehouse_id " +
+            "ORDER BY COUNT(p.participant_id) DESC",
+            countQuery = "SELECT COUNT(*) FROM livehouses WHERE session_id IN :sessionIds",
+            nativeQuery = true)
+    Page<Livehouse> findBySessionIdInOrderByParticipantCountDesc(List<String> sessionIds, Pageable pageable);
 
     Optional<Livehouse> findBySessionIdInAndHostId(List<String> activeSessions, UUID memberId);
 
     Optional<Livehouse> findBySessionIdInAndLivehouseId(List<String> activeSessions, Long livehouseId);
 
-    @Query("SELECT l FROM Livehouse l where l.sessionId IN :activeSessions AND (l.title LIKE %:keyword% OR l.hostNickname LIKE %:keyword%)")
+    @Query(value = "SELECT l.* FROM livehouses l " +
+            "LEFT JOIN participants p ON l.livehouse_id = p.livehouse_id " +
+            "WHERE l.session_id IN :activeSessions " +
+            "AND (l.title LIKE %:keyword% OR l.host_nickname LIKE %:keyword%) " +
+            "GROUP BY l.livehouse_id " +
+            "ORDER BY COUNT(p.participant_id) DESC",
+            countQuery = "SELECT COUNT(*) FROM livehouses l " +
+                    "WHERE l.session_id IN :activeSessions " +
+                    "AND (l.title LIKE %:keyword% OR l.host_nickname LIKE %:keyword%)",
+            nativeQuery = true)
     Page<Livehouse> searchByKeyword(@Param("activeSessions") List<String> activeSessions, @Param("keyword") String keyword, Pageable pageable);
 }

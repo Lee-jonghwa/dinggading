@@ -47,7 +47,7 @@ public class LivehouseService {
         openViduFetch();
 
         List<String> activeSessions = openVidu.getActiveSessions().stream().map(Session::getSessionId).toList();
-        return livehouseRepository.findBySessionIdIn(activeSessions, pageable)
+        return livehouseRepository.findBySessionIdInOrderByParticipantCountDesc(activeSessions, pageable)
             .map(LivehouseDTO::fromEntity);
     }
 

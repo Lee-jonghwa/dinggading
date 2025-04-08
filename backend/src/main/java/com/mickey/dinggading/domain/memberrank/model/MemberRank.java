@@ -93,8 +93,8 @@ public class MemberRank extends BaseEntity {
                 .toneScore(0)
                 .rankSuccessCount(0)
                 .lastAttemptTier(Tier.UNRANKED) // 초기 null 상태
-                .defenceExpireDate(null)
-                .lastAttemptDate(null)
+                .defenceExpireDate(LocalDateTime.of(2099, 1, 1, 0, 0))
+                .lastAttemptDate(LocalDateTime.of(2099, 1, 1, 0, 0))
                 .rankMatching(new ArrayList<>())
                 .tierLogs(new ArrayList<>())
                 .build();

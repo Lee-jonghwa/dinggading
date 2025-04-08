@@ -34,6 +34,186 @@ tags:
 
 components:
   schemas:
+    SortDTO:
+      type: array
+      description: 정렬 정보
+      items:
+        type: object
+        properties:
+          direction:
+            type: string
+            enum: [ASC, DESC]
+            example: ASC
+          property:
+            type: string
+            example: "createdAt"
+          ignoreCase:
+            type: boolean
+            example: false
+          nullHandling:
+            type: string
+            enum: [NATIVE, NULLS_FIRST, NULLS_LAST]
+            example: "NATIVE"
+          ascending:
+            type: boolean
+            example: true
+
+    PageDTO:
+      type: object
+      properties:
+        last:
+          type: boolean
+          description: "마지막 페이지 여부"
+          example: false
+        first:
+          type: boolean
+          description: "첫 페이지 여부"
+          example: true
+        totalElements:
+          type: integer
+          description: "총 요소 수"
+          example: 30
+        totalPages:
+          type: integer
+          description: "총 페이지 수"
+          example: 2
+        size:
+          type: integer
+          description: "페이지 크기"
+          example: 20
+        number:
+          type: integer
+          description: "현재 페이지 번호"
+          example: 0
+        numberOfElements:
+          type: integer
+          description: "현재 페이지의 요소 수"
+          example: 20
+        empty:
+          type: boolean
+          description: "페이지가 비어있는지 여부"
+          example: false
+
+    ChallengePageableDTO:
+      type: object
+      properties:
+        pageNumber:
+          type: integer
+          description: 현재 페이지 번호 (0부터 시작)
+          example: 0
+        pageSize:
+          type: integer
+          description: 페이지 크기
+          example: 20
+        sort:
+          $ref: '#/components/schemas/SortDTO'
+        offset:
+          type: integer
+          description: 오프셋 (건너뛴 레코드 수)
+          example: 0
+        paged:
+          type: boolean
+          description: 페이징 적용 여부
+          example: true
+        unpaged:
+          type: boolean
+          description: 페이징 미적용 여부
+          example: false
+
+    RankMatchingPageDTO:
+      allOf:
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/RankMatchingDTO'
+        - type: object
+          properties:
+            pageable:
+              $ref: '#/components/schemas/ChallengePageableDTO'
+        - $ref: '#/components/schemas/PageDTO'
+
+    MemberTierLogPageDTO:
+      allOf:
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/MemberTierLogDTO'
+        - type: object
+          properties:
+            pageable:
+              $ref: '#/components/schemas/ChallengePageableDTO'
+        - $ref: '#/components/schemas/PageDTO'
+
+    AttemptPageDTO:
+      allOf:
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/AttemptDTO'
+        - type: object
+          properties:
+            pageable:
+              $ref: '#/components/schemas/ChallengePageableDTO'
+        - $ref: '#/components/schemas/PageDTO'
+
+    SongPageDTO:
+      allOf:      
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/SongDTO'
+        - type: object
+          properties:
+            pageable:
+              $ref: '#/components/schemas/ChallengePageableDTO'
+        - $ref: '#/components/schemas/PageDTO'
+
+    SongDTO:
+      type: object
+      properties:
+        songId:
+          type: integer
+          format: int64
+          description: "곡 고유 식별자"
+          example: 10
+        title:
+          type: string
+          description: "곡 제목"
+          example: "Shape of You"
+        artist:
+          type: string
+          description: "아티스트"
+          example: "Ed Sheeran"
+        description:
+          type: string
+          description: "곡 설명"
+          example: "2017년 Ed Sheeran의 히트곡"
+        youtubeUrl:
+          type: string
+          description: "유튜브 링크"
+          example: "https://www.youtube.com/watch?v=JGwWNGJdvx8"
+        songFilename:
+          type: string
+          description: "곡 파일 이름"
+          example: "shape_of_you.mp3"
+        instruments:
+          type: array
+          items:
+            $ref: '#/components/schemas/SongByInstrumentDTO'
+      required:
+        - songId
+        - artist
+        - title
+        - youtubeUrl
+
     CreateAttemptRequestDTO:
       type: object
       properties:
@@ -45,9 +225,6 @@ components:
           type: integer
           format: int64
           description: "악기별 곡 ID"
-        recordUrl:
-          type: string
-          description: "녹음 파일 URL"
         gameType:
           type: string
           enum: [PRACTICE, RANK]
@@ -58,12 +235,10 @@ components:
           description: "랭크 유형 (FIRST: 배치고사, CHALLENGE: 티어 도전, DEFENCE: 티어 방어)"
       required:
         - songByInstrumentId
-        - recordUrl
         - gameType
       example:
         rankMatchingId: 123
         songByInstrumentId: 456
-        recordUrl: "https://storage.example.com/recordings/user123_song456.mp3"
         gameType: "RANK"
         rankType: "CHALLENGE"
 
@@ -265,42 +440,6 @@ components:
           packName: "Vocal Beginners Pack"
           songPackTier: "IRON"
           songPackInstrument: "VOCAL"
-          songs:
-            - songByInstrumentId: 1
-              songId: 1
-              songInstrumentPackId: 1
-              instrumentUrl: "https://storage.vocals/smells_like_teen_spirit_iron.mp3"
-              instrument: "VOCAL"
-              tier: "IRON"
-              song: null
-            - songByInstrumentId: 2
-              songId: 2
-              songInstrumentPackId: 1
-              instrumentUrl: "https://storage.vocals/dynamite_iron.mp3"
-              instrument: "VOCAL"
-              tier: "IRON"
-              song: null
-            - songByInstrumentId: 3
-              songId: 3
-              songInstrumentPackId: 1
-              instrumentUrl: "https://storage.vocals/take_five_iron.mp3"
-              instrument: "VOCAL"
-              tier: "IRON"
-              song: null
-            - songByInstrumentId: 4
-              songId: 4
-              songInstrumentPackId: 1
-              instrumentUrl: "https://storage.vocals/lose_yourself_iron.mp3"
-              instrument: "VOCAL"
-              tier: "IRON"
-              song: null
-            - songByInstrumentId: 5
-              songId: 5
-              songInstrumentPackId: 1
-              instrumentUrl: "https://storage.vocals/gangnam_style_iron.mp3"
-              instrument: "VOCAL"
-              tier: "IRON"
-              song: null
         attempts:
           - attemptId: 101
             rankMatchingId: 1
@@ -404,42 +543,53 @@ components:
           type: integer
           format: int64
           description: "시도 고유 식별자"
+          example: 1
         rankMatchingId:
           type: integer
           format: int64
           description: "랭크 매칭 ID"
+          example: 1
         songByInstrumentId:
           type: integer
           format: int64
           description: "악기별 곡 ID"
+          example: 12
         tuneScore:
           type: integer
           description: "음정 점수"
+          example: 61
         toneScore:
           type: integer
           description: "톤 점수"
+          example: 70
         beatScore:
           type: integer
           description: "박자 점수"
+          example: 50
         totalScore:
           type: integer
           description: "총 점수"
+          example: 60
         status:
           type: string
           enum: [SUCCESS, FAIL, BEFORE_ANALYZE]
           description: "성공 여부"
+          example: "SUCCESS"
         gameType:
           type: string
           enum: [PRACTICE, RANK]
           description: "게임 유형"
+          example: "RANK"
         rankType:
           type: string
           enum: [FIRST, CHALLENGE, DEFENCE]
           description: "랭크 유형"
+          example: "CHALLENGE"
         createdAt:
           type: string
           format: date-time
           description: "생성 일시"
+          example: "2023-12-15T14:30:00Z"
         songByInstrument:
           $ref: '#/components/schemas/SongByInstrumentDTO'
       required:
@@ -447,53 +597,22 @@ components:
         - songByInstrumentId
         - status
         - gameType
-      example:
-        attemptId: 123
-        rankMatchingId: 456
-        songByInstrumentId: 789
-        tuneScore: 85
-        toneScore: 78
-        beatScore: 92
-        totalScore: 85
-        status: "SUCCESS"
-        gameType: "RANK"
-        rankType: "CHALLENGE"
-        createdAt: "2023-12-15T14:30:00Z"
 
-    SongDTO:
-      type: object
-      properties:
-        songId:
-          type: integer
-          format: int64
-          description: "곡 고유 식별자"
-        title:
-          type: string
-          description: "곡 제목"
-        artist:
-          type: string
-          description: "아티스트"
-        description:
-          type: string
-          description: "곡 설명"
-        youtubeUrl:
-          type: string
-          description: "유튜브 링크"
-        instruments:
-          type: array
-          items:
-            $ref: '#/components/schemas/SongByInstrumentDTO'
-      required:
-        - songId
-        - artist
-        - title
-        - youtubeUrl
-      example:
-        songId: 123
-        title: "Shape of You"
-        artist: "Ed Sheeran"
-        description: "2017년 Ed Sheeran의 히트곡"
-        youtubeUrl: "https://www.youtube.com/watch?v=JGwWNGJdvx8"
+
+    SongInstrumentPackPageDTO:
+      allOf:
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/SongInstrumentPackDTO'
+        - type: object
+          properties:
+            pageable:
+              $ref: '#/components/schemas/ChallengePageableDTO'
+        - $ref: '#/components/schemas/PageDTO'
+
 
     SongInstrumentPackDTO:
       type: object
@@ -502,17 +621,21 @@ components:
           type: integer
           format: int64
           description: "곡 팩 고유 식별자"
+          example: 1
         packName:
           type: string
           description: "팩 이름"
+          example: "실버 보컬 팩"
         songPackTier:
           type: string
           enum: [UNRANKED, IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND]
           description: "팩 티어"
+          example: "SILVER"
         songPackInstrument:
           type: string
           enum: [VOCAL, GUITAR, DRUM, BASS]
           description: "팩 악기"
+          example: "VOCAL"
         songs:
           type: array
           items:
@@ -522,11 +645,6 @@ components:
         - packName
         - songPackTier
         - songPackInstrument
-      example:
-        songInstrumentPackId: 123
-        packName: "실버 보컬 팩"
-        songPackTier: "SILVER"
-        songPackInstrument: "VOCAL"
 
     SongByInstrumentDTO:
       type: object
@@ -535,41 +653,50 @@ components:
           type: integer
           format: int64
           description: "악기별 곡 고유 식별자"
+          example: 1
         songId:
           type: integer
           format: int64
           description: "곡 ID"
+          example: 1
         songInstrumentPackId:
           type: integer
           format: int64
           description: "곡 팩 ID"
-        instrumentUrl:
+          example: 1
+        songByInstrumentExFilename:
           type: string
-          description: "악기별 연주 URL"
+          description: "연주하려는 곡의 특정 악기가 제거된 음원 식별자"
+          example: "shape_of_you_ex_vocal.mp3"
+        songByInstrumentFilename:
+          type: string
+          description: "악기별 연주 파일 이름"
+          example: "shape_of_you_vocal.mp3"
+        songByInstrumentAnalysisJson:
+          type: string
+          description: "악기별 연주 분석 JSON"
+          example: "shape_of_you_vocal.json"
         instrument:
           type: string
           enum: [VOCAL, GUITAR, DRUM, BASS]
           description: "악기 종류"
+          example: "VOCAL"
         tier:
           type: string
           enum: [UNRANKED, IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND]
           description: "티어 난이도"
+          example: "SILVER"
         song:
           $ref: '#/components/schemas/SongBasicDTO'
       required:
         - songByInstrumentId
+        - songByInstrumentExFilename
+        - songByInstrumentFilename
+        - songByInstrumentAnalysisJson
         - songId
         - songInstrumentPackId
-        - instrumentUrl
         - instrument
         - tier
-      example:
-        songByInstrumentId: 123
-        songId: 456
-        songInstrumentPackId: 789
-        instrumentUrl: "https://storage.example.com/songs/vocal_123.mp3"
-        instrument: "VOCAL"
-        tier: "SILVER"
 
     SongBasicDTO:
       type: object
@@ -578,21 +705,19 @@ components:
           type: integer
           format: int64
           description: "곡 고유 식별자"
+          example: 1
         title:
           type: string
           description: "곡 제목"
+          example: "Shape of You"
         youtubeUrl:
           type: string
           description: "유튜브 링크"
+          example: "https://www.youtube.com/watch?v=JGwWNGJdvx8"
       required:
         - songId
         - title
         - youtubeUrl
-      example:
-        songId: 456
-        title: "Shape of You"
-        youtubeUrl: "https://www.youtube.com/watch?v=JGwWNGJdvx8"
-
 
     DefencePeriodDTO:
       type: object
@@ -682,58 +807,6 @@ components:
         rankType: "CHALLENGE"
         targetTier: "GOLD"
 
-    CreateSongRequestDTO:
-      type: object
-      properties:
-        title:
-          type: string
-          description: "곡 제목"
-        artist:
-          type: string
-          description: "아티스트"
-        description:
-          type: string
-          description: "곡 설명"
-        youtubeUrl:
-          type: string
-          description: "유튜브 링크"
-        instruments:
-          type: array
-          items:
-            type: object
-            properties:
-              instrumentUrl:
-                type: string
-                description: "악기별 연주 URL"
-              instrument:
-                type: string
-                enum: [VOCAL, GUITAR, DRUM, BASS]
-                description: "악기 종류"
-              tier:
-                type: string
-                enum: [UNRANKED, IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND]
-                description: "티어 난이도"
-              songInstrumentPackId:
-                type: integer
-                format: int64
-                description: "곡 팩 ID"
-      required:
-        - title
-        - youtubeUrl
-        - instruments
-      example:
-        title: "Shape of You"
-        description: "2017년 Ed Sheeran의 히트곡"
-        youtubeUrl: "https://www.youtube.com/watch?v=JGwWNGJdvx8"
-        instruments:
-          - instrumentUrl: "https://storage.example.com/songs/vocal_123.mp3"
-            instrument: "VOCAL"
-            tier: "SILVER"
-            songInstrumentPackId: 456
-          - instrumentUrl: "https://storage.example.com/songs/guitar_123.mp3"
-            instrument: "GUITAR"
-            tier: "GOLD"
-            songInstrumentPackId: 457
     TierAvailabilityDTO:
       type: object
       properties:
@@ -851,6 +924,7 @@ components:
           availableChallenge: false
           availableDefence: false
           availableFirst: false
+
   parameters:
     MemberId:
       name: memberId
@@ -974,102 +1048,14 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              content:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MemberTierLogDTO'
-              pageable:
-                type: object
-                properties:
-                  page:
-                    type: integer
-                    description: 현재 페이지 번호
-                  size:
-                    type: integer
-                    description: 페이지 크기
-                  totalElements:
-                    type: integer
-                    description: 전체 요소 수
-                  totalPages:
-                    type: integer
-                    description: 전체 페이지 수
-                required:
-                  - page
-                  - size
-                  - totalElements
-                  - totalPages
-            required:
-              - content
-              - pageable
-          example:
-            content:
-              - tierLogId: 123
-                memberRankId: 456
-                beforeTier: "BRONZE"
-                afterTier: "SILVER"
-                changedDate: "2023-11-15"
-              - tierLogId: 124
-                memberRankId: 456
-                beforeTier: "UNRANKED"
-                afterTier: "BRONZE"
-                changedDate: "2023-10-05"
-              - tierLogId: 125
-                memberRankId: 456
-                beforeTier: "SILVER"
-                afterTier: "GOLD"
-                changedDate: "2023-12-10"
-              - tierLogId: 126
-                memberRankId: 456
-                beforeTier: "GOLD"
-                afterTier: "SILVER"
-                changedDate: "2024-01-05"
-              - tierLogId: 127
-                memberRankId: 456
-                beforeTier: "SILVER"
-                afterTier: "GOLD"
-                changedDate: "2024-02-20"
-            pageable:
-              page: 0
-              size: 5
-              totalElements: 5
-              totalPages: 1
-              
+            $ref: '#/components/schemas/MemberTierLogPageDTO'
+
     PageRankMatchingResponse:
       description: "랭크 매칭 목록 페이지 응답"
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              content:
-                type: array
-                items:
-                  $ref: '#/components/schemas/RankMatchingDTO'
-              pageable:
-                type: object
-                properties:
-                  page:
-                    type: integer
-                    description: 현재 페이지 번호
-                  size:
-                    type: integer
-                    description: 페이지 크기
-                  totalElements:
-                    type: integer
-                    description: 전체 요소 수
-                  totalPages:
-                    type: integer
-                    description: 전체 페이지 수
-                required:
-                  - page
-                  - size
-                  - totalElements
-                  - totalPages
-            required:
-              - content
-              - pageable
+            $ref: '#/components/schemas/RankMatchingPageDTO'
 
     RankMatchingResponse:
       description: "랭크 매칭 응답"
@@ -1104,131 +1090,14 @@ components:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  content:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AttemptDTO'
-                  pageable:
-                    type: object
-                    properties:
-                      page:
-                        type: integer
-                        description: 현재 페이지 번호
-                      size:
-                        type: integer
-                        description: 페이지 크기
-                      totalElements:
-                        type: integer
-                        description: 전체 요소 수
-                      totalPages:
-                        type: integer
-                        description: 전체 페이지 수
-                    required:
-                      - page
-                      - size
-                      - totalElements
-                      - totalPages
-                required:
-                  - content
-                  - pageable
-              example:
-                content:
-                  - attemptId: 101
-                    rankMatchingId: 1
-                    songByInstrumentId: 1
-                    tuneScore: 83
-                    toneScore: 79
-                    beatScore: 91
-                    totalScore: 84
-                    status: "SUCCESS"
-                    gameType: "RANK"
-                    rankType: "CHALLENGE"
-                    createdAt: "2025-03-27T14:30:00Z"
-                  - attemptId: 102
-                    rankMatchingId: 1
-                    songByInstrumentId: 2
-                    tuneScore: 75
-                    toneScore: 68
-                    beatScore: 82
-                    totalScore: 75
-                    status: "SUCCESS"
-                    gameType: "RANK"
-                    rankType: "CHALLENGE"
-                    createdAt: "2025-03-28T09:15:00Z"
-                  - attemptId: 103
-                    rankMatchingId: 1
-                    songByInstrumentId: 3
-                    tuneScore: 62
-                    toneScore: 71
-                    beatScore: 68
-                    totalScore: 67
-                    status: "FAIL"
-                    gameType: "RANK"
-                    rankType: "CHALLENGE"
-                    createdAt: "2025-03-28T16:45:00Z"
-                  - attemptId: 104
-                    rankMatchingId: 1
-                    songByInstrumentId: 4
-                    tuneScore: 85
-                    toneScore: 88
-                    beatScore: 92
-                    totalScore: 88
-                    status: "SUCCESS"
-                    gameType: "RANK"
-                    rankType: "CHALLENGE"
-                    createdAt: "2025-03-29T11:20:00Z"
-                  - attemptId: 105
-                    rankMatchingId: 1
-                    songByInstrumentId: 5
-                    tuneScore: 64
-                    toneScore: 59
-                    beatScore: 73
-                    totalScore: 65
-                    status: "FAIL"
-                    gameType: "RANK"
-                    rankType: "CHALLENGE"
-                    createdAt: "2025-03-30T15:10:00Z"
-                pageable:
-                  page: 0
-                  size: 5
-                  totalElements: 5
-                  totalPages: 1
+                $ref: '#/components/schemas/AttemptPageDTO'
+                    
     PageSongResponse:
       description: "곡 목록 페이지 응답"
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              content:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SongDTO'
-              pageable:
-                type: object
-                properties:
-                  page:
-                    type: integer
-                    description: 현재 페이지 번호
-                  size:
-                    type: integer
-                    description: 페이지 크기
-                  totalElements:
-                    type: integer
-                    description: 전체 요소 수
-                  totalPages:
-                    type: integer
-                    description: 전체 페이지 수
-                required:
-                  - page
-                  - size
-                  - totalElements
-                  - totalPages
-            required:
-              - content
-              - pageable
+            $ref: '#/components/schemas/SongPageDTO'
 
     SongResponse:
       description: "곡 응답"
@@ -1265,35 +1134,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              content:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SongInstrumentPackDTO'
-              pageable:
-                type: object
-                properties:
-                  page:
-                    type: integer
-                    description: 현재 페이지 번호
-                  size:
-                    type: integer
-                    description: 페이지 크기
-                  totalElements:
-                    type: integer
-                    description: 전체 요소 수
-                  totalPages:
-                    type: integer
-                    description: 전체 페이지 수
-                required:
-                  - page
-                  - size
-                  - totalElements
-                  - totalPages
-            required:
-              - content
-              - pageable
+            $ref: '#/components/schemas/SongInstrumentPackPageDTO'
 
     SongPackDetailResponse:
       description: "곡 팩 상세 정보 응답"
@@ -1324,37 +1165,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/SongByInstrumentDTO'
-          example:
-            - songByInstrumentId: 123
-              songId: 456
-              songInstrumentPackId: 789
-              instrumentUrl: "https://storage.example.com/songs/vocal_456.mp3"
-              instrument: "VOCAL"
-              tier: "SILVER"
-            - songByInstrumentId: 124
-              songId: 456
-              songInstrumentPackId: 790
-              instrumentUrl: "https://storage.example.com/songs/guitar_456.mp3"
-              instrument: "GUITAR"
-              tier: "GOLD"
-            - songByInstrumentId: 125
-              songId: 456
-              songInstrumentPackId: 791
-              instrumentUrl: "https://storage.example.com/songs/drum_456.mp3"
-              instrument: "DRUM"
-              tier: "BRONZE"
-            - songByInstrumentId: 126
-              songId: 456
-              songInstrumentPackId: 792
-              instrumentUrl: "https://storage.example.com/songs/bass_456.mp3"
-              instrument: "BASS"
-              tier: "SILVER"
-            - songByInstrumentId: 127
-              songId: 456
-              songInstrumentPackId: 793
-              instrumentUrl: "https://storage.example.com/songs/keyboard_456.mp3"
-              instrument: "VOCAL"
-              tier: "PLATINUM"
+          
 
     DefencePeriodResponse:
       description: "티어 방어 기간 정보 응답"
@@ -1444,9 +1255,9 @@ components:
           schema:
             $ref: '#/components/schemas/CreateAttemptRequestDTO'
           example:
-            rankMatchingId: 123
-            songByInstrumentId: 456
-            recordUrl: "https://storage.example.com/recordings/user123_song456.mp3"
+            rankMatchingId: 1
+            songByInstrumentId: 21
+            gameType: "RANK"
 
 
     CreateRankMatchingRequest:
@@ -1461,12 +1272,6 @@ components:
             rankType: "CHALLENGE"
             targetTier: "GOLD"
 
-    CreateSongRequest:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/CreateSongRequestDTO'
             
 paths:
   /api/attempts:

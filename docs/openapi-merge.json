@@ -17,6 +17,9 @@
     },
     {
       "inputFile": "./recruitment-api.yaml"
+    },
+    {
+      "inputFile": "./livehouse-api.yaml"
     }
   ],
   "output": "./output/openapi.yaml"

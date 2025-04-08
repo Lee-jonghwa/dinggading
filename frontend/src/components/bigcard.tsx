@@ -25,7 +25,7 @@ export default function BigCard ({href, image, subText1, subText2, titleText} : 
       className={styles.container}
       onClick={handleClick}
       style={{backgroundImage : `url(${image.src})`}}
-    >
+      >
       <div className={styles.textContainer}>
         <div className={styles.text}>
           <div className={styles.subText}>{subText1}</div>
@@ -38,7 +38,7 @@ export default function BigCard ({href, image, subText1, subText2, titleText} : 
               src={ChevronRight}
               alt="chevron right"
               className={styles.image}
-            />
+              />
           </div>
         </div>
       </div>            

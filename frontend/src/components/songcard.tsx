@@ -28,7 +28,7 @@
       router.push(`/tier/${instrument}/challenge/${tier}/${songId}`)
     }
 
-    console.log("songcard.tsx/ backgroundImg props : ", thumbnailImg)
+    // console.log("songcard.tsx/ backgroundImg props : ", thumbnailImg)
 
     return (
       <div className={styles.songCard}>

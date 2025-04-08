@@ -17,10 +17,10 @@ const Logo:React.FC = () => {
   return (
     <div className="logo" onClick={onClickLogo}>
       <Image 
+        className="image"
         src={Dingading}
         alt="dingading logo"
-        width={300}
-        style={{rotate : "90deg"}}
+        style={{rotate : "90deg", width: "100%"}}
       />
     </div>
   )

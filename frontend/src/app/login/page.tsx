@@ -10,13 +10,15 @@ const Login: NextPage = () => {
 
   // 구글 로그인 : 백엔드 url로 직접 리다이렉트 시키기 
   const handleGoogleLogin = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL 
+    const baseUrl = process.env.NEXT_PUBLIC_API_OAUTH_URL 
 
     // if (!baseUrl.startsWith("http://") && !baseUrl.startsWith("https://")) {
     //   baseUrl = `https://${baseUrl}`
-    // }
+    // } 
+    // https://j12e107.p.ssafy.io
+    //
 
-    const authUrl = `http://${baseUrl}/oauth2/authorization/google`;
+    const authUrl = `${baseUrl}/oauth2/authorization/google`;
     window.location.href = authUrl;
   };
 

@@ -19,7 +19,7 @@ const getTokenFromStorage = (): string | null => {
   return null;
 }
 
-const baseUrl = `http://${process.env.NEXT_PUBLIC_API_BASE_URL}`
+const baseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}`
 
 // Zustand 스토어 타입 정의 
 interface ConfigState {

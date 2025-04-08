@@ -3,21 +3,14 @@ import { NextPage } from 'next';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
-import { useConfigStore } from '@/store/config';
 
 const Login: NextPage = () => {
   const router = useRouter();
   const { isLoggedIn } = useAuthStore();
-  const { envMode } = useConfigStore() 
 
   // 구글 로그인 : 백엔드 url로 직접 리다이렉트 시키기 
   const handleGoogleLogin = () => {
-    let baseUrl = "" 
-    if (envMode === "PRODUCTION") {
-      baseUrl = process.env.NEXT_PUBLIC_API_PROD_URL || "https://j12e107.p.ssafy.io"
-    } else {
-      baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "localhost:8080"
-    }
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL 
 
     // if (!baseUrl.startsWith("http://") && !baseUrl.startsWith("https://")) {
     //   baseUrl = `https://${baseUrl}`

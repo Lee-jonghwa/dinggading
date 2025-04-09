@@ -71,7 +71,10 @@ spring:
 
   sql:
     init:
-      data-locations: classpath:song.sql
+      data-locations:
+        - classpath:song.sql
+        - classpath:band.sql
+
       mode: ${SQL_INIT_MODE}
 
   datasource:

@@ -1,3 +1,8 @@
+SET SQL_SAFE_UPDATES = 0;
+
+-- 트랜잭션 시작
+BEGIN;
+
 -- Insert into song
 INSERT INTO song (created_at, artist, updated_at, song_filename, title, youtube_url, description)
 VALUES ('2025-04-07 23:02:45', 'Cranberries', NULL, 'original_Cranberries-Zombie.wav', 'Zombie',
@@ -92,3 +97,6 @@ VALUES ('2025-04-07 23:02:45', (SELECT song_id FROM song WHERE artist = 'Cranber
         (SELECT song_instrument_pack_id FROM song_instrument_pack WHERE pack_name = 'GUITAR_SILVER'), NULL,
         'silver_guitar_카더가든-꿈을 꿨어요.json', 'silver_guitar_카더가든-꿈을 꿨어요_ex.wav', 'silver_guitar_카더가든-꿈을 꿨어요.wav', 'GUITAR',
         'SILVER');
+
+-- 트랜잭션 커밋
+COMMIT;

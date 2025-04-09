@@ -22,6 +22,15 @@ public class MinioServiceImpl implements MinioService {
     private final MinioProperties minioProperties;
 
     @Override
+    public String generatePresignedUrlMyBucket(String objectName) {
+        return generatePresignedUrl(
+                minioProperties.getBucketName(),
+                objectName,
+                3600
+        );
+    }
+
+    @Override
     public void ensureBucketExists(String bucketName) {
         try {
             boolean bucketExists = minioClient.bucketExists(

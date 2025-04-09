@@ -4,6 +4,9 @@ import java.io.InputStream;
 import java.util.Map;
 
 public interface MinioService {
+
+    String generatePresignedUrlMyBucket(String objectName);
+
     /**
      * 버킷이 존재하는지 확인하고, 없으면 생성합니다.
      *

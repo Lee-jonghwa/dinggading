@@ -106,6 +106,7 @@ public class SongByInstrumentConverter {
 
         return SongByInstrumentURLResponseDTO.builder()
                 .song(songBasicDTO)
+                .songByInstrumentId(songByInstrument.getSongByInstrumentId())
                 .songByInstrumentUrl(url)
                 .build();
     }

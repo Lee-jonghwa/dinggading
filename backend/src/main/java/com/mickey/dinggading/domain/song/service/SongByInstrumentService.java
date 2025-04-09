@@ -1,5 +1,6 @@
 package com.mickey.dinggading.domain.song.service;
 
+import com.mickey.dinggading.domain.memberrank.model.Instrument;
 import com.mickey.dinggading.domain.memberrank.model.SongByInstrument;
 import com.mickey.dinggading.domain.song.converter.SongByInstrumentConverter;
 import com.mickey.dinggading.domain.song.repository.SongByInstrumentRepository;
@@ -8,6 +9,7 @@ import com.mickey.dinggading.domain.song.repository.SongRepository;
 import com.mickey.dinggading.infra.minio.MinioService;
 import com.mickey.dinggading.model.SongByInstrumentDTO;
 import com.mickey.dinggading.model.SongByInstrumentURLResponseDTO;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -93,6 +95,24 @@ public class SongByInstrumentService {
         SongByInstrument songByInstrument = songByInstrumentRepository.findById(songByInstrumentId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 악기별 곡 버전입니다. ID: " + songByInstrumentId));
 
+        String url = minioService.generatePresignedUrlMyBucket(songByInstrument.getSongByInstrumentExFilename());
+
+        return songByInstrumentConverter.toSongByInstrumentURLResponseDTO(songByInstrument, url);
+    }
+
+    @Transactional(readOnly = true)
+    public SongByInstrumentURLResponseDTO getSongByInstrumentUrl(Long songId, Instrument instrument) {
+        // 결과 리스트 조회
+        List<SongByInstrument> songByInstrumentList = songByInstrumentRepository
+                .findBySongSongIdAndInstrument(songId, instrument);
+
+        // 결과가 없는 경우 예외 처리
+        if (songByInstrumentList.isEmpty()) {
+            throw new EntityNotFoundException("해당하는 악기와 곡이 존재하지 않습니다. 곡 ID: " + songId + ", 악기: " + instrument);
+        }
+
+        // 결과가 있는 경우 첫 번째 항목 사용
+        SongByInstrument songByInstrument = songByInstrumentList.get(0);
         String url = minioService.generatePresignedUrlMyBucket(songByInstrument.getSongByInstrumentExFilename());
 
         return songByInstrumentConverter.toSongByInstrumentURLResponseDTO(songByInstrument, url);

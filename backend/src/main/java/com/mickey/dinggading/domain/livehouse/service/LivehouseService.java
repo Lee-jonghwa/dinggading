@@ -151,13 +151,13 @@ public class LivehouseService {
 
         // 멤버 찾기
         Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new ExceptionHandler(ErrorStatus.MEMBER_NOT_FOUND));
+            .orElseThrow(() -> new ExceptionHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         List<String> activeSessions = openVidu.getActiveSessions().stream().map(Session::getSessionId).toList();
 
         // 세션이 살아있는 라이브 하우스인지 찾기
         Livehouse livehouse = livehouseRepository.findBySessionIdInAndLivehouseId(activeSessions, livehouseId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "라이브하우스를 찾을 수 없습니다."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "라이브하우스를 찾을 수 없습니다."));
 
         if (livehouse.getStatus() == Livehouse.LivehouseStatus.CLOSED) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "종료된 라이브하우스입니다.");
@@ -168,57 +168,53 @@ public class LivehouseService {
         }
 
         try {
-            // 1.
-            Optional<Participant> existingParticipant = participantRepository.findByLivehouseAndNickname(livehouse, member.getNickname());
             Session session = openVidu.getActiveSession(livehouse.getSessionId());
-            if (existingParticipant.isPresent()) {
-                // 참가중인 경우 (뒤로 나갔다가 돌아온사람)
-                Participant participant = existingParticipant.get();
-                // 이미 참가 중인 경우 기존 정보 반환
-                return LivehouseSessionDTO.builder()
-                        .livehouseId(livehouse.getLivehouseId())
-                        .sessionId(livehouse.getSessionId())
-                        .participantId(existingParticipant.get().getParticipantId())
-                        .nickname(member.getNickname())
-                        .build();
+            if (session == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "OpenVidu 세션을 찾을 수 없습니다.");
             }
 
-            // 기존에 참가한 적 없다면 새로 참여자 등록
-            Participant participant = Participant.builder()
+            ConnectionProperties properties = new ConnectionProperties.Builder()
+                .type(ConnectionType.WEBRTC)
+                .role(OpenViduRole.PUBLISHER)
+                .data(String.format("{\"nickname\": \"%s\"}", member.getNickname()))
+                .build();
+
+            // 세션에 대한 연결 생성
+            Connection connection = session.createConnection(properties);
+            String token = connection.getToken();
+
+
+            // 기존 참가자 찾기
+            Optional<Participant> existingParticipant = participantRepository.findByLivehouseAndNickname(livehouse, member.getNickname());
+            Participant participant;
+
+            if (existingParticipant.isPresent()) {
+                // 이미 참가 중인 경우 connectionId 업데이트
+                participant = existingParticipant.get();
+                participant.setConnectionId(connection.getConnectionId()); // connectionId 업데이트
+                participantRepository.save(participant);
+            } else {
+                // 기존에 참가한 적 없다면 새로 참여자 등록
+                participant = Participant.builder()
                     .livehouse(livehouse)
                     .nickname(member.getNickname())
+                    .connectionId(connection.getConnectionId())
                     .isHost(false)
                     .joinedAt(LocalDateTime.now())
                     .build();
-
-            participantRepository.save(participant);
-
-            // OpenVidu 세션을 가져오거나 생성
-            String sessionId = livehouse.getSessionId();
-
-            // 3. 연결 속성 설정 및 데이터 포함
-            System.out.println("세션 " + sessionId + "에 대한 연결을 생성합니다.");
-            ConnectionProperties properties = new ConnectionProperties.Builder()
-                    .type(ConnectionType.WEBRTC)
-                    .role(OpenViduRole.PUBLISHER)
-                    .data(String.format("{\"nickname\": \"%s\"}", member.getNickname()))
-                    .build();
-
-            // 4. 세션에 대한 연결 생성
-            Connection connection = session.createConnection(properties);
-            String token = connection.getToken();
-            System.out.println("생성된 토큰: " + token.substring(0, 20) + "...");
+                participantRepository.save(participant);
+            }
 
             return LivehouseSessionDTO.builder()
-                    .livehouseId(livehouse.getLivehouseId())
-                    .sessionId(sessionId)
-                    .token(token)
-                    .participantId(participant.getParticipantId())
-                    .nickname(member.getNickname())
-                    .build();
+                .livehouseId(livehouse.getLivehouseId())
+                .sessionId(livehouse.getSessionId())
+                .token(token)
+                .participantId(participant.getParticipantId())
+                .nickname(member.getNickname())
+                .build();
 
         } catch (OpenViduJavaClientException | OpenViduHttpException e) {
-            e.printStackTrace(); // 스택 트레이스 출력
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "OpenVidu 서버 오류: " + e.getMessage(), e);
         }
     }

@@ -73,7 +73,7 @@ const Navbar: React.FC = () => {
           {/* <div className="nav-text" onClick={()=>toGo(`/myband`)}>내 밴드</div> */}
           <div className="nav-text" onClick={()=>toGo(`/tier`)}>티어 측정하기</div>
           {/* <div className="nav-text" onClick={()=>toGo(`/tier`)}>이달의 도전곡</div> */}
-          <div className="nav-text" onClick={()=>toGo(`/live`)}>라이브 하우스</div>
+          <div className="nav-text" onClick={()=>toGo(`/livehouses`)}>라이브 하우스</div>
           {isLoggedIn && <div className="nav-text" onClick={logout}>로그아웃</div>}
         </div>
       </div>

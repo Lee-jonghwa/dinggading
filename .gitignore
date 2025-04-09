@@ -12,6 +12,7 @@
 /frontend/.vite/
 /frontend/.vite-temp/
 /frontend/.DS_Store
+/frontend/.env
 
 .idea
 

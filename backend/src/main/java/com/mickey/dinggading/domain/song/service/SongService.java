@@ -10,6 +10,7 @@ import com.mickey.dinggading.domain.song.repository.SongRepository;
 import com.mickey.dinggading.exception.ExceptionHandler;
 import com.mickey.dinggading.model.SongByInstrumentDTO;
 import com.mickey.dinggading.model.SongDTO;
+import com.mickey.dinggading.model.SongPageDTO;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -108,4 +109,9 @@ public class SongService {
         }
     }
 
+    public SongPageDTO getSongsByInstrumentAndTier(Instrument instrument, Tier tier, Pageable pageable) {
+        Page<Song> byInstrumentAndTier = songRepository.findByInstrumentAndTier(instrument, tier, pageable);
+
+        return songConverter.toPageDto(byInstrumentAndTier);
+    }
 }

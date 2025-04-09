@@ -3,6 +3,7 @@ package com.mickey.dinggading.domain.song.controller;
 import com.mickey.dinggading.api.SongByInstrumentApi;
 import com.mickey.dinggading.domain.song.service.SongByInstrumentService;
 import com.mickey.dinggading.model.SongByInstrumentDTO;
+import com.mickey.dinggading.model.SongByInstrumentURLResponseDTO;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class SongByInstrumentController implements SongByInstrumentApi {
 
     private final SongByInstrumentService songByInstrumentService;
+
+    /**
+     * POST /api/songs/instruments/{song_by_instrument_id} : 악기 별 곡 접속 URL 조회 특정 악기별 곡의 mp3파일을 조회합니다. 연주하려는 악기의 음성이 제거된
+     * 음원의 URL이 조회됩니다.
+     *
+     * @param songByInstrumentId 악기별 곡 ID (required)
+     * @return SongByInstrumentURLResponseDTO 곡 ID에 따른 접속 URL 응답 (status code 200) or 요청한 리소스를 찾을 수 없습니다. (status code
+     * 404)
+     */
+    @Override
+    public ResponseEntity<?> requestSongByInstrumentUrl(Long songByInstrumentId) {
+        SongByInstrumentURLResponseDTO result = songByInstrumentService.getSongByInstrumentUrl(songByInstrumentId);
+        return ResponseEntity.ok(result);
+    }
 
     /**
      * 특정 악기별 곡 버전 상세 정보 조회

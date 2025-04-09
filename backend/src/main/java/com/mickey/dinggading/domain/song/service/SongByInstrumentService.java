@@ -5,7 +5,9 @@ import com.mickey.dinggading.domain.song.converter.SongByInstrumentConverter;
 import com.mickey.dinggading.domain.song.repository.SongByInstrumentRepository;
 import com.mickey.dinggading.domain.song.repository.SongInstrumentPackRepository;
 import com.mickey.dinggading.domain.song.repository.SongRepository;
+import com.mickey.dinggading.infra.minio.MinioService;
 import com.mickey.dinggading.model.SongByInstrumentDTO;
+import com.mickey.dinggading.model.SongByInstrumentURLResponseDTO;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ public class SongByInstrumentService {
     private final SongRepository songRepository;
     private final SongInstrumentPackRepository songInstrumentPackRepository;
     private final SongByInstrumentConverter songByInstrumentConverter;
+    private final MinioService minioService;
 
     /**
      * 특정 ID의 악기별 곡 버전 상세 정보 조회
@@ -83,5 +86,15 @@ public class SongByInstrumentService {
         List<SongByInstrument> songByInstruments = songByInstrumentRepository.findBySongInstrumentPackSongInstrumentPackId(
                 packId);
         return songByInstrumentConverter.toDtoList(songByInstruments, true);
+    }
+
+    @Transactional(readOnly = true)
+    public SongByInstrumentURLResponseDTO getSongByInstrumentUrl(Long songByInstrumentId) {
+        SongByInstrument songByInstrument = songByInstrumentRepository.findById(songByInstrumentId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 악기별 곡 버전입니다. ID: " + songByInstrumentId));
+
+        String url = minioService.generatePresignedUrlMyBucket(songByInstrument.getSongByInstrumentExFilename());
+
+        return songByInstrumentConverter.toSongByInstrumentURLResponseDTO(songByInstrument, url);
     }
 }

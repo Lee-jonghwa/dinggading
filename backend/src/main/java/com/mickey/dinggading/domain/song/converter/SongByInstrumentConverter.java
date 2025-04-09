@@ -5,6 +5,7 @@ import com.mickey.dinggading.model.SongBasicDTO;
 import com.mickey.dinggading.model.SongByInstrumentDTO;
 import com.mickey.dinggading.model.SongByInstrumentDTO.InstrumentEnum;
 import com.mickey.dinggading.model.SongByInstrumentDTO.TierEnum;
+import com.mickey.dinggading.model.SongByInstrumentURLResponseDTO;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -91,5 +92,21 @@ public class SongByInstrumentConverter {
         return songByInstruments.stream()
                 .map(sbi -> toDto(sbi, includeSong))
                 .collect(Collectors.toList());
+    }
+
+    public SongByInstrumentURLResponseDTO toSongByInstrumentURLResponseDTO(
+            SongByInstrument songByInstrument,
+            String url
+    ) {
+
+        SongBasicDTO songBasicDTO = null;
+        if (songByInstrument.getSong() != null) {
+            songBasicDTO = songBasicConverter.toDto(songByInstrument.getSong());
+        }
+
+        return SongByInstrumentURLResponseDTO.builder()
+                .song(songBasicDTO)
+                .songByInstrumentUrl(url)
+                .build();
     }
 }

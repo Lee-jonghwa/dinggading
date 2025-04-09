@@ -1,52 +1,149 @@
-import { NotificationApi } from "@generated/api";
-import { create } from "zustand";
-import { useConfigStore } from "./config";
+'use client'
 
-export interface Notice {
-  notificationId: number;
-  chatRoomId?: string;
-  messageId?: string;
-  senderId: string;
-  senderNickname?: string;
-  senderProfileUrl?: string;
-  receiverId: string;
-  message: string;
-  readOrNot: boolean;
-  type: "CHAT" | "RECRUITMENT" | "BAND" | "SYSTEM";
-  acceptUrl?: string;
-  rejectUrl?: string;
-  createdAt: string;
-}
+import { create } from "zustand"
+import { NotificationDTO } from "../components/notice"
+import { useAuthStore } from "./auth"
 
 interface NotificationState {
-  loading : boolean 
-  error : string | null 
-  notices : Notice[] 
-  fetchNotification : () => void 
+  notifications: NotificationDTO[]
+  loading: boolean
+  error: string | null
+  
+  // 알림 목록 가져오기
+  fetchNotification: () => Promise<void>
+  
+  // 알림 읽음 처리
+  markAsRead: (notificationId: number) => Promise<void>
+  
+  // 알림 모두 읽음 처리
+  markAllAsRead: () => Promise<void>
+  
+  // 새 알림 추가
+  addNotification: (notification: NotificationDTO) => void
 }
 
 export const useNotificationStore = create<NotificationState>((set) => ({
-  loading : false , 
-  error : null, 
-  notices : [], 
-  fetchNotification : async () => {
-    set({ loading : true, error : null })
-
+  notifications: [],
+  loading: false,
+  error: null,
+  
+  fetchNotification: async () => {
+    set({ loading: true, error: null });
+    
     try {
-      const configStore = useConfigStore.getState() 
-      const apiConfig = configStore.apiConfig
-
-      const notificationApi = new NotificationApi(apiConfig)
-
-      // const params : 
-
-      // const response = await notificationApi.getNotifications(0, 10)
-      const response = await notificationApi.getNotifications()
-      console.log("notification.ts fetchNotification response : ", response)
-
+      const { accessToken } = useAuthStore.getState();
+      
+      if (!accessToken) {
+        throw new Error('인증 토큰이 없습니다');
+      }
+      
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+      const response = await fetch(`${baseUrl}/api/notifications?unreadOnly=false&page=0&size=10`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API 호출 실패: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data && data.content) {
+        set({ 
+          notifications: data.content, 
+          loading: false 
+        });
+      } else {
+        set({ 
+          notifications: [], 
+          loading: false 
+        });
+      }
     } catch (error) {
-      console.log("notification.ts fetchNotification error : ", error)
+      console.error('알림을 가져오는데 실패했습니다:', error);
+      set({ 
+        error: error instanceof Error ? error.message : '알림을 가져오는데 실패했습니다',
+        loading: false 
+      });
     }
+  },
+  
+  markAsRead: async (notificationId: number) => {
+    try {
+      const { accessToken } = useAuthStore.getState();
+      
+      if (!accessToken) {
+        throw new Error('인증 토큰이 없습니다');
+      }
+      
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+      const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API 호출 실패: ${response.status}`);
+      }
+      
+      // 상태 업데이트
+      set(state => ({
+        notifications: state.notifications.map(notification => 
+          notification.notificationId === notificationId 
+            ? {...notification, readOrNot: true} 
+            : notification
+        )
+      }));
+    } catch (error) {
+      console.error('알림 읽음 처리에 실패했습니다:', error);
+      set({ 
+        error: error instanceof Error ? error.message : '알림 읽음 처리에 실패했습니다'
+      });
+    }
+  },
+  
+  markAllAsRead: async () => {
+    try {
+      const { accessToken } = useAuthStore.getState();
+      
+      if (!accessToken) {
+        throw new Error('인증 토큰이 없습니다');
+      }
+      
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+      const response = await fetch(`${baseUrl}/api/notifications/read-all`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API 호출 실패: ${response.status}`);
+      }
+      
+      // 모든 알림을 읽음 상태로 설정
+      set(state => ({
+        notifications: state.notifications.map(notification => ({
+          ...notification, 
+          readOrNot: true
+        }))
+      }));
+    } catch (error) {
+      console.error('모든 알림 읽음 처리에 실패했습니다:', error);
+      set({ 
+        error: error instanceof Error ? error.message : '모든 알림 읽음 처리에 실패했습니다'
+      });
+    }
+  },
+  
+  addNotification: (notification: NotificationDTO) => {
+    set(state => ({
+      notifications: [notification, ...state.notifications]
+    }));
   }
-
-}))
+}));

@@ -43,8 +43,8 @@ public interface SongRepository extends JpaRepository<Song, Long> {
      */
     @Query("SELECT DISTINCT s FROM Song s JOIN s.songByInstruments sbi " +
             "WHERE sbi.instrument = :instrument AND sbi.tier = :tier")
-    Page<Song> findByInstrumentAndTier(@Param("instrument") String instrument,
-                                       @Param("tier") String tier,
+    Page<Song> findByInstrumentAndTier(@Param("instrument") Instrument instrument,
+                                       @Param("tier") Tier tier,
                                        Pageable pageable);
 
 }

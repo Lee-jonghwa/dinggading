@@ -1,9 +1,12 @@
 package com.mickey.dinggading.domain.song.controller;
 
 import com.mickey.dinggading.api.SongApi;
+import com.mickey.dinggading.domain.memberrank.model.Instrument;
+import com.mickey.dinggading.domain.memberrank.model.Tier;
 import com.mickey.dinggading.domain.song.service.SongService;
 import com.mickey.dinggading.model.SongByInstrumentDTO;
 import com.mickey.dinggading.model.SongDTO;
+import com.mickey.dinggading.model.SongPageDTO;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +65,25 @@ public class SongController implements SongApi {
 
         Page<SongDTO> results = songService.getSongs(pageable);
 
+        return ResponseEntity.ok(results);
+    }
+
+    /**
+     * GET /api/songs/by-instrument/{instrument}/by-tier/{tier} : 악기, 티어 별 곡 목록 조회 특정 악기, 특정 티어에 해당하는 곡 목록을 조회합니다. size,
+     * page를 쿼리 파라미터로 전달하여 페이징 처리가 가능합니다.
+     *
+     * @param instrument 악기 종류 (VOCAL, GUITAR, DRUM, BASS) (required)
+     * @param tier       티어 등급 (UNRANKED, IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND) (required)
+     * @param pageable
+     * @return SongPageDTO 곡 목록 페이지 응답 (status code 200) or 잘못된 요청입니다. (status code 400)
+     */
+    @Override
+    public ResponseEntity<?> getSongsByInstrumentAndTier(String instrument, String tier, Pageable pageable) {
+        log.info("악기, 티어 별 곡 목록 조회, 악기: {}, 티어: {}", instrument, tier);
+        Tier targetTier = Tier.valueOf(tier);
+        Instrument targetInstrument = Instrument.valueOf(instrument);
+
+        SongPageDTO results = songService.getSongsByInstrumentAndTier(targetInstrument, targetTier, pageable);
         return ResponseEntity.ok(results);
     }
 

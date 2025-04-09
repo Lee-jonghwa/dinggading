@@ -1,4 +1,5 @@
 .searchbar {
+  /* border: 5px solid black; */
   background-color: white;
   display: flex;
   flex-direction: row;
@@ -9,12 +10,14 @@
 }
 
 .text-area {
+  /* border: 5px solid green; */
   display: flex;
-  flex: 1;
   border: none;
+  width: 100%;
 }
 
 .icon {
+  /* border: 5px solid green; */
   width: 36px;
   height: 36px;
 }

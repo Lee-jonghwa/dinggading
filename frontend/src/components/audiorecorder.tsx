@@ -1,119 +1,253 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRecordingStore } from '@/store/recording';
-import AudioPlayer from '@/components/audioplayer';
 import styles from './audioRecorder.module.css';
 
-type AudioRecorderProps = {
+interface AudioRecorderProps {
   songId: string;
-  title?: string;
-};
+  title: string;
+  autoStartWithPlay?: boolean;
+  autoStopWithEnd?: boolean;
+  externalStartTrigger?: boolean;
+  externalStopTrigger?: boolean;
+}
 
-export default function AudioRecorder({ songId, title = '내 녹음' }: AudioRecorderProps) {
-  // Zustand 스토어에서 필요한 상태와 액션만 가져오기
-  const isRecording = useRecordingStore(state => state.isRecording);
-  const currentRecording = useRecordingStore(state => state.currentRecording);
-  const startRecording = useRecordingStore(state => state.startRecording);
-  const stopRecording = useRecordingStore(state => state.stopRecording);
-  
+export default function AudioRecorder({
+  songId,
+  title,
+  // autoStartWithPlay = false,
+  // autoStopWithEnd = false,
+  externalStartTrigger = false,
+  externalStopTrigger = false
+}: AudioRecorderProps) {
+  const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
-  const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
+  const [audioURL, setAudioURL] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   
-  // 녹음 시작/중지 토글
-  const toggleRecording = async () => {
-    if (isRecording) {
-      // 녹음 중지
-      await stopRecording();
-      
-      // 타이머 중지
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        setTimerInterval(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
+  
+  const { setCurrentRecording } = useRecordingStore();
+  
+  // 미디어 스트림 초기화
+  const initMediaStream = useCallback(async () => {
+    try {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
       }
       
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+      
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const url = URL.createObjectURL(audioBlob);
+        setAudioURL(url);
+        
+        // 녹음 저장
+        setCurrentRecording({
+          id: `recording-${Date.now()}`,
+          songId,
+          blob: audioBlob,
+          url,
+          duration: recordingTime
+        });
+        
+        audioChunksRef.current = [];
+      };
+      
+      return true;
+    } catch (error) {
+      console.error('미디어 스트림 초기화 오류:', error);
+      return false;
+    }
+  }, [songId, recordingTime, setCurrentRecording]);
+
+  // 녹음 시작
+  const startRecording = useCallback(async () => {
+    if (isRecording) return;
+    
+    const initialized = await initMediaStream();
+    if (!initialized) {
+      alert('마이크 접근에 실패했습니다. 권한을 확인해주세요.');
+      return;
+    }
+    
+    try {
+      audioChunksRef.current = [];
       setRecordingTime(0);
+      
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.start();
+        setIsRecording(true);
+        
+        // 녹음 시간 타이머 시작
+        timerRef.current = setInterval(() => {
+          setRecordingTime(prev => prev + 1);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('녹음 시작 오류:', error);
+    }
+  }, [isRecording, initMediaStream]);
+
+  // 녹음 중지
+  const stopRecording = useCallback(() => {
+    if (!isRecording) return;
+    
+    try {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+      
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      
+      setIsRecording(false);
+      
+      // 미디어 스트림 정리
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+    } catch (error) {
+      console.error('녹음 중지 오류:', error);
+    }
+  }, [isRecording]);
+
+  // 녹음된 오디오 재생/정지
+  const togglePlayRecording = () => {
+    if (!audioPlayerRef.current || !audioURL) return;
+    
+    if (isPlaying) {
+      audioPlayerRef.current.pause();
+      setIsPlaying(false);
     } else {
-      // 녹음 시작
-      await startRecording(songId);
-      
-      // 타이머 시작
-      const interval = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
-      
-      setTimerInterval(interval);
+      audioPlayerRef.current.play();
+      setIsPlaying(true);
     }
   };
-  
-  // 새 녹음 시작
-  const startNewRecording = () => {
-    toggleRecording();
-  };
-  
-  // 컴포넌트 언마운트 시 타이머 정리
+
+  // 오디오 이벤트 리스너
+  useEffect(() => {
+    const audioPlayer = audioPlayerRef.current;
+    
+    if (audioPlayer) {
+      const handleEnded = () => setIsPlaying(false);
+      
+      audioPlayer.addEventListener('ended', handleEnded);
+      
+      return () => {
+        audioPlayer.removeEventListener('ended', handleEnded);
+      };
+    }
+  }, [audioURL]);
+
+  // 외부 트리거에 의한 녹음 시작/중지
+  useEffect(() => {
+    if (externalStartTrigger) {
+      startRecording();
+    }
+  }, [externalStartTrigger, startRecording]);
+
+  useEffect(() => {
+    if (externalStopTrigger) {
+      stopRecording();
+    }
+  }, [externalStopTrigger, stopRecording]);
+
+  // 컴포넌트 언마운트 시 리소스 정리
   useEffect(() => {
     return () => {
-      if (timerInterval) {
-        clearInterval(timerInterval);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
+      if (audioURL) {
+        URL.revokeObjectURL(audioURL);
       }
     };
-  }, [timerInterval]);
-  
-  // 시간 포맷팅 (mm:ss)
-  const formatTime = (timeInSeconds: number) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = Math.floor(timeInSeconds % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  }, [audioURL]);
+
+  // 시간 포맷팅 함수
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
-  
-  // 현재 노래에 맞는 녹음인지 확인
-  const isSongRecording = currentRecording?.songId === songId;
-  
+
   return (
     <div className={styles.audioRecorder}>
-      <div className={styles.recorderTitle}>{title}</div>
+      <div className={styles.title}>{title}</div>
       
-      {(currentRecording && isSongRecording) ? (
-        <div className={styles.recordingResult}>
-          <AudioPlayer
-            src={currentRecording.url}
-            title="녹음된 오디오"
-            waveformSrc="/api/placeholder/600/100" 
-          />
-          
-          <div className={styles.recordingInfo}>
-            녹음 시간: {new Date(currentRecording.timestamp).toLocaleTimeString()}
-          </div>
-          
-          <button
-            className={styles.newRecordingButton}
-            onClick={startNewRecording}
-          >
-            새로 녹음하기
-          </button>
-        </div>
-      ) : (
-        <div className={styles.recordingControls}>
-          <div className={styles.recordingStatus}>
-            {isRecording ? (
+      <div className={styles.controls}>
+        {!audioURL ? (
+          <>
+            <button
+              className={`${styles.recordButton} ${isRecording ? styles.recording : ''}`}
+              onClick={isRecording ? stopRecording : startRecording}
+            >
+              {isRecording ? '녹음 중지' : '녹음 시작'}
+            </button>
+            
+            {isRecording && (
               <div className={styles.recordingIndicator}>
                 <span className={styles.recordingDot}></span>
-                녹음 중... {formatTime(recordingTime)}
-              </div>
-            ) : (
-              <div className={styles.recordingPlaceholder}>
-                녹음을 시작하려면 아래 버튼을 클릭하세요
+                <span>{formatTime(recordingTime)}</span>
               </div>
             )}
+          </>
+        ) : (
+          <>
+            <button
+              className={styles.playButton}
+              onClick={togglePlayRecording}
+            >
+              {isPlaying ? '정지' : '재생'}
+            </button>
+            
+            <button
+              className={styles.recordAgainButton}
+              onClick={() => {
+                setAudioURL(null);
+                if (audioURL) {
+                  URL.revokeObjectURL(audioURL);
+                }
+              }}
+            >
+              다시 녹음
+            </button>
+          </>
+        )}
+      </div>
+      
+      {audioURL && (
+        <div className={styles.waveform}>
+          <audio ref={audioPlayerRef} src={audioURL} />
+          <div className={styles.visualizer}>
+            {/* 여기에 파형 시각화를 추가할 수 있습니다 */}
+            <div className={styles.simplifiedWave}></div>
           </div>
-          
-          <button
-            className={`${styles.recordButton} ${isRecording ? styles.recording : ''}`}
-            onClick={toggleRecording}
-          >
-            {isRecording ? '녹음 중지' : '녹음 시작'}
-          </button>
         </div>
       )}
     </div>

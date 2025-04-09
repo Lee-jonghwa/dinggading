@@ -31,8 +31,8 @@ const Login: NextPage = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center ">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-2xl font-bold text-gray-800">로그인</h1>
+      <div className="w-full max-w-md rounded-lg bg-gray-800 p-8 shadow-md">
+        <h1 className="mb-6 text-center text-2xl font-bold text-white">로그인</h1>
         
         <button
           onClick={handleGoogleLogin}

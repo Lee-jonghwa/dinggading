@@ -9,7 +9,7 @@ export default function AuthInitializer() {
   
   useEffect(() => {
     initAuth()
-  }, [])
+  }, [initAuth])
   
   return null // UI를 렌더링하지 않음
 } 

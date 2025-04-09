@@ -1,90 +1,103 @@
-.pageContainer  {
-  display: flex; 
-  flex-direction: row;
-  align-items: center;
-  height: 100vh;
-  gap: 2rem;
-
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 .songInfo {
-  /* border: 5px solid salmon; */
-  display: flex; 
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 30rem;
-  height: 90vh;
-  gap: 2rem;
-}
-
-.songText {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 1rem;
-}
-
-.songName {
-  font-size: 2rem;
-}
-
-.artist {
-  font-size: 1.5rem;
+  margin-bottom: 30px;
+  /* background-color: #f8f8f8; */
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .imageField {
-  /* border: 5px solid blue; */
-  display: flex; 
-  justify-content: center;
-  align-items: center;
-  height: 50%;
-
+  flex: 0 0 120px;
+  margin-right: 20px;
 }
 
-.controller {
-  border: 5px solid blueviolet;
-  display: flex; 
-  gap: 2rem;
+.albumCover {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.leftThing {
-  display: flex; 
+.songText {
+  flex: 1;
 }
 
-.icon {
-  border: 5px solid lightblue;
-  display: flex; 
+.songName {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.artist {
+  font-size: 18px;
+  color: #555;
+}
+
+.instructions {
+  /* background-color: #e8f5e9; */
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-left: 4px solid #4caf50;
+}
+
+.instructions p {
+  margin: 5px 0;
 }
 
 .playingInfo {
-  /* border: 5px solid blue; */
-  display: flex; 
+  display: flex;
   flex-direction: column;
-  flex: 1;
-  /* width: 100%; */
-  align-items: center;
-  gap: 2rem;
+  gap: 20px;
 }
 
-.songWave {
-  background-color: darkgrey;
-  /* border: 5px solid; */
-  border-radius: 5px;
-  display: flex; 
-  width: 80%;
-}
-
-.userWave  {
-  background-color: darkgrey;
-  /* border: 5px solid; */
-  border-radius: 5px;
-  display: flex; 
-  width: 80%;
-  padding: 1rem;
+.songWave,
+.userWave {
+  width: 100%;
 }
 
 .challengeButton {
-  padding: 1rem;
-  border-radius: 5px;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 20px;
+  align-self: center;
+}
+
+.challengeButton:hover {
+  background-color: #3367d6;
+}
+
+.challengeButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .songInfo {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .imageField {
+    margin-right: 0;
+    margin-bottom: 15px;
+  }
 }

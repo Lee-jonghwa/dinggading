@@ -14,6 +14,7 @@ const Searchbar:React.FC = () => {
   return (
     <div className="searchbar">
       <input type="text" className="text-area"/>
+      {/* <img src={search.src} alt="search icon" width={36} height={36} /> */}
       <Image 
         src={search} 
         alt="search icon" 
@@ -21,6 +22,7 @@ const Searchbar:React.FC = () => {
         width={20}  // 원하는 크기로 조정
         height={20} // 원하는 크기로 조정
         onClick={onClickSearch}
+        style={{ width : "36px", height : "36px"}}
       />
     </div>
   )

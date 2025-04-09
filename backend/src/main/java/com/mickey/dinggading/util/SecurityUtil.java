@@ -19,7 +19,10 @@ public class SecurityUtil {
 
     public UUID getCurrentMemberId() {
         // 요청 헤더에서 Authorization 값을 가져옴
+
+
         String authorizationHeader = request.getHeader("Authorization");
+        log.info("Authorization header: {}", authorizationHeader);
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             log.error("Authorization 헤더가 없거나 Bearer 토큰이 아닙니다.");
             throw new ExceptionHandler(ErrorStatus._UNAUTHORIZED);

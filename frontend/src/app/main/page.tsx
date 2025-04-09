@@ -73,7 +73,7 @@ const MainContent = () => {
           subText2="내 실력을 뽐내 보세요"
           titleText="라이브 하우스"
           image={card3}
-          href="/live"
+          href="/livehouses"
         />
       </div>
     </div>

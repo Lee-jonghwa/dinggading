@@ -54,10 +54,15 @@ const Navbar: React.FC = () => {
 
   const { isLoggedIn, logout } = useAuthStore() 
 
+  const handleLogout = () => {
+    router.push("/main")
+    logout()
+  }
+
   const middleThings = (
     <div className="navbar-container-middle">
       <div className="columns">
-        <div className="3dImage">
+        <div className="image-3d">
           <Image
             src={missA}
             alt='miss A'
@@ -74,7 +79,7 @@ const Navbar: React.FC = () => {
           <div className="nav-text" onClick={()=>toGo(`/tier`)}>티어 측정하기</div>
           {/* <div className="nav-text" onClick={()=>toGo(`/tier`)}>이달의 도전곡</div> */}
           <div className="nav-text" onClick={()=>toGo(`/livehouses`)}>라이브 하우스</div>
-          {isLoggedIn && <div className="nav-text" onClick={logout}>로그아웃</div>}
+          {isLoggedIn && <div className="nav-text" onClick={handleLogout}>로그아웃</div>}
         </div>
       </div>
     </div>
@@ -92,7 +97,7 @@ const Navbar: React.FC = () => {
         <div className='container' style={{width : "25rem"}}>
           {commonThings}
           {middleThings}
-          <div className="chevron" onClick={handleHamburgerClick}>
+          <div className="chevron-nav" onClick={handleHamburgerClick}>
             <Image src={chevronLeft} alt='chevron left'/>
           </div>
         </div>
@@ -103,8 +108,8 @@ const Navbar: React.FC = () => {
   return (
     <div className="navbar">
       {renderNavbarContent()}
-      <div className="right">
-        <div className="end-line">|</div>
+      <div className="right-nav">
+        <div className="end-line"></div>
       </div>
     </div>
   )

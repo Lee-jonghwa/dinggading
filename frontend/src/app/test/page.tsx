@@ -3,7 +3,7 @@ import Button from "@/components/button"
 import { useCountStore } from "@/store/count"
 import { Canvas } from "@react-three/fiber"
 import { Model } from "@/components/glbmodels"
-import TestMedal from "@/app/3dtest/Viewer/BRONZEBass"
+import TestMedal from "@/app/3dtest/Viewer/BRONZEBASS"
 
 const Test = () => {
 

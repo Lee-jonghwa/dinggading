@@ -130,9 +130,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       accessToken: '',
       memberId: '',
       isLoggedIn: false
-      // refreshToken: '',
-      // expiresIn: 0,
-      // tokenType: '',
     });
 
     // 로컬 스토리지에서 토큰 제거
@@ -147,9 +144,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       // 제거 후 확인
       console.log("제거 후 토큰 존재 여부:", !!localStorage.getItem('accessToken'));
     }
-
-    // const router = useRouter()
-    // router.push("/main")
   },
 
   // 로컬 스토리지에서 사용자 정보 가져오기
@@ -173,6 +167,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
     }
   },
+
 
   // // 사용자 정보 가져오기 - 현재 토큰 유효성 확인 
   // fetchUser: async () => {

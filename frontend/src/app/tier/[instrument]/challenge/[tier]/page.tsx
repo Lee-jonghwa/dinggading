@@ -10,14 +10,16 @@ import SongCarousel from "@/components/songcarousel"
 
 export default function TierPage() {
   const { userTier } = useTierStore()
-  const { tier } = useParams() // dynamic params를 client side에서 가져오기 위해 사용하는 useParams 훅
-  const nowTier = typeof tier === 'string' ? tier : "Iron" // 타입 명시, 기본값 명시
+  const { instrument, tier } = useParams() // instrument와 tier 모두 가져오기
+  const nowTier = typeof tier === 'string' ? tier : "IRON" // 기본값을 IRON으로 설정
+  const nowInstrument = typeof instrument === 'string' ? instrument : "DRUM" // 기본값을 DRUM으로 설정
   
   const { fetchSongs, songs } = useSongsStore()
   
   useEffect(() => {
-    fetchSongs(nowTier) // fetchSongs 함수 호출 시 현재 선택된 tier 전달
-  }, [nowTier, fetchSongs])
+    console.log("[tier]/page.tsx useEffect 실행")
+    fetchSongs(nowInstrument, nowTier) // instrument와 tier 모두 전달
+  }, [nowInstrument, nowTier, fetchSongs])
   
   return (
     <div className={styles.tierpage}>

@@ -13,26 +13,26 @@ import challenge from "@/assets/Challenge.png"
 import practice from "@/assets/Practice.png"
 
 // 악기별 컴포넌트 임포트 (동적 컴포넌트로 변경)
-const DrumsCharacter = lazy(() => import("@/app/3dtest/Viewer/DrumModel"));
-const BassCharacter = lazy(() => import("@/app/3dtest/Viewer/BassModel"));
-const GuitarCharacter = lazy(() => import("@/app/3dtest/Viewer/GuitarModel"));
-const VocalsCharacter = lazy(() => import("@/app/3dtest/Viewer/VocalModel"));
+const DrumsCharacter = lazy(() => import("@/app/3dtest/Viewer/DRUMModel"));
+const BassCharacter = lazy(() => import("@/app/3dtest/Viewer/BASSModel"));
+const GuitarCharacter = lazy(() => import("@/app/3dtest/Viewer/GUITARModel"));
+const VocalsCharacter = lazy(() => import("@/app/3dtest/Viewer/VOCALModel"));
 
 const Tier: NextPage = () => {
   // instrument 타입을 명시적으로 정의
-  type InstrumentType = "Drum" | "Bass" | "Guitar" | "Vocal";
-  const [instrument, setInstrument] = useState<InstrumentType>("Drum");
+  type InstrumentType = "DRUM" | "BASS" | "GUITAR" | "VOCAL";
+  const [instrument, setInstrument] = useState<InstrumentType>("DRUM");
 
   // 현재 렌더링할 컴포넌트 결정
   const renderCharacterComponent = () => {
     switch (instrument) {
-      case "Drum":
+      case "DRUM":
         return <DrumsCharacter />
-      case "Bass":
+      case "BASS":
         return <BassCharacter />
-      case "Guitar":
+      case "GUITAR":
         return <GuitarCharacter />
-      case "Vocal":
+      case "VOCAL":
         return <VocalsCharacter />
       default:
         return <DrumsCharacter />
@@ -40,7 +40,7 @@ const Tier: NextPage = () => {
   };
 
   const changeInstrument = (direction: "left" | "right") => {
-    const instruments: InstrumentType[] = ["Drum", "Bass", "Guitar", "Vocal"];
+    const instruments: InstrumentType[] = ["DRUM", "BASS", "GUITAR", "VOCAL"];
     const currentIndex = instruments.indexOf(instrument);
     let nextIndex = currentIndex;
     

@@ -29,7 +29,6 @@ interface ConfigState {
   getAccessToken: () => string | null
 }
 
-
 const initialToken = getTokenFromStorage();
 
 // Zustand 스토어 생성

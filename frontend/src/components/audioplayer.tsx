@@ -1,140 +1,167 @@
 'use client'
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styles from './audioPlayer.module.css';
 
-type AudioPlayerProps = {
+interface AudioPlayerProps {
   src: string;
-  title?: string;
+  title: string;
   waveformSrc?: string;
-  disabled?: boolean;
-  onPlayStateChange?: (isPlaying: boolean) => void;
-};
+  onPlayStart?: () => void;
+  onPlayEnd?: () => void;
+  autoPlay?: boolean;
+}
 
 export default function AudioPlayer({
   src,
-  title = '오디오',
+  title,
   waveformSrc,
-  disabled = false,
-  onPlayStateChange,
+  onPlayStart,
+  onPlayEnd,
+  autoPlay = false
 }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  
-  // 재생/정지 토글
-  const togglePlayback = () => {
-    if (!audioRef.current || disabled) return;
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const waveformRef = useRef<HTMLDivElement>(null);
+
+  // 오디오 로드 시 처리
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration);
+    };
+
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     
+    return () => {
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, [src]);
+
+  // 오디오 이벤트 처리
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleTimeUpdate = () => {
+      setProgress(audio.currentTime / audio.duration * 100);
+    };
+
+    const handlePlay = () => {
+      setIsPlaying(true);
+      if (onPlayStart) onPlayStart();
+    };
+
+    const handlePause = () => {
+      setIsPlaying(false);
+    };
+
+    const handleEnded = () => {
+      setIsPlaying(false);
+      setProgress(0);
+      if (onPlayEnd) onPlayEnd();
+    };
+
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('pause', handlePause);
+    audio.addEventListener('ended', handleEnded);
+
+    return () => {
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [onPlayStart, onPlayEnd]);
+
+  // 자동 재생
+  useEffect(() => {
+    if (autoPlay && audioRef.current) {
+      // 자동 재생 정책으로 인해 사용자 상호작용이 필요할 수 있음
+      // 실제 환경에서는 사용자에게 자동 재생 권한을 요청해야 할 수 있음
+      const playPromise = audioRef.current.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.error('자동 재생 실패:', error);
+        });
+      }
+    }
+  }, [autoPlay]);
+
+  const togglePlay = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
     if (isPlaying) {
-      audioRef.current.pause();
+      audio.pause();
     } else {
-      audioRef.current.play();
+      audio.play();
     }
   };
-  
-  // 처음부터 재생
-  const playFromStart = () => {
-    if (!audioRef.current || disabled) return;
+
+  const handleProgressBarClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const audio = audioRef.current;
+    const progressBar = e.currentTarget;
+    if (!audio || !progressBar) return;
+
+    const rect = progressBar.getBoundingClientRect();
+    const clickPosition = (e.clientX - rect.left) / rect.width;
+    const newTime = clickPosition * audio.duration;
     
-    audioRef.current.currentTime = 0;
-    audioRef.current.play();
+    audio.currentTime = newTime;
+    setProgress(clickPosition * 100);
   };
-  
-  // 오디오 메타데이터 로드 시
-  const handleLoadedMetadata = () => {
-    if (!audioRef.current) return;
-    
-    setDuration(audioRef.current.duration);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
-  
-  // 재생 상태 변경 시
-  const handlePlayStateChange = (playing: boolean) => {
-    setIsPlaying(playing);
-    if (onPlayStateChange) {
-      onPlayStateChange(playing);
-    }
-  };
-  
-  // 시간 업데이트
-  const handleTimeUpdate = () => {
-    if (!audioRef.current) return;
-    
-    setCurrentTime(audioRef.current.currentTime);
-  };
-  
-  // 재생 바 변경 시
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!audioRef.current) return;
-    
-    const time = parseFloat(e.target.value);
-    audioRef.current.currentTime = time;
-    setCurrentTime(time);
-  };
-  
-  // 시간 포맷팅 (mm:ss)
-  const formatTime = (timeInSeconds: number) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = Math.floor(timeInSeconds % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  };
-  
+
   return (
     <div className={styles.audioPlayer}>
-      <div className={styles.playerTitle}>{title}</div>
+      <div className={styles.title}>{title}</div>
       
-      <div className={styles.waveformContainer}>
-        {waveformSrc ? (
-          <img src={waveformSrc} alt="파형" className={styles.waveform} />
-        ) : (
-          <div className={styles.waveformPlaceholder}>
-            {isPlaying ? '재생 중...' : '오디오 파형'}
-          </div>
-        )}
-      </div>
-      
-      <div className={styles.timelineContainer}>
-        <span className={styles.timeDisplay}>{formatTime(currentTime)}</span>
-        <input
-          type="range"
-          min="0"
-          max={duration || 0}
-          value={currentTime}
-          onChange={handleSeek}
-          className={styles.timeline}
-          disabled={disabled}
-        />
-        <span className={styles.timeDisplay}>{formatTime(duration)}</span>
-      </div>
+      <audio ref={audioRef} src={src} />
       
       <div className={styles.controls}>
-        <button
-          className={styles.controlButton}
-          onClick={togglePlayback}
-          disabled={disabled}
+        <button 
+          className={styles.playButton} 
+          onClick={togglePlay}
         >
-          {isPlaying ? '정지' : '재생'}
+          {isPlaying ? '일시정지' : '재생'}
         </button>
         
-        <button
-          className={styles.controlButton}
-          onClick={playFromStart}
-          disabled={disabled}
-        >
-          처음부터
-        </button>
+        <div className={styles.timeInfo}>
+          <span>{formatTime(audioRef.current?.currentTime || 0)}</span>
+          <span>/</span>
+          <span>{formatTime(duration)}</span>
+        </div>
       </div>
       
-      <audio
-        ref={audioRef}
-        src={src}
-        onPlay={() => handlePlayStateChange(true)}
-        onPause={() => handlePlayStateChange(false)}
-        onEnded={() => handlePlayStateChange(false)}
-        onLoadedMetadata={handleLoadedMetadata}
-        onTimeUpdate={handleTimeUpdate}
-      />
+      <div className={styles.progressContainer} onClick={handleProgressBarClick}>
+        <div className={styles.progressBackground}>
+          {waveformSrc ? (
+            <div 
+              ref={waveformRef} 
+              className={styles.waveform} 
+              style={{ backgroundImage: `url(${waveformSrc})` }}
+            />
+          ) : (
+            <div className={styles.progressBar} />
+          )}
+        </div>
+        <div 
+          className={styles.progressCurrent} 
+          style={{ width: `${progress}%` }}
+        />
+      </div>
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import styles from "./successPage.module.css"
 import { useTierStore } from "@/store/tier"
-import SilverDrum from "@/app/3dtest/Viewer/SILVERDrum"
+import SilverDrum from "@/app/3dtest/Viewer/SILVERDRUM"
 
 export default function SuccessPage() {
   const router = useRouter()

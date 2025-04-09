@@ -14,7 +14,7 @@ interface TiercardProps {
 
 export default function Tiercard ({ tier, currentTier, noticeThing} : TiercardProps) {
   const tierOrder = ['IRON', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'DIAMOND']
-  const instruments = ['Drum', 'Bass', 'Guitar', 'Vocal']
+  const instruments = ['DRUM', 'BASS', 'GUITAR', 'VOCAL']
 
   const getTierStatus = () => {
     const currentIndex = tierOrder.indexOf(currentTier)
@@ -35,7 +35,7 @@ export default function Tiercard ({ tier, currentTier, noticeThing} : TiercardPr
   const { instrument } = params
 
   // 현재 선택된 악기가 유효한지 확인
-  const validInstrument = instruments.includes(String(instrument)) ? String(instrument) : 'Drum'
+  const validInstrument = instruments.includes(String(instrument)) ? String(instrument) : 'DRUM'
 
   // 동적으로 컴포넌트를 가져오기 위한 React.lazy 컴포넌트
   const [MedalComponent, setMedalComponent] = React.useState<React.ComponentType | null>(null)
@@ -53,7 +53,7 @@ export default function Tiercard ({ tier, currentTier, noticeThing} : TiercardPr
         console.error(`Failed to load component for ${tier}${validInstrument}:`, error)
         // 기본 컴포넌트로 fallback
         try {
-          const fallbackModule = await import('@/app/3dtest/Viewer/BRONZEDrum')
+          const fallbackModule = await import('@/app/3dtest/Viewer/BRONZEDRUM')
           setMedalComponent(() => fallbackModule.default)
         } catch (fallbackError) {
           console.error('Failed to load fallback component:', fallbackError)

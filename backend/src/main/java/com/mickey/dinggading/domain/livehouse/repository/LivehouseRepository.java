@@ -40,4 +40,6 @@ public interface LivehouseRepository extends JpaRepository<Livehouse, Long> {
                     "AND (l.title LIKE %:keyword% OR l.host_nickname LIKE %:keyword%)",
             nativeQuery = true)
     Page<Livehouse> searchByKeyword(@Param("activeSessions") List<String> activeSessions, @Param("keyword") String keyword, Pageable pageable);
+
+    Optional<Livehouse> findBySessionId(String sessionId);
 }

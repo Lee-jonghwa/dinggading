@@ -57,4 +57,4 @@ export function DiamondDrum(props) {
   )
 }
 
-useGLTF.preload('/Diamond_Drum.glb')
+useGLTF.preload('/Drum/Diamond_Drum.glb')

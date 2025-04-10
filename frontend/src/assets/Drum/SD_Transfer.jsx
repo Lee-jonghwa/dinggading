@@ -57,4 +57,4 @@ export function SilverDrum(props) {
   )
 }
 
-useGLTF.preload('/Silver_Drum.glb')
+useGLTF.preload('/Drum/Silver_Drum.glb')

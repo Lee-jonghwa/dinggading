@@ -57,4 +57,4 @@ export function DiamondGuitar(props) {
   )
 }
 
-useGLTF.preload('/Diamond_Guitar.glb')
+useGLTF.preload('/Guitar/Diamond_Guitar.glb')

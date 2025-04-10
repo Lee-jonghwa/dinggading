@@ -56,4 +56,4 @@ export function SilverVocal(props) {
   )
 }
 
-useGLTF.preload('/Silver_Vocal.glb')
+useGLTF.preload('/Vocal/Silver_Vocal.glb')

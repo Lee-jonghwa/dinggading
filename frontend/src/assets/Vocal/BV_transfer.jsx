@@ -56,4 +56,4 @@ export function BronzeVocal(props) {
   )
 }
 
-useGLTF.preload('/Bronze_Vocal.glb')
+useGLTF.preload('/Vocal/Bronze_Vocal.glb')

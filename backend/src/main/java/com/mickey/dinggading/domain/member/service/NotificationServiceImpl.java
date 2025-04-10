@@ -6,6 +6,10 @@ import com.mickey.dinggading.domain.member.model.entity.Member;
 import com.mickey.dinggading.domain.member.model.entity.Notification;
 import com.mickey.dinggading.domain.member.repository.MemberRepository;
 import com.mickey.dinggading.domain.member.repository.NotificationRepository;
+import com.mickey.dinggading.domain.membermatching.repository.AttemptRepository;
+import com.mickey.dinggading.domain.memberrank.model.Attempt;
+import com.mickey.dinggading.domain.memberrank.model.MemberRank;
+import com.mickey.dinggading.domain.memberrank.repository.MemberRankRepository;
 import com.mickey.dinggading.exception.ExceptionHandler;
 import com.mickey.dinggading.infra.rabbitmq.dto.MessageDTO;
 import com.mickey.dinggading.model.NotificationDTO;
@@ -36,11 +40,13 @@ public class NotificationServiceImpl implements NotificationService {
     private final MemberRepository memberRepository;
     private final NotificationRepository notificationRepository;
     private final NotificationConverter notificationConverter;
+    private final MemberRankRepository memberRankRepository;
 
     private static final long SSE_TIMEOUT = 60 * 60 * 1000L * 2; // 2시간
 
     // 사용자별 SSE 연결 시간을 저장
     private final Map<UUID, LocalDateTime> connectionStartTimes = new ConcurrentHashMap<>();
+    private final AttemptRepository attemptRepository;
 
     @Override
     public SseEmitter subscribe(UUID memberId) {
@@ -131,14 +137,23 @@ public class NotificationServiceImpl implements NotificationService {
 
         String notificationContent = "티어 분석이 완료되었습니다. 확인해보세요!";
 
+        Attempt attempt = attemptRepository.findById(message.getAttemptId())
+            .orElseThrow(() -> new ExceptionHandler(ErrorStatus.ATTEMPT_NOT_FOUND));
+
+        MemberRank memberRank = memberRankRepository.findByMemberAndInstrument(member, attempt.getSongByInstrument().getInstrument())
+            .orElseThrow(() -> new ExceptionHandler(ErrorStatus.MEMBER_RANK_NOT_FOUND));
+
+        String tierAndInstrument = attempt.getSongByInstrument().getInstrument() + "" + memberRank.getTier();
+
         // 알림 엔티티 생성 및 저장
-        Notification notification = new Notification(member, notificationContent, NotificationType.RANK, false);
+        Notification notification = new Notification(member, notificationContent, NotificationType.RANK, false, message.getAttemptId(), attempt.isSuccess());
 
         Notification savedNotification = notificationRepository.save(notification);
+        log.info("tierAndInstrument = {}", tierAndInstrument);
         log.info("새 메시지 알림 생성 완료: ID {}", savedNotification.getNotificationId());
 
         // 실시간 알림 발송
-        sendNotification(rankerId, notificationConverter.fromEntity(savedNotification));
+        sendNotification(rankerId, notificationConverter.fromEntity(savedNotification, tierAndInstrument));
 
         notificationConverter.fromEntity(savedNotification);
     }

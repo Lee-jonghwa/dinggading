@@ -1,5 +1,6 @@
 package com.mickey.dinggading.domain.memberrank.repository;
 
+import com.mickey.dinggading.domain.member.model.entity.Member;
 import com.mickey.dinggading.domain.memberrank.model.Instrument;
 import com.mickey.dinggading.domain.memberrank.model.MemberRank;
 import com.mickey.dinggading.domain.memberrank.model.RankMatching;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MemberRankRepository extends JpaRepository<MemberRank, Long> {
+
+    Optional<MemberRank> findByMemberAndInstrument(Member memberId, Instrument instrument);
 
     List<MemberRank> findByRankMatching(RankMatching rankMatching);
 

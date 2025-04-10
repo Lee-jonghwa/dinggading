@@ -120,6 +120,9 @@ components:
           type: integer
           format: int64
           description: "알림 고유 식별자"
+        attemptId:
+          type: integer
+          format: int64
         chatRoomId:
           type: string
           description: "채팅방 ID"
@@ -159,6 +162,10 @@ components:
           type: string
           format: date-time
           description: "생성 일시"
+        isSuccess:
+          type: boolean
+        tierAndInstrument:
+          type: string
 
       required:
         - notificationId

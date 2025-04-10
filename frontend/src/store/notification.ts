@@ -78,17 +78,33 @@ export const useNotificationStore = create<NotificationState>((set) => ({
         throw new Error('인증 토큰이 없습니다');
       }
       
+      // 디버깅을 위한 로깅 추가
+      console.log(`API 호출 시작: PUT /api/notifications/${notificationId}/read`);
+      
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-      const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
+      const url = `${baseUrl}/api/notifications/${notificationId}/read`;
+      console.log(`완전한 URL: ${url}`);
+      
+      const response = await fetch(url, {
         method: 'PUT',
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`
         }
       });
       
+      // 응답 상태 로깅
+      console.log(`API 응답 상태: ${response.status}`);
+      
       if (!response.ok) {
+        // 응답 본문 추가 로깅
+        const errorText = await response.text();
+        console.error(`API 오류 응답: ${errorText}`);
         throw new Error(`API 호출 실패: ${response.status}`);
       }
+      
+      const data = await response.json();
+      console.log(`API 응답 데이터:`, data);
       
       // 상태 업데이트
       set(state => ({
@@ -103,6 +119,7 @@ export const useNotificationStore = create<NotificationState>((set) => ({
       set({ 
         error: error instanceof Error ? error.message : '알림 읽음 처리에 실패했습니다'
       });
+      throw error; // 에러를 다시 던져서 컴포넌트에서 처리할 수 있게 함
     }
   },
   

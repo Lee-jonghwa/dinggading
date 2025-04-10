@@ -1,3 +1,4 @@
+// C:\Users\SSAFY\Desktop\project\S12P21E107\frontend\src\components\notice.tsx
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
@@ -31,20 +32,29 @@ export interface NotificationDTO {
   acceptUrl?: string;
   rejectUrl?: string;
   createdAt: string;
+  attemptId?: number; // 시도 ID
+  isSuccess?: boolean; // 성공 여부
 }
 
 const Notice = () => {
-  const [notifications, setNotifications] = useState<NotificationDTO[]>([]);
+  // 로컬 상태는 UI 관련 상태만 유지
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   
   const { accessToken, isLoggedIn } = useAuthStore();
-  const { fetchNotification, notifications: storeNotifications } = useNotificationStore();
+  // 스토어에서 필요한 모든 함수와 상태 가져오기
+  const { 
+    fetchNotification, 
+    notifications, 
+    markAsRead: storeMarkAsRead, 
+    markAllAsRead: storeMarkAllAsRead, 
+    addNotification 
+  } = useNotificationStore();
   
-  // SSE 연결 상태를 유지하기 위한 ref
-  const eventSourceRef = useRef<EventSource | null>(null);
+  // SSE 이벤트 리스너 설정 상태
+  const [sseListenersSetup, setSseListenersSetup] = useState(false);
 
   // 외부 클릭 시 알림 드롭다운 닫기
   useEffect(() => {
@@ -60,94 +70,48 @@ const Notice = () => {
     };
   }, []);
 
-  // 알림 가져오기 및 SSE 연결 설정
+  // 초기 알림 목록 가져오기 및 SSE 이벤트 리스너 설정
   useEffect(() => {
-    if (isLoggedIn && accessToken) {
+    if (isLoggedIn && accessToken && !sseListenersSetup) {
       // 초기 알림 목록 가져오기
       fetchNotification();
       
-      // 알림 소켓 연결 (SSE)
-      connectSSE();
-      
-      return () => {
-        // 컴포넌트 언마운트 시 SSE 연결 정리
-        if (eventSourceRef.current) {
-          eventSourceRef.current.close();
-          eventSourceRef.current = null;
-        }
-      };
+      // SSE 이벤트 리스너 설정 (이미 연결된 SSE에 리스너만 추가)
+      setupSseListeners();
+      setSseListenersSetup(true);
     }
-  }, [isLoggedIn, accessToken, fetchNotification]);
+  }, [isLoggedIn, accessToken, fetchNotification, sseListenersSetup]);
 
-  // 스토어에서 알림 데이터 업데이트 시 처리
+  // 읽지 않은 알림 개수 계산 - notifications가 변경될 때마다 실행
   useEffect(() => {
-    if (storeNotifications && storeNotifications.length > 0) {
-      setNotifications(storeNotifications);
-      
-      // 읽지 않은 알림 개수 계산
-      const unread = storeNotifications.filter(notification => !notification.readOrNot).length;
+    if (notifications) {
+      const unread = notifications.filter(notification => !notification.readOrNot).length;
       setUnreadCount(unread);
     }
-  }, [storeNotifications]);
+  }, [notifications]);
 
-  // SSE 연결 함수
-  const connectSSE = () => {
+  // SSE 이벤트 리스너 설정 함수
+  const setupSseListeners = () => {
     if (!isLoggedIn || !accessToken) return;
+
+    // 이미 존재하는 SSE 이벤트 소스에 이벤트 리스너 설정
+    const eventSource = new EventSource("/api/sse"); // 가정: 이미 연결된 SSE 이벤트 소스
     
-    // 이미 연결된 EventSource가 있다면 닫기
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-    }
-    
-    // SSE 연결 설정
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-    const sse = new EventSource(`${baseUrl}/api/notifications/subscribe`, {
-      withCredentials: true
-    });
-    
-    sse.onopen = () => {
-      console.log("SSE 연결이 열렸습니다");
-    };
-    
-    // 연결 이벤트 리스너
-    sse.addEventListener('connect', (event) => {
-      console.log("SSE connect 이벤트:", event.data);
-    });
-    
-    // 알림 이벤트 리스너
-    sse.addEventListener('notification', (event) => {
+    // 알림 이벤트 리스너 - 스토어 직접 업데이트
+    eventSource.addEventListener('notification', (event) => {
       try {
         const notificationData = JSON.parse(event.data) as NotificationDTO;
         console.log("새로운 알림 수신:", notificationData);
         
-        // 새 알림을 목록에 추가
-        setNotifications(prev => [notificationData, ...prev]);
+        // 스토어에 직접 알림 추가 - 즉시 UI에 반영됨
+        addNotification(notificationData);
         
-        // 읽지 않은 알림 개수 증가
-        setUnreadCount(prev => prev + 1);
-        
-        // 토스트 알림 표시 등 추가 처리 가능
+        // 토스트 알림 표시
         showNotificationToast(notificationData);
-        
-        // 스토어 업데이트
-        fetchNotification();
       } catch (e) {
         console.error("알림 데이터 파싱 에러:", e);
       }
     });
-    
-    // 하트비트 이벤트 리스너
-    sse.addEventListener('heartbeat', (event) => {
-      console.log("SSE heartbeat:", event.data);
-    });
-    
-    sse.onerror = (error) => {
-      console.error("SSE 에러 발생:", error);
-      // 에러 발생 시 재연결 시도는 브라우저가 자동으로 처리
-    };
-    
-    // 참조 저장
-    eventSourceRef.current = sse;
   };
 
   // 토스트 알림 표시 함수
@@ -183,32 +147,15 @@ const Notice = () => {
     }
   };
 
-  // 알림 읽음 처리
-  const markAsRead = async (notificationId: number) => {
+  // 알림 읽음 처리 - 스토어 함수 사용
+  const handleMarkAsRead = async (notificationId: number) => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-      await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
-        }
-      });
+      // 디버깅을 위한 로그 추가
+      console.log(`알림 읽음 처리 시작: ${notificationId}`);
       
-      // 상태 업데이트
-      setNotifications(prevNotifications => 
-        prevNotifications.map(notification => 
-          notification.notificationId === notificationId 
-            ? {...notification, readOrNot: true} 
-            : notification
-        )
-      );
+      await storeMarkAsRead(notificationId);
       
-      // 읽지 않은 알림 개수 갱신
-      setUnreadCount(prev => Math.max(0, prev - 1));
-      
-      // 스토어 업데이트
-      fetchNotification();
+      console.log(`알림 읽음 처리 완료: ${notificationId}`);
     } catch (error) {
       console.error('알림 읽음 처리에 실패했습니다:', error);
     }
@@ -216,7 +163,7 @@ const Notice = () => {
 
   // 알림 클릭 핸들러
   const handleNotificationClick = (notification: NotificationDTO) => {
-    markAsRead(notification.notificationId);
+    handleMarkAsRead(notification.notificationId);
     
     // 알림 타입에 따른 다른 처리
     switch(notification.type) {
@@ -226,10 +173,15 @@ const Notice = () => {
         }
         break;
       case NotificationType.RANK:
-        router.push('/tier');
-        break;
-      case NotificationType.BAND:
-        router.push('/myband');
+        if (notification.attemptId) {
+          if (notification.isSuccess) {
+            router.push(`/tier/attempt/${notification.attemptId}/success`);
+          } else {
+            router.push(`/tier/attempt/${notification.attemptId}/fail`);
+          }
+        } else {
+          router.push('/tier');
+        }
         break;
       default:
         // 기본적으로는 아무 동작도 하지 않음
@@ -240,28 +192,10 @@ const Notice = () => {
     setShowNotifications(false);
   };
 
-  // 모든 알림 읽음 처리
-  const markAllAsRead = async () => {
+  // 모든 알림 읽음 처리 - 스토어 함수 사용
+  const handleMarkAllAsRead = async () => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-      await fetch(`${baseUrl}/api/notifications/read-all`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
-        }
-      });
-      
-      // 모든 알림을 읽음 상태로 설정
-      setNotifications(prevNotifications => 
-        prevNotifications.map(notification => ({...notification, readOrNot: true}))
-      );
-      
-      // 읽지 않은 알림 개수 초기화
-      setUnreadCount(0);
-      
-      // 스토어 업데이트
-      fetchNotification();
+      await storeMarkAllAsRead();
     } catch (error) {
       console.error('모든 알림 읽음 처리에 실패했습니다:', error);
     }
@@ -301,14 +235,14 @@ const Notice = () => {
             {unreadCount > 0 && (
               <button 
                 className={styles.readAllBtn}
-                onClick={markAllAsRead}
+                onClick={handleMarkAllAsRead}
               >
                 모두 읽음
               </button>
             )}
           </div>
           <div className={styles.list}>
-            {notifications.length > 0 ? (
+            {notifications && notifications.length > 0 ? (
               notifications.map(notification => (
                 <div 
                   key={notification.notificationId}

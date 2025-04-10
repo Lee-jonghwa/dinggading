@@ -46,6 +46,12 @@ public class Notification extends BaseEntity {
     @Comment("채팅방 ID")
     private String chatRoomId;
 
+    @Column(name = "attempt_id")
+    private Long attemptId;
+
+    @Column(name = "is_success")
+    private Boolean isSuccess;
+
     // Update methods
     public void markAsRead() {
         this.readOrNot = true;
@@ -60,11 +66,13 @@ public class Notification extends BaseEntity {
         this.readOrNot = readOrNot;
     }
 
-    public Notification (Member ranker, String message, NotificationType type, boolean readOrNot) {
+    public Notification (Member ranker, String message, NotificationType type, boolean readOrNot, Long attemptId, boolean isSuccess) {
         this.message = message;
         this.type = type;
         this.sender = ranker;
         this.receiver = ranker;
         this.readOrNot = readOrNot;
+        this.attemptId = attemptId;
+        this.isSuccess = isSuccess;
     }
 }

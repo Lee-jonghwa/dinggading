@@ -55,10 +55,12 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
   // API 설정 초기화
   apiConfig: new Configuration({
     basePath: baseUrl,
-    accessToken: `Bearer ${initialToken || ""}`, // 문자열로 초기화
+    // accessToken: `Bearer ${initialToken || ""}`, // 문자열로 초기화
     baseOptions: {
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json', 
+        ...(initialToken ? { 'Authorization': `Bearer ${initialToken}` } : {})
+
       }
     }
   }),
@@ -73,10 +75,16 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
     console.log("Setting accessToken:", token);
     
     set((state) => ({
-      token: token, // 토큰 상태 업데이트 추가
+      token: token,
       apiConfig: new Configuration({
         ...state.apiConfig,
-        accessToken: `Bearer ${token}`,
+        baseOptions: {
+          ...state.apiConfig.baseOptions,
+          headers: {
+            ...state.apiConfig.baseOptions?.headers,
+            'Authorization': `Bearer ${token}`
+          }
+        }
       }),
     }));
   },

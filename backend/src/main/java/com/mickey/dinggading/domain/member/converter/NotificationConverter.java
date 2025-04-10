@@ -16,27 +16,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class NotificationConverter {
 
-    public NotificationDTO fromEntity(Notification entity, String tierAndInstrument) {
-        return NotificationDTO.builder()
-            .tierAndInstrument(tierAndInstrument)
-            .notificationId(entity.getNotificationId())
-            .attemptId(entity.getAttemptId())
-            .isSuccess(entity.getIsSuccess())
-            .senderId(entity.getSender().getMemberId())
-            .receiverId(entity.getReceiver().getMemberId())
-            .senderNickname(entity.getSender().getNickname())
-            .senderProfileUrl(entity.getSender().getProfileImgUrl())
-            .message(entity.getMessage())
-            .type(entity.getType())
-            .readOrNot(entity.getReadOrNot())
-            .createdAt(LocalDateTime.now())
-            .build();
-    }
-
     public NotificationDTO fromEntity(Notification entity) {
         return NotificationDTO.builder()
+            .tierAndInstrument(entity.getTierAndInstrument())
             .notificationId(entity.getNotificationId())
             .chatRoomId(entity.getChatRoomId())
+            .attemptId(entity.getAttemptId())
+            .isSuccess(entity.getIsSuccess())
             .senderId(entity.getSender().getMemberId())
             .receiverId(entity.getReceiver().getMemberId())
             .senderNickname(entity.getSender().getNickname())

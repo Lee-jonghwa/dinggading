@@ -1,4 +1,3 @@
-// C:\Users\SSAFY\Desktop\project\S12P21E107\frontend\src\components\notice.tsx
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
@@ -34,6 +33,7 @@ export interface NotificationDTO {
   createdAt: string;
   attemptId?: number; // 시도 ID
   isSuccess?: boolean; // 성공 여부
+  tierAndInstrument?: string;
 }
 
 const Notice = () => {
@@ -76,7 +76,7 @@ const Notice = () => {
       // 초기 알림 목록 가져오기
       fetchNotification();
       
-      // SSE 이벤트 리스너 설정 (이미 연결된 SSE에 리스너만 추가)
+      // SSE 이벤트 리스너 설정
       setupSseListeners();
       setSseListenersSetup(true);
     }
@@ -90,17 +90,19 @@ const Notice = () => {
     }
   }, [notifications]);
 
+  // 커스텀 이벤트 타입 정의
+  interface NotificationEvent extends CustomEvent {
+    detail: string; // NotificationDTO를 담은 JSON 문자열
+  }
+
   // SSE 이벤트 리스너 설정 함수
   const setupSseListeners = () => {
     if (!isLoggedIn || !accessToken) return;
 
-    // 이미 존재하는 SSE 이벤트 소스에 이벤트 리스너 설정
-    const eventSource = new EventSource("/api/sse"); // 가정: 이미 연결된 SSE 이벤트 소스
-    
-    // 알림 이벤트 리스너 - 스토어 직접 업데이트
-    eventSource.addEventListener('notification', (event) => {
+    // 전역 이벤트 리스너를 통해 알림 이벤트 구독
+    const handleNotificationEvent = (event: NotificationEvent) => {
       try {
-        const notificationData = JSON.parse(event.data) as NotificationDTO;
+        const notificationData = JSON.parse(event.detail) as NotificationDTO;
         console.log("새로운 알림 수신:", notificationData);
         
         // 스토어에 직접 알림 추가 - 즉시 UI에 반영됨
@@ -111,7 +113,15 @@ const Notice = () => {
       } catch (e) {
         console.error("알림 데이터 파싱 에러:", e);
       }
-    });
+    };
+    
+    // 커스텀 이벤트 리스너 등록
+    window.addEventListener('notification-received', handleNotificationEvent as EventListener);
+    
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거를 위해 정리 함수 반환
+    return () => {
+      window.removeEventListener('notification-received', handleNotificationEvent as EventListener);
+    };
   };
 
   // 토스트 알림 표시 함수
@@ -163,34 +173,46 @@ const Notice = () => {
 
   // 알림 클릭 핸들러
   const handleNotificationClick = (notification: NotificationDTO) => {
-    handleMarkAsRead(notification.notificationId);
-    
-    // 알림 타입에 따른 다른 처리
-    switch(notification.type) {
-      case NotificationType.CHAT:
-        if (notification.chatRoomId) {
-          router.push(`/chat/${notification.chatRoomId}`);
-        }
-        break;
-      case NotificationType.RANK:
-        if (notification.attemptId) {
-          if (notification.isSuccess) {
-            router.push(`/tier/attempt/${notification.attemptId}/success`);
-          } else {
-            router.push(`/tier/attempt/${notification.attemptId}/fail`);
-          }
+  handleMarkAsRead(notification.notificationId);
+  
+  // 알림 타입에 따른 다른 처리
+  switch(notification.type) {
+    case NotificationType.CHAT:
+      if (notification.chatRoomId) {
+        router.push(`/chat/${notification.chatRoomId}`);
+      }
+      break;
+    case NotificationType.RANK:
+      console.log("티어 알림 클릭:", notification);
+      
+      // UNRANKED를 IRON으로 변환
+      let tierInfo = notification.tierAndInstrument;
+      if (tierInfo && tierInfo.includes('UNRANKED')) {
+        tierInfo = tierInfo.replace('UNRANKED', 'IRON');
+      }
+      
+      if (notification.attemptId) {
+        if (notification.isSuccess) {
+          // tierAndInstrument 정보를 URL 쿼리 파라미터로 전달
+          const tierInfoParam = tierInfo 
+            ? `?tierInfo=${encodeURIComponent(tierInfo)}` 
+            : '';
+          router.push(`/tier/attempt/${notification.attemptId}/success${tierInfoParam}`);
         } else {
-          router.push('/tier');
+          router.push(`/tier/attempt/${notification.attemptId}/fail`);
         }
-        break;
-      default:
-        // 기본적으로는 아무 동작도 하지 않음
-        break;
-    }
-    
-    // 드롭다운 닫기
-    setShowNotifications(false);
-  };
+      } else {
+        router.push('/tier');
+      }
+      break;
+    default:
+      // 기본적으로는 아무 동작도 하지 않음
+      break;
+  }
+  
+  // 드롭다운 닫기
+  setShowNotifications(false);
+};
 
   // 모든 알림 읽음 처리 - 스토어 함수 사용
   const handleMarkAllAsRead = async () => {

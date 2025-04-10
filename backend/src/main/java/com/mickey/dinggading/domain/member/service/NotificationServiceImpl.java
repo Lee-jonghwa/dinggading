@@ -143,17 +143,17 @@ public class NotificationServiceImpl implements NotificationService {
         MemberRank memberRank = memberRankRepository.findByMemberAndInstrument(member, attempt.getSongByInstrument().getInstrument())
             .orElseThrow(() -> new ExceptionHandler(ErrorStatus.MEMBER_RANK_NOT_FOUND));
 
-        String tierAndInstrument = attempt.getSongByInstrument().getInstrument() + "" + memberRank.getTier();
+        String tierAndInstrument = memberRank.getTier() + "" + attempt.getSongByInstrument().getInstrument();
 
         // 알림 엔티티 생성 및 저장
-        Notification notification = new Notification(member, notificationContent, NotificationType.RANK, false, message.getAttemptId(), attempt.isSuccess());
+        Notification notification = new Notification(member, notificationContent, NotificationType.RANK, false, message.getAttemptId(), attempt.isSuccess(), tierAndInstrument);
 
         Notification savedNotification = notificationRepository.save(notification);
         log.info("tierAndInstrument = {}", tierAndInstrument);
         log.info("새 메시지 알림 생성 완료: ID {}", savedNotification.getNotificationId());
 
         // 실시간 알림 발송
-        sendNotification(rankerId, notificationConverter.fromEntity(savedNotification, tierAndInstrument));
+        sendNotification(rankerId, notificationConverter.fromEntity(savedNotification));
 
         notificationConverter.fromEntity(savedNotification);
     }

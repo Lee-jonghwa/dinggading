@@ -52,6 +52,9 @@ public class Notification extends BaseEntity {
     @Column(name = "is_success")
     private Boolean isSuccess;
 
+    @Column(name = "tier_and_instrument")
+    private String tierAndInstrument;
+
     // Update methods
     public void markAsRead() {
         this.readOrNot = true;
@@ -66,7 +69,7 @@ public class Notification extends BaseEntity {
         this.readOrNot = readOrNot;
     }
 
-    public Notification (Member ranker, String message, NotificationType type, boolean readOrNot, Long attemptId, boolean isSuccess) {
+    public Notification (Member ranker, String message, NotificationType type, boolean readOrNot, Long attemptId, boolean isSuccess, String tierAndInstrument) {
         this.message = message;
         this.type = type;
         this.sender = ranker;
@@ -74,5 +77,6 @@ public class Notification extends BaseEntity {
         this.readOrNot = readOrNot;
         this.attemptId = attemptId;
         this.isSuccess = isSuccess;
+        this.tierAndInstrument = tierAndInstrument;
     }
 }

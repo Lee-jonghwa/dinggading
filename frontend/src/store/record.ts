@@ -2,7 +2,8 @@
 
 import { create } from "zustand"
 import { useConfigStore } from "./config"
-import { RecordApi } from "../../generated/api/record-api"
+import { RecordApi, RecordApiCreateRecordRequest } from "../../generated/api/record-api"
+import { RecordCreateRequestDTO } from "../../generated/model/record-create-request-dto"
 import axios, { AxiosError } from "axios"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
@@ -76,36 +77,20 @@ export const useRecordStore = create<RecordState>((set) => ({
     set({ loading: true, error: null })
     try {
       const apiConfig = useConfigStore.getState().apiConfig
-      const baseURL = apiConfig.basePath || process.env.NEXT_PUBLIC_API_BASE_URL
+      // const baseURL = apiConfig.basePath || process.env.NEXT_PUBLIC_API_BASE_URL
       
-      console.log("녹음 생성 요청:", { recordInfo, audioFile })
-      
-      // FormData 객체 생성
-      const formData = new FormData()
-      
-      // JSON 데이터를 문자열로 변환하여 추가
-      formData.append('recordInfo', new Blob(
-        [JSON.stringify(recordInfo)], 
-        { type: 'application/json' }
-      ))
-      
-      // 파일 추가
-      formData.append('audioFile', audioFile)
-      
-      // axios로 직접 요청 전송
-      const response = await axios.post(
-        `${baseURL}/api/records/me`, 
-        formData, 
-        {
-          headers: {
-            // Content-Type은 FormData가 자동으로 설정하므로 명시적으로 지정하지 않음
-            // axios가 boundary를 자동으로 설정함
-            ...apiConfig.baseOptions?.headers
-          },
-        }
-      )
-      
-      console.log("녹음 생성 응답:", response.data)
+      const recordApi = new RecordApi(apiConfig)
+
+      const request : RecordCreateRequestDTO = {
+        dtype : recordInfo.dtype , title : recordInfo.title , attemptId : recordInfo.attemptId
+      }
+
+      const params : RecordApiCreateRecordRequest = {
+        recordInfo : request, 
+        audioFile : audioFile
+      }
+
+      const response = await recordApi.createRecord(params)
       
       set({
         record: response.data,

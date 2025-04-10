@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { OpenVidu, Publisher, Session, StreamEvent, StreamManager, Device } from 'openvidu-browser';
 import axios from 'axios';
 
-const APPLICATION_SERVER_URL = process.env.APPLICATION_SERVER_URL || 'http://localhost:8080/';
+const APPLICATION_SERVER_URL = process.env.APPLICATION_SERVER_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export interface OpenViduState {
   mySessionId: string;

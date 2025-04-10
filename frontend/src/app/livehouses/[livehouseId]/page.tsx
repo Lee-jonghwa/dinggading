@@ -97,13 +97,13 @@ export default function LivehousePage({ params }: PageProps) {
 
     try {
       const joinResponse = await axios.post<JoinResponse>(
-        `http://localhost:8080/api/livehouses/${livehouseId}/join`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/livehouses/${livehouseId}/join`,
         {},
         { headers: { Authorization: `Bearer ${token}` } },
       )
 
       const { token: ovToken, nickname } = joinResponse.data
-      const livehouseResponse = await axios.get(`http://localhost:8080/api/livehouses/${livehouseId}`, {
+      const livehouseResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/livehouses/${livehouseId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
 
@@ -225,7 +225,7 @@ export default function LivehousePage({ params }: PageProps) {
 
     if (livehouse?.participantId && livehouseId) {
       await axios.post(
-        `http://localhost:8080/api/livehouses/${livehouseId}/leave/${livehouse.participantId}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/livehouses/${livehouseId}/leave/${livehouse.participantId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } },
       )
@@ -239,7 +239,7 @@ export default function LivehousePage({ params }: PageProps) {
     if (!token || !isHost || !livehouseId || !livehouse) return // livehouse null 체크 추가
   
     await axios.post(
-      `http://localhost:8080/api/livehouses/${livehouseId}/close`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/livehouses/${livehouseId}/close`,
       { participantId: livehouse.participantId },
       { headers: { Authorization: `Bearer ${token}` } },
     )

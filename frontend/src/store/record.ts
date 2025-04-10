@@ -76,7 +76,7 @@ export const useRecordStore = create<RecordState>((set) => ({
     set({ loading: true, error: null })
     try {
       const apiConfig = useConfigStore.getState().apiConfig
-      const baseURL = apiConfig.basePath || 'http://localhost:8080'
+      const baseURL = apiConfig.basePath || process.env.NEXT_PUBLIC_API_BASE_URL
       
       console.log("녹음 생성 요청:", { recordInfo, audioFile })
       

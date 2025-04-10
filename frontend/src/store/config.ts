@@ -21,7 +21,7 @@ const saveMemberIdToStorage = (memberId: string) => {
 // 토큰을 로컬 스토리지에서 가져오기
 const getTokenFromStorage = (): string | null => {
   if (typeof window !== 'undefined') {
-    return `Bearer ${localStorage.getItem('accessToken')}`;
+    return localStorage.getItem('accessToken');
   }
   return null;
 }
@@ -55,7 +55,7 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
   // API 설정 초기화
   apiConfig: new Configuration({
     basePath: baseUrl,
-    accessToken: initialToken || "", // 문자열로 초기화
+    accessToken: `Bearer ${initialToken || ""}`, // 문자열로 초기화
     baseOptions: {
       headers: {
         'Content-Type': 'application/json'

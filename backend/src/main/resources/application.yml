@@ -46,9 +46,6 @@ spring:
               - profile
               - email
 
-  #  profiles:
-  #    include: oauth,python,minio
-
   config:
     import:
       - optional:file:../infra/env/.env.production[.properties]

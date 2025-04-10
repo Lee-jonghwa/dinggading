@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -42,5 +44,17 @@ public class NotificationController implements NotificationApi {
         UUID memberId = securityUtil.getCurrentMemberId();
         Page<NotificationDTO> notifications = notificationService.getNotifications(memberId, pageable, unreadOnly);
         return ResponseEntity.ok(notifications);
+    }
+
+    @PutMapping("/api/notifications/{notificationId}/read")
+    public NotificationDTO markAsRead(@PathVariable Long notificationId) {
+        UUID memberId = securityUtil.getCurrentMemberId();
+        return notificationService.markAsRead(notificationId, memberId);
+    }
+
+    @PutMapping("/api/notifications/read-all")
+    public int markAllAsRead() {
+        UUID memberId = securityUtil.getCurrentMemberId();
+        return notificationService.markAllAsRead(memberId);
     }
 }

@@ -14,7 +14,7 @@ const saveTokenToStorage = (token: string) => {
 // 토큰을 로컬 스토리지에서 가져오기
 const getTokenFromStorage = (): string | null => {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('accessToken');
+    return `Bearer ${localStorage.getItem('accessToken')}`;
   }
   return null;
 }

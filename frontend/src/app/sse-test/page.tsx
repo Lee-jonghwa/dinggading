@@ -1,3 +1,4 @@
+// C:\Users\SSAFY\Desktop\project\S12P21E107\frontend\src\app\sse-test\page.tsx
 "use client";
 
 import { NextPage } from "next";

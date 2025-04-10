@@ -67,6 +67,7 @@ public class AttemptController implements AttemptApi {
      * @param attemptId 시도 ID
      * @return 시도 상세 정보
      */
+    @Override
     public ResponseEntity<?> getAttempt(@PathVariable("attempt_id") Long attemptId) {
         AttemptDTO attempt = attemptService.getAttempt(attemptId);
         return ResponseEntity.ok(attempt);
@@ -79,6 +80,7 @@ public class AttemptController implements AttemptApi {
      * @param pageable   페이징 정보
      * @return 연습 모드 시도 기록 페이지
      */
+    @Override
     public ResponseEntity<Page<?>> getPracticeAttempts(
             @RequestParam(required = false) String instrument,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
@@ -97,6 +99,7 @@ public class AttemptController implements AttemptApi {
      * @param pageable   페이징 정보
      * @return 랭크 모드 시도 기록 페이지
      */
+    @Override
     public ResponseEntity<Page<?>> getRankAttempts(
             @RequestParam(required = false) String instrument,
             @RequestParam(required = false) String rankType,

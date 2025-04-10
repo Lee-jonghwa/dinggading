@@ -10,6 +10,7 @@ import styles from './challengeBySongId.module.css';
 import { useSongsStore } from '@/store/songs';
 import { useSongByInstrumentStore } from '@/store/songbyinstrument';
 import { getYouTubeThumbnail } from '@/utils/getYoutubeThumbnail';
+import { convertWebMToWav } from '@/utils/convertWebMToWav';
 
 export default function ChallengeBySongId() {
   // URL 파라미터 가져오기
@@ -127,9 +128,13 @@ export default function ChallengeBySongId() {
       });
       ///////////////// 디버깅용 파일 저장 로직 끝 /////////////////
       
+      // webm 을 wav로 변환 
+      const wavBlob = await convertWebMToWav(currentRecording.blob);
+
+
       // 녹음 파일을 File 객체로 변환
-      const audioFile = new File([currentRecording.blob], `recording-${Date.now()}.webm`, {
-        type: 'audio/webm'
+      const audioFile = new File([wavBlob], `recording-${Date.now()}.wav`, {
+        type: 'audio/wav'
       });
       
       ///////////////// 디버깅용 파일 저장 로직 시작 /////////////////

@@ -76,7 +76,7 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
       token: token, // 토큰 상태 업데이트 추가
       apiConfig: new Configuration({
         ...state.apiConfig,
-        accessToken: token,
+        accessToken: `Bearer ${token}`,
       }),
     }));
   },

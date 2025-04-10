@@ -1,8 +1,14 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { useRecordingStore } from '@/store/recording';
 import styles from './audioRecorder.module.css';
+
+// 외부에서 사용할 메서드 타입 정의
+export interface AudioRecorderHandle {
+  startRecording: () => Promise<void>;
+  stopRecording: () => void;
+}
 
 interface AudioRecorderProps {
   songId: string;
@@ -11,16 +17,19 @@ interface AudioRecorderProps {
   autoStopWithEnd?: boolean;
   externalStartTrigger?: boolean;
   externalStopTrigger?: boolean;
+  hideControls?: boolean;
 }
 
-export default function AudioRecorder({
-  songId,
-  title,
-  // autoStartWithPlay = false,
-  // autoStopWithEnd = false,
-  externalStartTrigger = false,
-  externalStopTrigger = false
-}: AudioRecorderProps) {
+// 함수 선언 방식으로 변경하여 일관성 유지
+const AudioRecorder = forwardRef<AudioRecorderHandle, AudioRecorderProps>(function AudioRecorder(props, ref) {
+  const {
+    songId,
+    title,
+    externalStartTrigger = false,
+    externalStopTrigger = false, 
+    hideControls = false
+  } = props;
+  
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [audioURL, setAudioURL] = useState<string | null>(null);
@@ -131,6 +140,12 @@ export default function AudioRecorder({
     }
   }, [isRecording]);
 
+  // 외부에서 메서드 접근 가능하도록 설정
+  useImperativeHandle(ref, () => ({
+    startRecording,
+    stopRecording
+  }));
+
   // 녹음된 오디오 재생/정지
   const togglePlayRecording = () => {
     if (!audioPlayerRef.current || !audioURL) return;
@@ -200,56 +215,68 @@ export default function AudioRecorder({
     <div className={styles.audioRecorder}>
       <div className={styles.title}>{title}</div>
       
-      <div className={styles.controls}>
-        {!audioURL ? (
-          <>
-            <button
-              className={`${styles.recordButton} ${isRecording ? styles.recording : ''}`}
-              onClick={isRecording ? stopRecording : startRecording}
-            >
-              {isRecording ? '녹음 중지' : '녹음 시작'}
-            </button>
-            
-            {isRecording && (
-              <div className={styles.recordingIndicator}>
-                <span className={styles.recordingDot}></span>
-                <span>{formatTime(recordingTime)}</span>
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            <button
-              className={styles.playButton}
-              onClick={togglePlayRecording}
-            >
-              {isPlaying ? '정지' : '재생'}
-            </button>
-            
-            <button
-              className={styles.recordAgainButton}
-              onClick={() => {
-                setAudioURL(null);
-                if (audioURL) {
-                  URL.revokeObjectURL(audioURL);
-                }
-              }}
-            >
-              다시 녹음
-            </button>
-          </>
-        )}
-      </div>
+      {!hideControls && (
+        <div className={styles.controls}>
+          {!audioURL ? (
+            <>
+              <button
+                className={`${styles.recordButton} ${isRecording ? styles.recording : ''}`}
+                onClick={isRecording ? stopRecording : startRecording}
+              >
+                {isRecording ? '녹음 중지' : '녹음 시작'}
+              </button>
+              
+              {isRecording && (
+                <div className={styles.recordingIndicator}>
+                  <span className={styles.recordingDot}></span>
+                  <span>{formatTime(recordingTime)}</span>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <button
+                className={styles.playButton}
+                onClick={togglePlayRecording}
+              >
+                {isPlaying ? '정지' : '재생'}
+              </button>
+              
+              <button
+                className={styles.recordAgainButton}
+                onClick={() => {
+                  setAudioURL(null);
+                  if (audioURL) {
+                    URL.revokeObjectURL(audioURL);
+                  }
+                }}
+              >
+                다시 녹음
+              </button>
+            </>
+          )}
+        </div>
+      )}
+      
+      {isRecording && (
+        <div className={styles.recordingStatus}>
+          <span className={styles.recordingDot}></span>
+          <span>녹음 중... {formatTime(recordingTime)}</span>
+        </div>
+      )}
       
       {audioURL && (
         <div className={styles.waveform}>
           <audio ref={audioPlayerRef} src={audioURL} />
           <div className={styles.visualizer}>
-            {/* 여기에 파형 시각화를 추가할 수 있습니다 */}
             <div className={styles.simplifiedWave}></div>
           </div>
         </div>
       )}
     </div>
   );
-}
+});
+
+AudioRecorder.displayName = 'AudioRecorder';
+
+export default AudioRecorder;

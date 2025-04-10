@@ -20,11 +20,17 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "DINGADING",
   description: "let's ding ga ding !",
+  icons : {
+    icon : "/favicon.png" // favicon 경로 설정 
+  }
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.png"/>
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div className="layout-container">
           <AuthInitializer /> 

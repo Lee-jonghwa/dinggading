@@ -57,4 +57,4 @@ export function IronDrum(props) {
   )
 }
 
-useGLTF.preload('/Iron_Drum.glb')
+useGLTF.preload('/Drum/Iron_Drum.glb')

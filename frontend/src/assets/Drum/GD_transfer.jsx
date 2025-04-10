@@ -57,4 +57,4 @@ export function GoldDrum(props) {
   )
 }
 
-useGLTF.preload('/Gold_Drum.glb')
+useGLTF.preload('/Drum/Gold_Drum.glb')

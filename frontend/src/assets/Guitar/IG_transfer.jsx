@@ -57,4 +57,4 @@ export function IronGuitar(props) {
   )
 }
 
-useGLTF.preload('/Iron_Guitar.glb')
+useGLTF.preload('/Guitar/Iron_Guitar.glb')

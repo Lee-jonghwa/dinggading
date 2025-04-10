@@ -57,4 +57,4 @@ export function SilverGuitar(props) {
   )
 }
 
-useGLTF.preload('/Silver_Guitar.glb')
+useGLTF.preload('/Guitar/Silver_Guitar.glb')

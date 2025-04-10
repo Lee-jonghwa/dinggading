@@ -57,4 +57,4 @@ export function PlatinumGuitar(props) {
   )
 }
 
-useGLTF.preload('/Platinum_Guitar.glb')
+useGLTF.preload('/Guitar/Platinum_Guitar.glb')

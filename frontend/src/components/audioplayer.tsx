@@ -29,14 +29,17 @@ export default function AudioPlayer({
   // 오디오 로드 시 처리
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
-
+    if (!audio) {
+      console.log("audioplayer.tsx, audio가 존재하지 않습니다.")
+      return;
+    } 
+    console.log("audioplayer.tsx, audio element 초기화 , src == ", src)
+    
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
     };
 
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    
     return () => {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };

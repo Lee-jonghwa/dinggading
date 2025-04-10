@@ -57,4 +57,4 @@ export function PlatinumDrum(props) {
   )
 }
 
-useGLTF.preload('/Platinum_Drum.glb')
+useGLTF.preload('/Drum/Platinum_Drum.glb')

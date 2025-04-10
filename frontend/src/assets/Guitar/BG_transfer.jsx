@@ -57,4 +57,4 @@ export function BronzeGuitar(props) {
   )
 }
 
-useGLTF.preload('/Bronze_Guitar.glb')
+useGLTF.preload('/Guitar/Bronze_Guitar.glb')

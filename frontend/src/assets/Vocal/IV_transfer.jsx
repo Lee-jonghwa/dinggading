@@ -56,4 +56,4 @@ export function IronVocal(props) {
   )
 }
 
-useGLTF.preload('/Iron_Vocal.glb')
+useGLTF.preload('/Vocal/Iron_Vocal.glb')

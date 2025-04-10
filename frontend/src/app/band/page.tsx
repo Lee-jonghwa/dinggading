@@ -1,348 +1,177 @@
+"use client";
 
-// 'use client';
+import { useState, useRef, useCallback } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import BandCard from "../../components/band/bandcard";
+import CitySelector from "../../components/band/cityselector";
+import { useConfigStore } from "@/store/config";
 
-// import { useState, useEffect, useRef } from 'react';
-// import { useInfiniteQuery } from '@tanstack/react-query';
-// import BandCard from '../../components/band/bandcard';
-// import CitySelector from '../../components/band/cityselector';
-// import { generateDummyBands, type Band } from '@/utils/dummyData';
-// import styles from './styles.module.css';
-// import HorizontalScrollWrapper from '@/components/horizontalscrollwrapper';
+import styles from "./styles.module.css";
+import HorizontalScrollWrapper from "@/components/horizontalscrollwrapper";
 
-// // api 연결 전 더미데이터 밴드 확인하는  함수 
-// const fetchBands = async ({ pageParam = 1, region = '', searchTerm = '' }) => {
-//   return generateDummyBands(pageParam, 8, region, searchTerm);
-// };
+import { BandApi, BandApiSearchBandsRequest } from "@generated/api";
+import BandDetailModal from "@/components/band/bandmodal";
+import { BandDTO } from "@generated/model";
 
-// const Band = () => {
-//   const [region, setRegion] = useState(''); //도시
-//   const [searchTerm, setSearchTerm] = useState(''); // 검색어 입력 상태
-//   const [openIndex, setOpenIndex] = useState<number | null>(null); //펼쳐진 밴드 카드 인덱스
-
-//   const scrollContainerRef = useRef<HTMLDivElement>(null); //스크롤 관련 div를 직접 조작하기 위한 참조(ref)
-//   const scrollWrapperRef = useRef<HTMLDivElement>(null); //스크롤 관련 div를 직접 조작하기 위한 참조(ref)
-
-
-//   // react-query 무한 스크롤 처리 
-//   const {
-//     data,
-//     fetchNextPage,
-//     hasNextPage,
-//     isFetchingNextPage,
-//   } = useInfiniteQuery({
-//     queryKey: ['bands', region, searchTerm],
-//     queryFn: ({ pageParam }) => fetchBands({ pageParam, region, searchTerm }),
-//     getNextPageParam: (lastPage) => lastPage.nextPage,
-//     initialPageParam: 1,
-//   });
-
-//   // 무한 스크롤 트리거 함수
-//   const handleScroll = ({ scrollLeft, scrollWidth, clientWidth }: any) => {
-//     if (scrollWidth - scrollLeft - clientWidth < 100 && hasNextPage && !isFetchingNextPage) {
-//       fetchNextPage();
-//     }
-//   };
-
-//   // 휠 스크롤 처리 (8개 분량씩 이동)
-//     useEffect(() => {
-//     // 기존의 HorizontalScrollWrapper 내부 div 참조
-//         const scrollContainer = scrollContainerRef.current?.parentElement;
-//         if (!scrollContainer) return;
-
-//     // 페이지 크기 계산에 필요한 상수
-//     const CARD_WIDTH = 300; // 카드 너비
-//     const GAP = 20; // 카드 간격
-//     // 함수 정의: 현재 화면에서 한 줄에 몇 개 보여줄 수 있는지 계산
-//     const getCardsPerRow = () => {
-//         const containerWidth = scrollContainer.clientWidth;
-//         return Math.max(1, Math.floor(containerWidth / (CARD_WIDTH + GAP))); // 최소 1개 보장
-//     };
-
-//     // 휠 이벤트 핸들러 - 원래 HorizontalScrollWrapper 내의 wheel 이벤트보다 먼저 실행
-//     const handleWheel = (e: WheelEvent) => {
-//         e.preventDefault();
-//         const CARDS_PER_ROW = getCardsPerRow();
-//         const PAGE_SCROLL_WIDTH = (CARD_WIDTH + GAP) * CARDS_PER_ROW * 1; // 8개 이동 기준
-      
-//         const direction = e.deltaY > 0 ? 1 : -1;
-      
-//         const currentPosition = scrollContainer.scrollLeft;
-      
-//         // 🔥 휠 방향에 따라 페이지 이동 기준 변경
-//         const currentPage = direction > 0
-//           ? Math.floor(currentPosition / PAGE_SCROLL_WIDTH)
-//           : Math.ceil(currentPosition / PAGE_SCROLL_WIDTH);
-      
-//         const targetPosition = currentPage * PAGE_SCROLL_WIDTH + direction * PAGE_SCROLL_WIDTH;
-      
-//         scrollContainer.scrollTo({
-//           left: targetPosition,
-//           behavior: 'smooth',
-//         });
-      
-//         // 스크롤 이벤트 트리거 (무한 스크롤)
-//         setTimeout(() => {
-//           const scrollEvent = {
-//             scrollLeft: scrollContainer.scrollLeft,
-//             scrollWidth: scrollContainer.scrollWidth,
-//             clientWidth: scrollContainer.clientWidth,
-//           };
-//           handleScroll(scrollEvent);
-//         }, 300);
-//       };
-
-//     // 이벤트 캡처 단계에서 휠 이벤트 처리
-//     document.addEventListener('wheel', handleWheel, { capture: true, passive: false });
+const fetchBands =
+  (bandApiInstance: BandApi) =>
+  async ({ pageParam = 0, region = "", searchTerm = "" }) => {
+    const pagingParams = {
+      params: {
+        page: pageParam,
+        size: 10,
+      }
+    }
+    const apiParams: BandApiSearchBandsRequest = {
+      sigun: region || undefined,
+      keyword: searchTerm || undefined,
+    };
     
-//     return () => {
-//       document.removeEventListener('wheel', handleWheel, { capture: true });
-//     };
-//   }, [handleScroll]);
-
-//   // 스크롤바 스타일링을 위한 사용자 정의 CSS 추가
-//   useEffect(() => {
-//     // 스타일 요소 생성
-//     const styleElement = document.createElement('style');
-//     styleElement.textContent = `
-//       /* 스크롤바 스타일링 */
-//       .${styles['band-container']} > div {
-//         scrollbar-width: thin;
-//         scrollbar-color: #888 #f1f1f1;
-//         padding-bottom: 10px;
-//       }
-//       .${styles['band-container']} > div::-webkit-scrollbar {
-//         height: 8px;
-//       }
-//       .${styles['band-container']} > div::-webkit-scrollbar-track {
-//         background: #f1f1f1;
-//         border-radius: 4px;
-//       }
-//       .${styles['band-container']} > div::-webkit-scrollbar-thumb {
-//         background: #888;
-//         border-radius: 4px;
-//       }
-//       .${styles['band-container']} > div::-webkit-scrollbar-thumb:hover {
-//         background: #555;
-//       }
-//     `;
-    
-//     // 스타일 요소를 문서 헤드에 추가
-//     document.head.appendChild(styleElement);
-    
-//     // 컴포넌트 언마운트 시 스타일 요소 제거
-//     return () => {
-//       document.head.removeChild(styleElement);
-//     };
-//   }, [styles]);
-
-//   const filtered = data?.pages.flatMap(page => page.items) || [];
-
-//   return (
-//     <div className={styles['band-container']} ref={scrollWrapperRef}>
-//       <div className={styles['top-bar']}>
-//         <CitySelector selectedCity={region} onSelect={setRegion} />
-//         <input
-//           type="text"
-//           placeholder="밴드 검색"
-//           value={searchTerm}
-//           onChange={(e) => setSearchTerm(e.target.value)}
-//           className={styles['search-input']}
-//         />
-//       </div>
-
-//       <HorizontalScrollWrapper onScroll={handleScroll}>
-//         <div ref={scrollContainerRef} className={styles['band-wrapper']}>
-//           {filtered.map((band, idx) => (
-//             <div key={band.id} className={styles['band-card-wrapper']}>
-//               <BandCard
-//                 name={band.name}
-//                 region={band.region}
-//                 isSelected={openIndex === idx}
-//                 onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
-//               />
-//             </div>
-//           ))}
-//           {isFetchingNextPage && (
-//             <div className={styles['loading-spinner']}>
-//               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-//             </div>
-//           )}
-//         </div>
-//       </HorizontalScrollWrapper>
-//     </div>
-//   );
-// };
-
-// export default Band;
-'use client';
-
-import { useState, useEffect, useRef } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import BandCard from '../../components/band/bandcard';
-import CitySelector from '../../components/band/cityselector';
-import { generateDummyBands, type Band } from '@/utils/dummyData';
-import styles from './styles.module.css';
-import HorizontalScrollWrapper from '@/components/horizontalscrollwrapper';
-
-// 더미 데이터 8개씩 불러오는 함수
-const fetchBands = async ({ pageParam = 1, region = '', searchTerm = '' }) => {
-  return generateDummyBands(pageParam, 8, region, searchTerm);
-};
-
-interface scrollInfo {
-  scrollLeft: number
-  scrollWidth: number
-  clientWidth: number
-}
-
-export default function Band () {
-  const [region, setRegion] = useState(''); // 도시 선택
-  const [searchTerm, setSearchTerm] = useState(''); // 검색어 상태
-  // const [openIndex, setOpenIndex] = useState<number | null>(null); // 펼쳐진 카드 인덱스
-  
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const scrollWrapperRef = useRef<HTMLDivElement>(null);
-  
-  // react-query 무한 스크롤
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ['bands', region, searchTerm],
-    queryFn: ({ pageParam }) => fetchBands({ pageParam, region, searchTerm }),
-    getNextPageParam: (lastPage) => lastPage.nextPage,
-    initialPageParam: 1,
-  });
-
-
-  // 무한 스크롤 트리거
-  const handleScroll = ({ scrollLeft, scrollWidth, clientWidth }: scrollInfo) => {
-    if (scrollWidth - scrollLeft - clientWidth < 100 && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
+    try {
+      let res;
+      // 지역이나 검색어가 있으면 searchBands 사용, 아니면 getBands 사용
+      if (region || searchTerm) {
+        // searchBands API 호출
+        console.log("Using searchBands with params:", apiParams, pagingParams);
+        res = await bandApiInstance.searchBands(apiParams, pagingParams);
+      } else {
+        // 필터링 없이 전체 밴드 조회
+        console.log("Using getBands with params:", pagingParams);
+        res = await bandApiInstance.getBands(pagingParams);
+      }
+      
+      if (!res || !res.data || !res.data.content || !res.data.pageable) {
+        console.error("Invalid API response structure:", res);
+        throw new Error("Invalid API response structure");
+      }
+      
+      const content: BandDTO[] = res.data.content;
+      const currentPage = res.data.pageable.page;
+      const totalPages = res.data.pageable.totalPages;
+      const nextPage = currentPage < totalPages - 1 ? currentPage + 1 : undefined;
+      
+      console.log(`Received ${content.length} bands for region: ${region}`);
+      return { items: content || [], nextPage: nextPage };
+    } catch (error) {
+      console.error("Error fetching bands:", error);
+      throw error;
     }
   };
 
-  // 휠 스크롤: 가로로 8개 분량씩 이동
-  useEffect(() => {
-    const scrollContainer = scrollContainerRef.current?.parentElement;
-    if (!scrollContainer) return;
+interface scrollInfo {
+  scrollLeft: number;
+  scrollWidth: number;
+  clientWidth: number;
+}
+  
 
-    const CARD_WIDTH = 300;
-    const GAP = 20;
+export default function Band() {
+  const [region, setRegion] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedBandId, setSelectedBandId] = useState<number | null>(null); // 모달 상태
 
-    const getCardsPerRow = () => {
-      const containerWidth = scrollContainer.clientWidth;
-      return Math.max(1, Math.floor(containerWidth / (CARD_WIDTH + GAP)));
-    };
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollWrapperRef = useRef<HTMLDivElement>(null);
+  const { apiConfig } = useConfigStore((state) => state);
 
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
+  const currentApiConfig = apiConfig;
 
-      const CARDS_PER_ROW = getCardsPerRow();
-      const PAGE_SCROLL_WIDTH = (CARD_WIDTH + GAP) * CARDS_PER_ROW;
+  const bandApi = useRef(new BandApi(currentApiConfig)).current;
 
-      const direction = e.deltaY > 0 ? 1 : -1;
-      const currentPosition = scrollContainer.scrollLeft;
 
-      const currentPage = Math.round(currentPosition / PAGE_SCROLL_WIDTH);
-      let targetPage = currentPage + direction;
+  const {
+      data,
+      fetchNextPage,
+      hasNextPage,
+      isFetchingNextPage,
+      isLoading,
+      isError,
+      error,
+  } = useInfiniteQuery< { items: BandDTO[]; nextPage: number | undefined }, Error >({
+    queryKey: ["bands", region, searchTerm],
+    queryFn: ({ pageParam = 0 }) => fetchBands(bandApi)({ pageParam: pageParam as number, region, searchTerm }),
+    getNextPageParam: (lastPage) => lastPage?.nextPage,
+    initialPageParam: 0,
+    staleTime: 60000, // 1분 동안 결과를 캐시
+  });
 
-      if (targetPage < 0) targetPage = 0;
+  const handleScroll = useCallback(({ scrollLeft, scrollWidth, clientWidth }: scrollInfo) => {
+    if (scrollWidth > clientWidth && scrollWidth - scrollLeft - clientWidth < 200 && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-      const targetPosition = targetPage * PAGE_SCROLL_WIDTH;
-
-      scrollContainer.scrollTo({
-        left: targetPosition,
-        behavior: 'smooth',
-      });
-
-      // 스크롤 트리거
-      setTimeout(() => {
-        const scrollEvent = {
-          scrollLeft: scrollContainer.scrollLeft,
-          scrollWidth: scrollContainer.scrollWidth,
-          clientWidth: scrollContainer.clientWidth,
-        };
-        handleScroll(scrollEvent);
-      }, 300);
-    };
-
-    document.addEventListener('wheel', handleWheel, { capture: true, passive: false });
-
-    return () => {
-      document.removeEventListener('wheel', handleWheel, { capture: true });
-    };
-  }, [handleScroll]);
-
-  // 스크롤바 스타일 적용
-  useEffect(() => {
-    const styleElement = document.createElement('style');
-    styleElement.textContent = `
-      .${styles['band-container']} > div {
-        scrollbar-width: thin;
-        scrollbar-color: #888 #f1f1f1;
-        padding-bottom: 10px;
-      }
-      .${styles['band-container']} > div::-webkit-scrollbar {
-        height: 8px;
-      }
-      .${styles['band-container']} > div::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 4px;
-      }
-      .${styles['band-container']} > div::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
-      }
-      .${styles['band-container']} > div::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
-    `;
-    document.head.appendChild(styleElement);
-
-    return () => {
-      document.head.removeChild(styleElement);
-    };
-  }, [styles]);
 
   // 전체 밴드 데이터 펼치기
-  const filtered = data?.pages.flatMap((page) => page.items) || [];
+  const filteredBands: BandDTO[] = data?.pages.flatMap((page) => page.items) || [];
+
+  // 카드 클릭 핸들러
+  const handleCardClick = (bandId: number) => {
+    setSelectedBandId(bandId);
+  };
+
+  // 모달 닫기 핸들러
+  const handleCloseModal = () => {
+    setSelectedBandId(null);
+  };
+
 
   return (
-    <div className={styles['band-container']} ref={scrollWrapperRef}>
-      <div className={styles['top-bar']}>
+    <div className={styles["band-container"]} ref={scrollWrapperRef}>
+      <div className={styles["top-bar"]}>
         <CitySelector selectedCity={region} onSelect={setRegion} />
         <input
           type="text"
-          placeholder="밴드 검색"
+          placeholder="밴드 이름 검색"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className={styles['search-input']}
+          className={styles["search-input"]}
         />
       </div>
 
+      {isLoading && <div className={styles["loading-spinner"]}>Loading...</div>}
+      {isError && <div className={styles["error-message"]}>Error fetching data: {error?.message}</div>}
+
       <HorizontalScrollWrapper onScroll={handleScroll}>
-        <div ref={scrollContainerRef} className={styles['band-wrapper']}>
-          {filtered.map((band) => ( // idx 인자에서 제외 
-            <div key={band.id} className={styles['band-card-wrapper']}>
+        <div ref={scrollContainerRef} className={styles["band-wrapper"]}>
+          {filteredBands.map((band) => (
+            // 카드 클릭 이벤트 추가
+            <div key={band.bandId}
+                 className={styles["band-card-wrapper"]}
+                 onClick={() => handleCardClick(band.bandId)} 
+                 role="button" // 시맨틱 개선
+                 tabIndex={0} // 키보드 접근성
+                 onKeyDown={(e) => e.key === 'Enter' && handleCardClick(band.bandId)} // Enter 키로도 선택 가능
+            >
               <BandCard
                 name={band.name}
-                region={band.region}
-                // isSelected={openIndex === idx}
-                // onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+                sigun={band.sigun}
+                profileUrl={band.profileUrl}
+                tags={band.tags}
+                maxSize={band.maxSize}
+                jobOpening={band.jobOpening}
+                memberCount={band.memberCount}
+                instrumentAvailability={band.instrumentAvailability || {}}
               />
             </div>
           ))}
-          {isFetchingNextPage && (
-            <div className={styles['loading-spinner']}>
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-            </div>
-          )}
+          {isFetchingNextPage && <div className={styles["loading-more"]}>더 불러오는 중...</div>}
+          {!isLoading && !isFetchingNextPage && !hasNextPage && filteredBands.length > 0 && 
+            <div className={styles["no-more-bands"]}>더 이상 밴드가 없습니다</div>}
+          {!isLoading && !isFetchingNextPage && filteredBands.length === 0 && !isError && 
+            <div className={styles["no-bands-found"]}>
+              {region ? `${region}에 등록된 밴드가 없습니다` : '등록된 밴드가 없습니다'}
+            </div>}
         </div>
       </HorizontalScrollWrapper>
+
+      {/* 모달 컴포넌트 렌더링 */}
+      <BandDetailModal
+        bandId={selectedBandId}
+        isOpen={selectedBandId !== null}
+        onClose={handleCloseModal}
+        apiConfig={currentApiConfig} // API 설정 전달
+      />
     </div>
   );
-};
-
+}

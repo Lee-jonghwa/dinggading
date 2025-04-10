@@ -19,14 +19,16 @@ export default function HorizontalScrollWrapper({ children, onScroll }: Props) {
     if (!container) return;
 
     const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      container.scrollLeft += e.deltaY;
+      // 항상 휠 이벤트를 가로 스크롤로 처리
+      if (container.scrollHeight <= container.clientHeight) {
+        container.scrollLeft += e.deltaY;
 
-      onScroll?.({
-        scrollLeft: container.scrollLeft,
-        scrollWidth: container.scrollWidth,
-        clientWidth: container.clientWidth,
-      });
+        onScroll?.({
+          scrollLeft: container.scrollLeft,
+          scrollWidth: container.scrollWidth,
+          clientWidth: container.clientWidth,
+        });
+      }
     };
 
     const handleScroll = () => {
@@ -53,7 +55,7 @@ export default function HorizontalScrollWrapper({ children, onScroll }: Props) {
         width: '100%',
         overflowX: 'auto',
         overflowY: 'hidden',
-        whiteSpace: 'nowrap',
+        whiteSpace: 'nowrap'
       }}
     >
       {children}

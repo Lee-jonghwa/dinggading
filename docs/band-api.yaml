@@ -626,7 +626,7 @@ security:
   - BearerAuth: []
 
 paths:
-  /bands/{bandId}:
+  /api/bands/{bandId}:
     get:
       tags:
         - Band
@@ -677,7 +677,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands:
+  /api/bands:
     get:
       tags:
         - Band
@@ -705,7 +705,7 @@ paths:
         "400":
           $ref: "#/components/responses/BadRequestException"
 
-  /bands/search:
+  /api/bands/search:
     get:
       tags:
         - Band
@@ -721,7 +721,7 @@ paths:
         "200":
           $ref: "#/components/responses/BandListResponse"
 
-  /bands/{bandId}/members:
+  /api/bands/{bandId}/members:
     get:
       tags:
         - Band
@@ -757,7 +757,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands/{bandId}/members/{memberId}:
+  /api/bands/{bandId}/members/{memberId}:
     delete:
       tags:
         - Band
@@ -775,7 +775,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands/{bandId}/members/{memberId}/instrument:
+  /api/bands/{bandId}/members/{memberId}/instrument:
     patch:
       tags:
         - Band
@@ -797,7 +797,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands/{bandId}/master/transfer:
+  /api/bands/{bandId}/master/transfer:
     post:
       tags:
         - Band
@@ -818,7 +818,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands/{bandId}/contacts:
+  /api/bands/{bandId}/contacts:
     get:
       tags:
         - Band
@@ -853,7 +853,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands/{bandId}/contacts/{contactId}:
+  /api/bands/{bandId}/contacts/{contactId}:
     patch:
       tags:
         - Band

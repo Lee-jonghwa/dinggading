@@ -16,4 +16,8 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     Optional<Participant> findByLivehouseAndNickname(Livehouse livehouse, String nickname);
 
     Optional<Participant> findByParticipantId(Long participantId);
+
+    Optional<Participant> findByConnectionId(String connectionId);
+
+    void deleteByLivehouse(Livehouse livehouse);
 }

@@ -33,8 +33,8 @@ export default function LivehousesPage() {
   const fetchLivehouses = async (keyword = "") => {
     try {
       const url = keyword
-        ? `http://localhost:8080/api/livehouses/search?keyword=${keyword}&page=0&size=20`
-        : `http://localhost:8080/api/livehouses`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/livehouses/search?keyword=${keyword}&page=0&size=20`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/livehouses`;
       const response = await axios.get<{ content: Livehouse[] }>(url);
       const updatedLivehouses = response.data.content.map((livehouse, index) => ({
         ...livehouse,
@@ -69,7 +69,7 @@ export default function LivehousesPage() {
 
       // 서버에 방 생성 요청
       const response = await axios.post<CreateResponse>(
-        "http://localhost:8080/api/livehouses",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/livehouses`,
         {
           title,
           description,

@@ -457,7 +457,7 @@ security:
   - BearerAuth: []
 
 paths:
-  /bands/recruitments:
+  /api/bands/recruitments:
     get:
       tags:
         - Recruitment
@@ -469,7 +469,7 @@ paths:
         "200":
           $ref: "#/components/responses/RecruitmentListResponse"
 
-  /bands/{bandId}/recruitments:
+  /api/bands/{bandId}/recruitments:
     get:
       tags:
         - Recruitment
@@ -506,7 +506,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands/{bandId}/recruitments/{recruitmentId}:
+  /api/bands/{bandId}/recruitments/{recruitmentId}:
     patch:
       tags:
         - Recruitment
@@ -549,7 +549,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands/{bandId}/recruitments/{recruitmentId}/{recruitmentStatus}:
+  /api/bands/{bandId}/recruitments/{recruitmentId}/{recruitmentStatus}:
     post:
       tags:
         - Recruitment
@@ -572,7 +572,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands/{bandId}/recruitments/{recruitmentId}/instruments:
+  /api/bands/{bandId}/recruitments/{recruitmentId}/instruments:
     get:
       tags:
         - Recruitment
@@ -611,7 +611,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands/{bandId}/recruitments/{recruitmentId}/instruments/{instrumentId}:
+  /api/bands/{bandId}/recruitments/{recruitmentId}/instruments/{instrumentId}:
     delete:
       tags:
         - Recruitment
@@ -632,7 +632,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands/{bandId}/recruitments/{recruitmentId}/applicants:
+  /api/bands/{bandId}/recruitments/{recruitmentId}/applicants:
     get:
       tags:
         - Recruitment
@@ -691,7 +691,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands/{bandId}/recruitments/{recruitmentId}/accept/{applicantId}:
+  /api/bands/{bandId}/recruitments/{recruitmentId}/accept/{applicantId}:
     post:
       tags:
         - Recruitment
@@ -714,7 +714,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /bands/{bandId}/recruitments/{recruitmentId}/reject/{applicantId}:
+  /api/bands/{bandId}/recruitments/{recruitmentId}/reject/{applicantId}:
     post:
       tags:
         - Recruitment

@@ -787,7 +787,7 @@ paths:
         "200":
           description: "메시지 발행 성공"
 
-  /chatrooms:
+  /api/chatrooms:
     get:
       tags:
         - ChatRoom
@@ -800,7 +800,7 @@ paths:
         "200":
           $ref: "#/components/responses/ChatRoomListResponse"
 
-  /chatrooms/{roomId}:
+  /api/chatrooms/{roomId}:
     get:
       tags:
         - ChatRoom
@@ -819,7 +819,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /chatrooms/personal/{memberId}:
+  /api/chatrooms/personal/{memberId}:
     post:
       tags:
         - ChatRoom
@@ -838,7 +838,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundException"
 
-  /chatrooms/{roomId}/messages:
+  /api/chatrooms/{roomId}/messages:
     get:
       tags:
         - ChatRoom

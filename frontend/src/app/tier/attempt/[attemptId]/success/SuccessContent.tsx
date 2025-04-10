@@ -4,7 +4,6 @@
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import styles from "./successPage.module.css"
-import { useTierStore } from "@/store/tier"
 import { useAttemptStore } from "@/store/attempt"
 import SilverDrum from "@/app/3dtest/Viewer/SILVERDRUM"
 
@@ -13,7 +12,6 @@ export default function SuccessContent({ attemptId }: { attemptId: string }) {
   console.log("Attempt ID:", attemptId)
   const router = useRouter()
   
-  const { userTier } = useTierStore()
   const { attempt, loading, fetchAttempt } = useAttemptStore()
   
   useEffect(() => {
@@ -47,7 +45,7 @@ export default function SuccessContent({ attemptId }: { attemptId: string }) {
           </div>
           <div className={styles.title}>
             <div className={styles.text}>
-              🎉 축하합니다! {userTier}에 도달했습니다 🎉 
+              {/* 🎉 축하합니다! {userTier}에 도달했습니다 🎉  */}
             </div> 
           </div>
         </div>

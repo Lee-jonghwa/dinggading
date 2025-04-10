@@ -11,10 +11,25 @@ const saveTokenToStorage = (token: string) => {
   }
 }
 
+// memberId를 로컬 스토리지에 저장
+const saveMemberIdToStorage = (memberId: string) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('memberId', memberId);
+  }
+}
+
 // 토큰을 로컬 스토리지에서 가져오기
 const getTokenFromStorage = (): string | null => {
   if (typeof window !== 'undefined') {
     return `Bearer ${localStorage.getItem('accessToken')}`;
+  }
+  return null;
+}
+
+// memberId를 로컬 스토리지에서 가져오기
+const getMemberIdFromStorage = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('memberId');
   }
   return null;
 }
@@ -25,11 +40,15 @@ const baseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}`
 interface ConfigState {
   apiConfig: Configuration
   token: string | null
+  memberId: string | null
   setAccessToken: (token: string) => void
   getAccessToken: () => string | null
+  setMemberId: (memberId: string) => void
+  getMemberId: () => string | null
 }
 
 const initialToken = getTokenFromStorage();
+const initialMemberId = getMemberIdFromStorage();
 
 // Zustand 스토어 생성
 export const useConfigStore = create<ConfigState>((set, get) => ({
@@ -45,6 +64,7 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
   }),
   
   token: initialToken,
+  memberId: initialMemberId,
   
   // 액세스 토큰 설정 함수
   setAccessToken: (token: string) => {
@@ -64,5 +84,16 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
   // 액세스 토큰 가져오기 함수
   getAccessToken: () => {
     return get().token;
+  },
+
+  // memberId 설정 함수
+  setMemberId: (memberId: string) => {
+    saveMemberIdToStorage(memberId);
+    set({ memberId });
+  },
+
+  // memberId 가져오기 함수
+  getMemberId: () => {
+    return get().memberId;
   },
 }));

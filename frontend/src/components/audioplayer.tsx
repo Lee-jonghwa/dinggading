@@ -1,7 +1,13 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import styles from './audioPlayer.module.css';
+
+// 인터페이스 이름 오타 수정 (AudioPlaerHandle -> AudioPlayerHandle)
+export interface AudioPlayerHandle {
+  play: () => void;
+  pause: () => void;
+}
 
 interface AudioPlayerProps {
   src: string;
@@ -10,38 +16,72 @@ interface AudioPlayerProps {
   onPlayStart?: () => void;
   onPlayEnd?: () => void;
   autoPlay?: boolean;
+  hideControls?: boolean;
 }
 
-export default function AudioPlayer({
-  src,
-  title,
-  waveformSrc,
-  onPlayStart,
-  onPlayEnd,
-  autoPlay = false
-}: AudioPlayerProps) {
+// forwardRef를 사용하도록 수정
+const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(function AudioPlayer(props, ref) {
+  const {
+    src,
+    title,
+    waveformSrc,
+    onPlayStart,
+    onPlayEnd,
+    autoPlay = false, 
+    hideControls = false 
+  } = props;
+  
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
   const waveformRef = useRef<HTMLDivElement>(null);
 
+  // 외부에서 메서드 접근 가능하도록 설정
+  useImperativeHandle(ref, () => ({
+    play: () => {
+      const audio = audioRef.current;
+      if (!audio) return;
+      
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.error('재생 실패:', error);
+        });
+      }
+    },
+    pause: () => {
+      const audio = audioRef.current;
+      if (!audio) return;
+      
+      audio.pause();
+    }
+  }));
+
   // 오디오 로드 시 처리
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) {
-      console.log("audioplayer.tsx, audio가 존재하지 않습니다.")
+      console.log("audioplayer.tsx, audio가 존재하지 않습니다.");
       return;
     } 
-    console.log("audioplayer.tsx, audio element 초기화 , src == ", src)
+    console.log("audioplayer.tsx, audio element 초기화 , src == ", src);
     
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
     };
 
+    // 오디오 로드 에러 처리 추가
+    const handleError = (e: Event) => {
+      console.error('오디오 로드 중 오류:', e);
+    };
+
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('error', handleError);
+    
     return () => {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('error', handleError);
     };
   }, [src]);
 
@@ -86,7 +126,6 @@ export default function AudioPlayer({
   useEffect(() => {
     if (autoPlay && audioRef.current) {
       // 자동 재생 정책으로 인해 사용자 상호작용이 필요할 수 있음
-      // 실제 환경에서는 사용자에게 자동 재생 권한을 요청해야 할 수 있음
       const playPromise = audioRef.current.play();
       
       if (playPromise !== undefined) {
@@ -96,6 +135,13 @@ export default function AudioPlayer({
       }
     }
   }, [autoPlay]);
+
+  // src 변경 감지 추가
+  useEffect(() => {
+    if (audioRef.current && src && src.trim() !== '') {
+      audioRef.current.load(); // src가 변경되면 오디오 다시 로드
+    }
+  }, [src]);
 
   const togglePlay = () => {
     const audio = audioRef.current;
@@ -133,20 +179,22 @@ export default function AudioPlayer({
       
       <audio ref={audioRef} src={src} />
       
-      <div className={styles.controls}>
-        <button 
-          className={styles.playButton} 
-          onClick={togglePlay}
-        >
-          {isPlaying ? '일시정지' : '재생'}
-        </button>
-        
-        <div className={styles.timeInfo}>
-          <span>{formatTime(audioRef.current?.currentTime || 0)}</span>
-          <span>/</span>
-          <span>{formatTime(duration)}</span>
+      {!hideControls && (
+        <div className={styles.controls}>
+          <button 
+            className={styles.playButton} 
+            onClick={togglePlay}
+          >
+            {isPlaying ? '일시정지' : '재생'}
+          </button>
+          
+          <div className={styles.timeInfo}>
+            <span>{formatTime(audioRef.current?.currentTime || 0)}</span>
+            <span>/</span>
+            <span>{formatTime(duration)}</span>
+          </div>
         </div>
-      </div>
+      )}
       
       <div className={styles.progressContainer} onClick={handleProgressBarClick}>
         <div className={styles.progressBackground}>
@@ -167,4 +215,8 @@ export default function AudioPlayer({
       </div>
     </div>
   );
-}
+});
+
+AudioPlayer.displayName = 'AudioPlayer';
+
+export default AudioPlayer;

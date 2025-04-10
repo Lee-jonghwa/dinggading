@@ -1,10 +1,12 @@
 'use client'
-
 import { create } from "zustand"
-import { SongByInstrumentApi, SongByInstrumentApiGetSongByInstrumentUrlBySongIdAndInstrumentRequest } from "../../generated/api"
+import { SongByInstrumentApi } from "../../generated/api"
 import { SongByInstrumentDTO } from "../../generated/model/song-by-instrument-dto"
-import { Instrument } from "../../generated/model/instrument"
 import { useConfigStore } from "./config"
+
+// API에서 요구하는 Instrument 열거형 타입 정의
+// (이미 generated/api에 정의되어 있을 수도 있음)
+type InstrumentEnum = 'VOCAL' | 'GUITAR' | 'DRUM' | 'BASS';
 
 interface SongByInstrumentState {
   songByInstrument: SongByInstrumentDTO | null
@@ -17,9 +19,9 @@ interface SongByInstrumentState {
   
   // 악기별 곡 URL 조회
   fetchSongByInstrumentUrl: (songByInstrumentId: number) => Promise<void>
-
-  // 악기, 티어별 곡 URL 조회 
-  fetchSongByInstrumentUrlBySongIdAndInstrument: (songId: number, instrument: string) => Promise<void>
+  
+  // 악기, 티어별 곡 URL 조회 - 파라미터 타입 수정
+  fetchSongByInstrumentUrlBySongIdAndInstrument: (songId: number, instrument: InstrumentEnum) => Promise<void>
 }
 
 // Zustand store 생성
@@ -43,7 +45,7 @@ export const useSongByInstrumentStore = create<SongByInstrumentState>((set) => (
         error: null
       })
     } catch (error) {
-      console.error("Error fetching song by instrument:", error)
+      console.error("songbyinstrument.ts, Error fetching song by instrument:", error)
       set({
         loading: false,
         error: error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다."
@@ -51,36 +53,41 @@ export const useSongByInstrumentStore = create<SongByInstrumentState>((set) => (
     }
   },
   
-  fetchSongByInstrumentUrlBySongIdAndInstrument: async (songId: number, instrument: string) => {
-    set({ loading: true, error: null })
+  // instrument 파라미터 타입을 InstrumentEnum으로 수정
+  fetchSongByInstrumentUrlBySongIdAndInstrument: async (songId: number, instrument: InstrumentEnum) => {
     try {
-      const apiConfig = useConfigStore.getState().apiConfig 
-      const songByInstrumentApi = new SongByInstrumentApi(apiConfig)
+      set({ loading: true, error: null });
       
-      // 문자열을 Instrument enum으로 변환
-      const instrumentEnum = instrument.toUpperCase() as Instrument
+      const configStore = useConfigStore.getState();
+      const apiConfig = configStore.apiConfig;
       
-      const params: SongByInstrumentApiGetSongByInstrumentUrlBySongIdAndInstrumentRequest = {
-        songId,
-        instrument: instrumentEnum
+      const songByInstrumentApi = new SongByInstrumentApi(apiConfig);
+      
+      // POST 메서드 사용 - API 명세서에 따르면 이 엔드포인트는 POST를 사용함
+      const response = await songByInstrumentApi.getSongByInstrumentUrlBySongIdAndInstrument({
+        songId: songId,
+        instrument: instrument  // 이제 올바른 타입의 값이 전달됨
+      });
+      
+      // 응답 데이터에서 URL 추출
+      const url = response.data.songByInstrumentUrl;
+      
+      if (!url) {
+        throw new Error('유효한 음원 URL이 없습니다.');
       }
       
-      const response = await songByInstrumentApi.getSongByInstrumentUrlBySongIdAndInstrument(params)
-
-      set({
-        songUrl: response.data.songByInstrumentUrl,
-        loading: false,
-        error: null
-      })
+      set({ songUrl: url, loading: false });
+      console.log('음원 URL 로드 성공:', url);
     } catch (error) {
-      console.log("Error fetching song by instrument, songid : ", error)
-      set({
+      console.error('음원 URL 로드 실패:', error);
+      set({ 
+        error: '음원 URL을 가져오는데 실패했습니다.', 
         loading: false,
-        error: error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다."
-      })
+        songUrl: '' // 에러 시 URL 초기화
+      });
     }
   }, 
-
+  
   fetchSongByInstrumentUrl: async (songByInstrumentId: number) => {
     set({ loading: true, error: null })
     try {

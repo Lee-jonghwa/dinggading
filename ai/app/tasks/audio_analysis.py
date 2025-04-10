@@ -155,65 +155,284 @@ def evaluate_user_scores(pitch_user, pitch_ref,
                          sr):
 
     def dtw_pitch_score(p1, p2):
-        distance, _ = fastdtw(p1, p2, dist=euclidean)
-        return max(0.0, 100.0 / (1.0 + distance))
+        p1 = np.ravel(p1)
+        p2 = np.ravel(p2)
+    
+        min_len = min(len(p1), len(p2))
+        p1 = p1[:min_len]
+        p2 = p2[:min_len]
+    
+        # 정규화 (스케일 차 제거)
+        scaler = StandardScaler()
+        p1_norm = scaler.fit_transform(p1.reshape(-1, 1)).flatten()
+        p2_norm = scaler.fit_transform(p2.reshape(-1, 1)).flatten()
+    
+        # DTW + 안정적 스코어
+        def scalar_euclidean(a, b): return abs(a - b)
+        distance, _ = fastdtw(p1_norm, p2_norm, dist=scalar_euclidean)
+        score = 100 / (1 + np.log1p(distance / len(p1_norm)))
+        return round(max(0.0, min(100.0, score)), 2)
 
     def transpose_score(p1, p2):
-        semitone_shift = 12 * np.log2(np.mean(p1[p1 > 0]) / np.mean(p2[p2 > 0]))
-        penalty = min(100.0, abs(semitone_shift) * 5)
-        return max(0.0, 100.0 - penalty)
+        p1 = np.ravel(p1)
+        p2 = np.ravel(p2)
 
+        user_valid = p1[p1 > 0]
+        ref_valid = p2[p2 > 0]
+
+        if len(user_valid) == 0 or len(ref_valid) == 0:
+            return 0.0
+
+        mean_user = np.mean(user_valid)
+        mean_ref = np.mean(ref_valid)
+
+        if mean_user <= 0 or mean_ref <= 0:
+            return 0.0
+
+        semitone_shift = 12 * np.log2(mean_user / mean_ref)
+        penalty = abs(semitone_shift) * 5
+        return round(max(0.0, 100.0 - min(100.0, penalty)), 2)
+
+    
     def pitch_chunk_score(p1, p2, chunks=10):
+        p1 = np.ravel(p1)
+        p2 = np.ravel(p2)
+
         length = min(len(p1), len(p2))
-        chunk_size = length // chunks
+        if length == 0:
+            return 0.0
+
+        chunk_size = max(1, length // chunks)
         errors = []
         for i in range(chunks):
-            s, e = i * chunk_size, (i + 1) * chunk_size
-            if e > length:
-                break
+            s = i * chunk_size
+            e = min((i + 1) * chunk_size, length)
+            if s >= e:
+                continue
             diff = np.mean(np.abs(p1[s:e] - p2[s:e]))
             errors.append(diff)
-        return max(0.0, 100.0 - np.mean(errors))
 
-    def mfcc_cosine_score(m1, m2):
-        return max(0.0, 100.0 * (1 - cosine(np.mean(m1, axis=1), np.mean(m2, axis=1))))
+        avg_error = np.mean(errors) if errors else 0.0
+        return round(max(0.0, 100.0 - avg_error), 2)
 
-    def mfcc_chunk_rmse(m1, m2, chunks=10):
-        length = min(m1.shape[1], m2.shape[1])
-        chunk_size = length // chunks
-        rmses = []
-        for i in range(chunks):
-            s, e = i * chunk_size, (i + 1) * chunk_size
-            if e > length:
-                break
-            rmse = np.sqrt(np.mean((m1[:, s:e] - m2[:, s:e]) ** 2))
-            rmses.append(rmse)
-        avg_rmse = np.mean(rmses)
-        return max(0.0, 100.0 / (1 + avg_rmse))
 
-    def onset_match_score(pos1, pos2, delta=0.1):
-        matches = sum(any(abs(p - r) < delta for r in pos2) for p in pos1)
-        return round(100.0 * matches / len(pos1), 2) if len(pos1) else 0.0
+    def mfcc_cosine_score(m1, m2, rms_user, rms_ref, threshold=0.02):
+        min_len = min(m1.shape[1], m2.shape[1], len(rms_user), len(rms_ref))
+        m1 = m1[:, :min_len]
+        m2 = m2[:, :min_len]
+        rms_user = rms_user[:min_len]
+        rms_ref = rms_ref[:min_len]
 
-    def onset_chunk_rmse(o1, o2):
-        l = min(len(o1), len(o2))
-        if l == 0:
+        epsilon = 1e-6
+        rms_user = rms_user / (np.max(rms_user) + epsilon)
+        rms_ref = rms_ref / (np.max(rms_ref) + epsilon)
+
+        scores = []
+        weights = []
+
+        for i in range(min_len):
+            u = m1[:, i]
+            r = m2[:, i]
+            u_silent = rms_user[i] < threshold
+            r_silent = rms_ref[i] < threshold
+
+            if u_silent and r_silent:
+                continue
+            elif u_silent != r_silent:
+                scores.append(0.0)
+                weights.append(1.0)
+            else:
+                sim = 1 - cosine(u, r)
+                scores.append(sim * 100)
+                weights.append((rms_user[i] + rms_ref[i]) / 2)
+
+        if np.sum(weights) == 0:
             return 0.0
-        rmse = np.sqrt(np.mean((o1[:l] - o2[:l]) ** 2))
-        return max(0.0, 100.0 / (1 + rmse))
+        score = np.sum(np.array(scores) * np.array(weights)) / np.sum(weights)
+        return round(score, 2)
 
-    def tempo_threshold_score(t1, t2):
-        return max(0.0, 100.0 - abs(t1 - t2))
+    def mfcc_chunk_rmse(m1, m2, rms_user, rms_ref, chunks=10, threshold=0.02):
+        def average_mfcc_by_chunks(mfcc, num_chunks):
+            num_frames = mfcc.shape[1]
+            step = max(1, num_frames // num_chunks)
+            result = []
+            for i in range(num_chunks):
+                s = i * step
+                e = min((i + 1) * step, num_frames)
+                avg = np.mean(mfcc[:, s:e], axis=1) if e > s else np.zeros(mfcc.shape[0])
+                avg = np.nan_to_num(avg, nan=-590.0, posinf=-590.0, neginf=-590.0)
+                result.append(avg)
+            return np.array(result)
+
+        def adaptive_score(rmse):
+            if rmse < 20: return 100 - rmse * 0.25
+            elif rmse < 100: return 95 - (rmse - 20) * 0.125
+            elif rmse < 200: return 85 - (rmse - 100) * 0.05
+            elif rmse < 300: return 80 - (rmse - 200) * 0.1
+            else: return max(0, 70 - (rmse - 300) * 0.2)
+
+        min_len = min(m1.shape[1], m2.shape[1], len(rms_user), len(rms_ref))
+        m1 = m1[:, :min_len]
+        m2 = m2[:, :min_len]
+        rms_user = rms_user[:min_len]
+        rms_ref = rms_ref[:min_len]
+
+        rms_user = rms_user / (np.max(rms_user) + 1e-6)
+        rms_ref = rms_ref / (np.max(rms_ref) + 1e-6)
+
+        if (
+            np.max(m1) < 5 and np.max(m2) < 5
+        ) or (
+            np.max(rms_user) < threshold and np.max(rms_ref) < threshold
+        ):
+            return 0.0
+
+        user_chunks = average_mfcc_by_chunks(m1, chunks)
+        ref_chunks = average_mfcc_by_chunks(m2, chunks)
+
+        distances = []
+        for i in range(len(user_chunks)):
+            rms_u = np.mean(rms_user[i::chunks])  # chunk 내 평균
+            rms_r = np.mean(rms_ref[i::chunks])
+            if rms_u < threshold and rms_r < threshold:
+                continue
+            if (rms_u < threshold) != (rms_r < threshold):
+                distances.append(100.0)
+            else:
+                dist = euclidean(user_chunks[i], ref_chunks[i])
+                distances.append(dist)
+
+        if not distances:
+            return 0.0
+
+        rmse = np.sqrt(np.mean(np.square(distances)))
+        return round(adaptive_score(rmse), 2)
+
+    def onset_match_score(user_onsets, ref_onsets, rms_user, rms_ref,
+                                 sr, hop_length=512, delta=0.1, threshold=0.02,
+                                 shift_range=np.linspace(-0.1, 0.1, 11), verbose=False):
+        def match_score(a, b, rms_a, rms_b):
+            matched = 0
+            valid = 0
+            for r in b:
+                r_idx = int(r * sr / hop_length)
+                if r_idx >= len(rms_b) or rms_b[r_idx] < threshold:
+                    continue
+                valid += 1
+                for u in a:
+                    u_idx = int(u * sr / hop_length)
+                    if abs(r - u) < delta and u_idx < len(rms_a) and rms_a[u_idx] >= threshold:
+                        matched += 1
+                        break
+            return 100.0 * matched / max(1, valid)
+
+        best_score = 0.0
+        best_shift = 0.0
+        for shift in shift_range:
+            shifted_user = user_onsets + shift
+            forward = match_score(shifted_user, ref_onsets, rms_user, rms_ref)
+            backward = match_score(ref_onsets, shifted_user, rms_ref, rms_user)
+            avg_score = (forward + backward) / 2
+            if avg_score > best_score:
+                best_score = avg_score
+                best_shift = shift
+
+        if verbose:
+            print(f"[onset_match_score] Best shift: {round(best_shift, 3)} sec")
+        return round(best_score, 2)
+
+
+    def onset_chunk_rmse(user_onset, ref_onset, rms_user, rms_ref, chunks=10, threshold=0.02, k=0.08):
+        min_len = min(len(user_onset), len(ref_onset), len(rms_user), len(rms_ref))
+        user_onset = user_onset[:min_len]
+        ref_onset = ref_onset[:min_len]
+        rms_user = rms_user[:min_len]
+        rms_ref = rms_ref[:min_len]
+
+        epsilon = 1e-6
+        rms_user = rms_user / (np.max(rms_user) + epsilon)
+        rms_ref = rms_ref / (np.max(rms_ref) + epsilon)
+
+        if (
+            np.max(user_onset) < 5 and np.max(ref_onset) < 5
+        ) or (
+            np.max(rms_user) < threshold and np.max(rms_ref) < threshold
+        ):
+            return 0.0
+
+        step = max(1, min_len // chunks)
+        rmse_chunks = []
+
+        for i in range(chunks):
+            start = i * step
+            end = min((i + 1) * step, min_len)
+            if end <= start:
+                continue
+            u_chunk = user_onset[start:end]
+            r_chunk = ref_onset[start:end]
+            rms_u = np.mean(rms_user[start:end])
+            rms_r = np.mean(rms_ref[start:end])
+
+            if rms_u < threshold and rms_r < threshold:
+                continue
+            elif (rms_u < threshold) != (rms_r < threshold):
+                rmse_chunks.append(100.0)
+            else:
+                rmse = np.sqrt(np.mean((u_chunk - r_chunk) ** 2))
+                rmse_chunks.append(rmse)
+
+        if not rmse_chunks:
+            return 0.0
+
+        aggregated_rmse = np.mean(rmse_chunks)
+        score = 100 * np.exp(-k * aggregated_rmse)
+        return round(min(100.0, max(0.0, score)), 2)
+
+
+    def tempo_threshold_score(t1, t2, rms_user=None, rms_ref=None, threshold=0.02, method="log") -> float:
+        """
+        사용자 tempo와 기준 tempo의 차이를 기반으로 점수를 계산합니다.
+        - method: 'abs', 'ratio', 'log', 'threshold'
+        """
+        if (rms_user is not None and rms_ref is not None):
+            if np.max(rms_user) < threshold or np.max(rms_ref) < threshold:
+                return 0.0
+
+        diff = abs(t1 - t2)
+        if t1 <= 0 or t2 <= 0:
+            return 0.0
+
+        if method == "abs":
+            return round(max(0, 100 - diff), 2)
+
+        elif method == "ratio":
+            ratio = diff / t2
+            return round(max(0, 100 * (1 - ratio)), 2)
+
+        elif method == "log":
+            return round(100 / (1 + np.log1p(diff)), 2)
+
+        elif method == "threshold":
+            max_score = 100
+            min_score = 0
+            step = 1           # 점수 감소 단위
+            bucket_size = 1    # diff가 증가할 때마다 점수 깎는 간격
+            penalty = (diff // bucket_size) * step
+            return round(max(min_score, max_score - penalty), 2)
+
+        else:
+            raise ValueError(f"Unknown tempo scoring method: {method}")
+
 
     scores = {
         "pitch_dtw": round(dtw_pitch_score(pitch_user, pitch_ref), 2),
         "transpose": round(transpose_score(pitch_user, pitch_ref), 2),
         "pitch_chunk": round(pitch_chunk_score(pitch_user, pitch_ref), 2),
-        "mfcc_cos": round(mfcc_cosine_score(mfcc_stack_user, mfcc_stack_ref), 2),
-        "mfcc_chunk": round(mfcc_chunk_rmse(mfcc_stack_user, mfcc_stack_ref), 2),
-        "onset_match": round(onset_match_score(onset_pos_user, onset_pos_ref), 2),
-        "onset_chunk": round(onset_chunk_rmse(onset_user_norm, onset_ref_norm), 2),
-        "tempo_thresh": round(tempo_threshold_score(tempo_user, tempo_ref), 2)
+        "mfcc_cos": round(mfcc_cosine_score(mfcc_stack_user, mfcc_stack_ref, rms_user, rms_ref), 2),
+        "mfcc_chunk": round(mfcc_chunk_rmse(mfcc_stack_user, mfcc_stack_ref, rms_user, rms_ref), 2),
+        "onset_match": round(onset_match_score(onset_pos_user, onset_pos_ref, rms_user, rms_ref, sr), 2),
+        "onset_chunk": round(onset_chunk_rmse(onset_user_norm, onset_ref_norm, rms_user, rms_ref), 2),
+        "tempo_thresh": round(tempo_threshold_score(tempo_user, tempo_ref, rms_user, rms_ref), 2)
     }
     return scores
 
@@ -265,7 +484,7 @@ def run_audio_analysis(user_audio_url: str, original_json_url: str):
     tmp_audio_path = None
     try:
         try:
-            audio_response = requests.get(user_audio_url)
+            audio_response = requests.get(user_audio_url, verify=False)
             audio_response.raise_for_status()
         except RequestException as e:
             raise RuntimeError(f"사용자 오디오 다운로드 실패: {e}")
@@ -278,7 +497,7 @@ def run_audio_analysis(user_audio_url: str, original_json_url: str):
 
         # 원본 특징 JSON 다운로드
         try:
-            json_response = requests.get(original_json_url)
+            json_response = requests.get(original_json_url, verify=False)
             json_response.raise_for_status()
             features_json = json_response.json()
         except RequestException as e:
@@ -286,10 +505,28 @@ def run_audio_analysis(user_audio_url: str, original_json_url: str):
 
         # 원본 특징 값 로딩
         pitch_org = np.array(features_json["pyin"])
-        mfcc_org = np.array(features_json["mfcc"])
+        try:
+            mfcc_org = np.array(features_json["mfcc"])
+        except KeyError:
+            mfcc_org = np.array(features_json["mfcc_stack"])
         onset_env_org = np.array(features_json["onset"])
-        tempo_org = float(features_json["beat"])
 
+        # onset을 이용한 tempo 계산
+        def compute_tempo_from_onset(onset_times):
+            if onset_times is None or len(onset_times) < 2:
+                return 0.0
+            intervals = np.diff(onset_times)
+            mean_interval = np.mean(intervals)
+            if mean_interval <= 0:
+                return 0.0
+            return round(60.0 / mean_interval, 2)
+
+        if "beat" in features_json:
+            tempo_org = float(features_json["beat"])
+        else:
+            tempo_org = compute_tempo_from_onset(onset_env_org)
+
+        
         # 사용자 특징 추출
         pitch_user = extract_pyin_pitch(user_y, user_sr)
         mfcc_user = extract_mfcc_stack(user_y, user_sr)

@@ -1,0 +1,60 @@
+services:
+  spring:
+    platform: linux/amd64
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ./infra/dockerfiles/backend.Dockerfile
+      args:
+        - STAGE=development
+    env_file:
+      - ./infra/env/.env.development
+    ports:
+      - "8080:8080"
+    networks:
+      - ding-ga-ding-network
+
+  fastapi:
+    platform: linux/amd64
+    restart: unless-stopped
+    build:
+      context: . # 루트 기준
+      dockerfile: ./infra/dockerfiles/ai.Dockerfile
+      target: development
+      # development 스테이지까지만 사용
+      args:
+        - STAGE=development
+    command: uvicorn ai.app.main:app --host 0.0.0.0 --port 8000
+    env_file:
+      - ./infra/env/.env.development
+    environment:
+      - ENV_MODE=development
+      - PYTHONPATH=/app
+    networks:
+      - ding-ga-ding-network
+    ports:
+      - "8000:8000"
+  celery_worker:
+    platform: linux/amd64
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ./infra/dockerfiles/ai.Dockerfile
+      target: development
+      args:
+        - STAGE=development
+    command: celery -A ai.celery_worker:celery worker --loglevel=info
+    env_file:
+      - ./infra/env/.env.development
+    environment:
+      - ENV_MODE=development
+      - PYTHONPATH=/app
+    networks:
+      - ding-ga-ding-network
+
+volumes:
+  shared-data: # 공유 볼륨 정의
+
+networks:
+  ding-ga-ding-network:
+    external: true

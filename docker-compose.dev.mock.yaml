@@ -1,0 +1,25 @@
+services:
+  openapi-merger:
+    build:
+      context: .
+      dockerfile: ./infra/dockerfiles/merger.Dockerfile
+    volumes:
+      - shared-data:/merged/output
+      - ./docs:/merged/local
+    restart: "no"
+
+  mock:
+    platform: linux/amd64
+    image: stoplight/prism:4
+    volumes:
+      - shared-data:/tmp:ro
+    ports:
+      - "8081:4010"
+    command: "mock -h 0.0.0.0 /tmp/openapi.yaml"
+
+    depends_on:
+      openapi-merger:
+        condition: service_completed_successfully
+
+volumes:
+  shared-data: # 공유 볼륨 정의

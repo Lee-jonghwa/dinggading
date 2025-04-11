@@ -1,0 +1,62 @@
+# 스프링,
+
+services:
+  openapi-merger:
+    build:
+      context: .
+      dockerfile: ./infra/dockerfiles/merger.Dockerfile
+    volumes:
+      - shared-data:/merged/output
+      - ./docs:/merged/local
+    restart: "no"
+
+  spring-generator:
+    build:
+      context: .
+      dockerfile: ./infra/dockerfiles/generator.Dockerfile
+    volumes:
+      - shared-data:/openapi/input
+      - ./backend/generated:/backend
+    command:
+      - "generate"
+      - "-i"
+      - "./input/openapi.yaml"
+      - "-g"
+      - "spring"
+      - "-o"
+      - "/backend"
+      - "-t"
+      - "spring-custom-generator/custom-codegen"
+      - "-c"
+      - "spring-custom-generator/config.json"
+    depends_on:
+      openapi-merger:
+        condition: service_completed_successfully
+    restart: "no"
+
+  axios-generator:
+    build:
+      context: .
+      dockerfile: ./infra/dockerfiles/generator.Dockerfile
+    volumes:
+      - shared-data:/openapi/input
+      - ./frontend/generated:/frontend
+    command:
+      - "generate"
+      - "-i"
+      - "./input/openapi.yaml"
+      - "-g"
+      - "typescript-axios"
+      - "-o"
+      - "/frontend"
+      - "-t"
+      - "axios-custom-generator/custom-codegen"
+      - "-c"
+      - "axios-custom-generator/config.json"
+    restart: "no"
+    depends_on:
+      openapi-merger:
+        condition: service_completed_successfully
+
+volumes:
+  shared-data:  # 공유 볼륨 정의

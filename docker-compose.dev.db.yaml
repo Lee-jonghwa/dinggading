@@ -1,0 +1,99 @@
+
+services:
+  # MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: ding_ga_ding
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - ding-ga-ding-network
+
+  # MongoDB
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 1234
+      MONGO_INITDB_DATABASE: ding_ga_ding
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - ding-ga-ding-network
+
+  # Redis
+  redis:
+    image: redis:7.0-alpine
+    container_name: redis
+    restart: always
+    command: redis-server --requirepass 1234
+    ports:
+      - "6370:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ding-ga-ding-network
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: 1234
+    ports:
+      - "5673:5672"   # AMQP protocol port
+      - "15673:15672" # Management UI port
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - ding-ga-ding-network
+  minio:
+    image: quay.io/minio/minio:latest
+    command: server /data --address ":9001" --console-address ":9002"
+    container_name: minio
+    environment:
+      - MINIO_ROOT_USER=root
+      - MINIO_ROOT_PASSWORD=12341234
+      - MINIO_BROWSER_REDIRECT_URL=http://localhost:9002
+      - MINIO_SERVER_URL=http://localhost:9001  # 외부 IP로 변경
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: always
+    ports:
+      - "9001:9001"  # API 서버 포트를 외부에 노출
+      - "9002:9002"  # 콘솔 포트
+    volumes:
+      - minio_data:/data
+    networks:
+      - ding-ga-ding-network
+      
+networks:
+  ding-ga-ding-network:
+    external: true
+
+volumes:
+  mysql_data:
+    driver: local
+  mongo_data:
+    driver: local
+  redis_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  minio_data:
+    driver: local

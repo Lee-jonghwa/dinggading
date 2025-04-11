@@ -176,18 +176,77 @@
     list-style: none;
     padding: 0;
     margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .memberItem, .contactItem {
-    padding: 5px 0;
+    padding: 10px;
     font-size: 0.95rem;
 }
-.memberItem span {
+
+.memberItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #2a2d36;
+    border-radius: 8px;
+    padding: 12px;
+    width: 100px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.memberItem:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.memberProfile {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #444;
+    margin-bottom: 8px;
+}
+
+.defaultProfile {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #444;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #aaa;
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+
+.memberInstrument {
     background-color: #333;
-    padding: 2px 6px;
-    border-radius: 3px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+    color: #9ecbff;
+}
+
+.memberName {
     font-size: 0.9rem;
-    margin-right: 5px;
+    color: #fff;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.memberId {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 3px;
 }
 
 
@@ -200,6 +259,42 @@
 }
 .contactItem a:hover {
     text-decoration: underline;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+    justify-content: center;
+}
+
+.applyButton, .inquiryButton {
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    font-size: 0.95rem;
+    height: 38px;
+}
+
+.applyButton {
+    background-color: #1E88E5; /* 파랑 계열 */
+    color: white;
+}
+
+.applyButton:hover {
+    background-color: #1565C0;
+}
+
+.inquiryButton {
+    background-color: #2E7D32; /* 초록 계열 */
+    color: white;
+}
+
+.inquiryButton:hover {
+    background-color: #1B5E20;
 }
 
 .loading, .error {

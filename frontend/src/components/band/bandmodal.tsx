@@ -11,7 +11,7 @@ import { BandDTO, InstrumentAvailabilityDTO } from '@generated/model';
 const instrumentMap: { [key: string]: string } = {
   vocal: '🎤 보컬',
   guitar: '🎸 기타',
-  bass: ' bassist 베이스',
+  bass: ' 🪕 베이스',
   drum: '🥁 드럼',
 };
 
@@ -141,7 +141,23 @@ const BandDetailModal: React.FC<BandDetailModalProps> = ({
                     {bandData.jobOpening ? '모집중' : '모집마감'}
                     </span>
                 </div>
-            </div>
+                
+              </div>
+                          {/* 버튼 그룹 */}
+                          <div className={styles.buttonGroup}>
+                  <button className={styles.inquiryButton} onClick={() => {
+                      // 1:1 문의 로직
+                      console.log('1:1 문의 요청');
+                  }}>
+                      1:1 문의
+                  </button>
+                  <button className={styles.applyButton} onClick={() => {
+                      // 가입 신청 로직
+                      console.log('가입 신청 요청');
+                  }}>
+                      가입 신청하기
+                  </button>
+              </div>
             <button onClick={onClose} className={styles.closeButton}>&times;</button>
         </div>
 
@@ -155,7 +171,7 @@ const BandDetailModal: React.FC<BandDetailModalProps> = ({
              {/* 모집 악기 */}
              {availableInstruments.length > 0 && (
                 <section className={styles.section}>
-                    <h3>모집 중인 파트</h3>
+                    <h3>현재 멤버 구성</h3>
                     <div className={styles.instruments}>
                     {availableInstruments.map((inst, index) => (
                         <span key={index} className={styles.instrument}>{inst}</span>
@@ -171,9 +187,14 @@ const BandDetailModal: React.FC<BandDetailModalProps> = ({
                     <ul className={styles.memberList}>
                     {bandData.bandMember.map((member) => (
                         <li key={member.bandMemberId} className={styles.memberItem}>
-                            {/* 멤버 프로필 사진 등 추가 가능 */}
-                            <span>{member.instrument}</span> {/* API 응답값 그대로 표시 */}
-                            {/* <span>{instrumentMap[member.instrument.toLowerCase()] || member.instrument}</span> */} {/* 한글 변환 시 */}
+                            {member.profileUrl ? (
+                                <img src={member.profileUrl} alt={`'Member'} profile`} className={styles.memberProfile} />
+                            ) : (
+                                <div className={styles.defaultProfile}>👤</div>
+                            )}
+                            <span className={styles.memberInstrument}>{member.instrument}</span>
+                            <span className={styles.memberName}>{'익명'}</span>
+                            <span className={styles.memberId}>ID: {member.bandMemberId}</span>
                         </li>
                     ))}
                     </ul>

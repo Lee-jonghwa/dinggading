@@ -136,12 +136,12 @@ def safe_onset_detect(y, sr):
     onset_pos = librosa.onset.onset_detect(y=y, sr=sr, units='time')
     return onset_pos if len(onset_pos) > 0 else np.array([0.0])
 
-def extract_tempo(y, sr, onset_env, silence_threshold=1e-4):
+def extract_tempo(y, sr, onset_pos, silence_threshold=1e-4):
     if y is None or len(y) == 0 or np.max(np.abs(y)) < silence_threshold:
         return 0.0
     try:
-        tempo = float(librosa.beat.tempo(onset_envelope=onset_env, sr=sr, aggregate=np.mean))
-        if abs(tempo - 120.0) < 0.1 and np.std(onset_env) < 1e-3:
+        tempo = float(librosa.beat.tempo(onset_envelope=onset_pos, sr=sr, aggregate=np.mean))
+        if abs(tempo - 120.0) < 0.1 and np.std(onset_pos) < 1e-3:
             return 0.0
         return round(tempo, 2)
     except Exception:
@@ -415,7 +415,7 @@ def evaluate_user_scores(pitch_user, pitch_ref,
         elif method == "threshold":
             max_score = 100
             min_score = 0
-            step = 1           # 점수 감소 단위
+            step = 5           # 점수 감소 단위
             bucket_size = 1    # diff가 증가할 때마다 점수 깎는 간격
             penalty = (diff // bucket_size) * step
             return round(max(min_score, max_score - penalty), 2)
@@ -430,7 +430,7 @@ def evaluate_user_scores(pitch_user, pitch_ref,
         "pitch_chunk": round(pitch_chunk_score(pitch_user, pitch_ref), 2),
         "mfcc_cos": round(mfcc_cosine_score(mfcc_stack_user, mfcc_stack_ref, rms_user, rms_ref), 2),
         "mfcc_chunk": round(mfcc_chunk_rmse(mfcc_stack_user, mfcc_stack_ref, rms_user, rms_ref), 2),
-        "onset_match": round(onset_match_score(onset_pos_user, onset_pos_ref, rms_user, rms_ref, sr), 2),
+        # "onset_match": round(onset_match_score(onset_pos_user, onset_pos_ref, rms_user, rms_ref, sr), 2),
         "onset_chunk": round(onset_chunk_rmse(onset_user_norm, onset_ref_norm, rms_user, rms_ref), 2),
         "tempo_thresh": round(tempo_threshold_score(tempo_user, tempo_ref, rms_user, rms_ref), 2)
     }
@@ -463,9 +463,9 @@ all_weights = {
     "pitch_chunk": 0.06,
     "mfcc_cos": 0.16,
     "mfcc_chunk": 0.17,
-    "onset_match": 0.11,
-    "onset_chunk": 0.11,
-    "tempo_thresh": 0.15
+    # "onset_match": 0.11,
+    "onset_chunk": 0.17,
+    "tempo_thresh": 0.2
 }
 
 categories = {
@@ -474,7 +474,7 @@ categories = {
     "pitch_chunk": "tune",
     "mfcc_cos": "tone",
     "mfcc_chunk": "tone",
-    "onset_match": "beat",
+    # "onset_match": "beat",
     "onset_chunk": "beat",
     "tempo_thresh": "beat"
 }
@@ -503,6 +503,16 @@ def run_audio_analysis(user_audio_url: str, original_json_url: str):
         except RequestException as e:
             raise RuntimeError(f"features.json 다운로드 실패: {e}")
 
+        def get_onset_pos_org(features_json, user_y, user_sr):
+            if "onset_pos" in features_json:
+                return np.array(features_json["onset_pos"])
+
+            # JSON에도 없을 경우: 평균적인 박자 기준으로 생성 (예: 120bpm → 0.5초 간격)
+            print("[INFO] onset_pos_org not found. Generating synthetic onsets every 0.5s.")
+            duration = len(user_y) / user_sr
+            return np.arange(0, duration, 0.5)
+
+        onset_pos_org = get_onset_pos_org(features_json, user_y, user_sr)
         # 원본 특징 값 로딩
         pitch_org = np.array(features_json["pyin"])
         try:
@@ -524,7 +534,7 @@ def run_audio_analysis(user_audio_url: str, original_json_url: str):
         if "beat" in features_json:
             tempo_org = float(features_json["beat"])
         else:
-            tempo_org = compute_tempo_from_onset(onset_env_org)
+            tempo_org = compute_tempo_from_onset(onset_pos_org)
 
         
         # 사용자 특징 추출
@@ -532,7 +542,7 @@ def run_audio_analysis(user_audio_url: str, original_json_url: str):
         mfcc_user = extract_mfcc_stack(user_y, user_sr)
         onset_env_user = extract_onset_strength(user_y, user_sr)
         onset_pos_user = safe_onset_detect(user_y, user_sr)
-        tempo_user = extract_tempo(user_y, user_sr, onset_env_user)
+        tempo_user = extract_tempo(user_y, user_sr, onset_pos_user)
         rms_user = librosa.feature.rms(y=user_y)[0]
         rms_org = np.ones_like(rms_user)  # 원본 오디오가 없으므로 길이 맞춤용 (선택)
 
@@ -540,7 +550,7 @@ def run_audio_analysis(user_audio_url: str, original_json_url: str):
         scores = evaluate_user_scores(
             pitch_user, pitch_org,
             onset_env_user, onset_env_org,
-            onset_pos_user, onset_pos_user * 0,  # onset_pos_org 없음 처리
+            onset_pos_user, onset_pos_user,
             tempo_user, tempo_org,
             mfcc_user, mfcc_org,
             rms_user, rms_org,
@@ -548,6 +558,8 @@ def run_audio_analysis(user_audio_url: str, original_json_url: str):
         )
 
         grouped = compute_grouped_scores(scores, all_weights, categories)
+        print("Grouped Scores:", grouped)
+        print("All Scores:", scores)
         total = compute_weighted_score(scores, all_weights)
 
         final_result = {

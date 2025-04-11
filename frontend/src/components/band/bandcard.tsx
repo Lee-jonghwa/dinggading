@@ -9,7 +9,7 @@ import { InstrumentAvailabilityDTO } from '@generated/model';
 const instrumentMap: { [key: string]: string } = {
   vocal: '🎤 보컬', // 아이콘 예시
   guitar: '🎸 기타',
-  bass: ' bassist 베이스', // 예시 아이콘 변경
+  bass: ' 🪕 베이스', // 예시 아이콘 변경
   drum: '🥁 드럼',
   // 필요시 다른 악기 추가
 };
@@ -83,7 +83,7 @@ const BandCard: React.FC<BandCardProps> = ({
         {/* 좌측 하단 정보 (모집 악기) */}
         {availableInstruments.length > 0 && (
             <div className={styles.bottomLeftInfo}>
-                <span className={styles.instrumentTitle}>모집악기:</span>
+                <span className={styles.instrumentTitle}>밴드 구성:</span>
                 <div className={styles.instruments}>
                 {availableInstruments.map((instrument, index) => (
                     <span key={index} className={styles.instrument}>{instrument}</span>

@@ -33,6 +33,7 @@ public class BandConverter {
                 .sigun(band.getSigun())
                 .tags(band.getTags())
                 .profileUrl(band.getProfileUrl())
+                .memberCount(band.getMembers().size())
                 .maxSize(band.getMaxSize())
                 .jobOpening(band.isJobOpening())
                 .bandMember(bandMemberDTOs)

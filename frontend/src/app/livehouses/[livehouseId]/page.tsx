@@ -10,6 +10,7 @@ import VocalModelScene from "./VocalModel"
 import GuitarModelScene from "./GuitarModel"
 import Audience from "./Audience"
 import "./livehouse.css"
+import image from "../../../../public/LiveHouse/BackGround.png"
 
 interface SegmentParams {
   [key: string]: string | string[] | undefined
@@ -312,7 +313,7 @@ export default function LivehousePage({ params }: PageProps) {
 
   return (
     <div className="livehouse-container">
-      <div className="livehouse-main">
+      <div className="livehouse-main" style={{backgroundImage : `url(${image.src})`}}>
         <div className="livehouse-content">
           <div className="livehouse-audience-layer">
             <Audience />

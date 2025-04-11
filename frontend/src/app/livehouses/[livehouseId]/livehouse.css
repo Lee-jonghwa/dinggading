@@ -13,7 +13,7 @@
 .livehouse-main {
   width: 100%;
   height: 100%;
-  background-image: url("/LiveHouse/Background.png");
+  /* background-image: url("/LiveHouse/Background.png"); */
   background-size: 79% 100%;
   background-position: left;
   background-repeat: no-repeat;

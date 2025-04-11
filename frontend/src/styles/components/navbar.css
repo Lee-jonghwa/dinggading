@@ -31,13 +31,6 @@
   /* gap: 1rem; */
 }
 
-.container {
-  /* border:  5px solid blue; */
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-}
-
 .navbar {
   /* border: 5px solid skyblue; */
   display: flex;

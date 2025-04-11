@@ -58,7 +58,7 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
     // accessToken: `Bearer ${initialToken || ""}`, // 문자열로 초기화
     baseOptions: {
       headers: {
-        'Content-Type': 'application/json', 
+        // 'Content-Type': 'application/json', 
         ...(initialToken ? { 'Authorization': `Bearer ${initialToken}` } : {})
 
       }

@@ -1,111 +1,82 @@
-# CodeGen 프로젝트 가이드 📚
+# 🎸 딩가딩 (Ding-Ga-Ding) 프로젝트
 
-## Docker Compose 실행 옵션 🐳
+> 🎵 AI 음성 인식 기반의 연주 실력 측정 및 밴드 구인구직 플랫폼
 
-docker-compose 파일이 여러개 구성되어있는데 각각에 대해서 설명하겠습니다.
+## 📋 프로젝트 소개
 
-** 이곳에 설명 작성**
+딩가딩은 음성인식 AI를 통해 사용자의 연주 실력을 분석하고 티어를 측정하여, 실력에 맞는 밴드를 찾을 수 있도록 도와주는 서비스입니다. 더 나아가 라이브하우스 기능을 통해 실시간으로 다른 연주자들과 소통하고 함께 연주할 수 있는 환경을 제공합니다.
 
-development 환경: 개발환경 (포트가 모두 개방, )
+## 🎯 핵심 목표
+
+1. **🔍 정확한 밴드 구인구직 매칭**
+- 실력 기반의 구인구직으로 적합한 밴드원 찾기
+- 라이브하우스, 채팅 등을 통한 쉬운 구인구직 프로세스
+
+2. **🏆 실력 측정을 통한 사용자 동기 부여**
+- AI 기반 연주 평가 시스템 (비트감, 음정, 톤)
+- 티어 시스템을 통한 실력 향상 동기 부여
+
+3. **🤝 커뮤니티 활성화**
+- 라이브하우스를 통한 실시간 연주 및 소통
+- 팔로우 시스템으로 연주자 간 네트워크 형성
+
+## 프로젝트 아키텍처
+![프로젝트 아키텍처](./exec/Architecture.png)
 
 
-### 생성된 코드 정리하기
-``` bash
+## 🚀 주요 기능
 
-./cleanup.sh
+### 📊 실력 측정 시스템
 
-```
+- **💯 랭크 게임**: 특정 곡을 연주하여 실력 측정
+- **🏅 티어 시스템**: IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND 등급으로 구분
+- **📈 점수 분석**: 비트감(Beat), 음정(Tune), 톤(Tone) 세 가지 요소 평가
 
+### 👥 밴드 및 구인구직
 
-### 개발 환경 (Development) ⚙️
+- **👨‍🎤 밴드 생성 및 관리**: 본인의 밴드 생성 및 멤버 관리
+- **🔎 맞춤형 구인**: 필요한 악기와 티어를 지정하여 멤버 모집
+- **📅 오디션 일정 관리**: 오디션 날짜와 곡 선정
 
-**`docker-compose.dev.yaml`**
-```bash
+### 🏠 라이브하우스
 
-docker-compose -f docker-compose.dev.yaml up --build --force-recreate
-```
+- **🎭 실시간 연주**: 최대 인원 설정, 연주자/관객 역할 선택
+- **🎬 연주자 기능**: 음성 스트리밍, 악기별 GLB 모델 및 애니메이션
+- **👏 관객 기능**: 리액션 이모티콘, 관람 기능
+- **👮 방장 관리 기능**: 참가자 강제 퇴장, 공개/비공개 설정
 
-- 로컬 MySQL, Spring, Next.js를 한번에 실행
-- 포트 개방: 
-  - MySQL: 3306
-  - Spring: 8080
-  - Next.js: 3000
-- 각 서비스에 직접 접근 가능
+## 🛠️ 기술 스택
 
-### 로컬 프로덕션 환경 (Local Production) 🔄
+### 백엔드
+- **☕ Java/Spring Boot**: 서버 API 구현
+- **🗄️ MySQL**: 데이터베이스
+- **📝 OpenAPI 3.0**: API 문서화
 
-**`docker-compose.prod.local.yaml`**
-```bash
+### 프론트엔드
+- **⚛️ React**: 사용자 인터페이스
+- **🎨 THREE.js**: 3D 환경 구현
 
-docker-compose -f docker-compose.prod.local.yaml up --build --force-recreate
-```
+### 유니티
+- **🎨Unity**: 3D 모델링 구축
 
-- 로컬 MySQL, Spring, Next.js를 한번에 실행
-- 외부 포트 폐쇄 (보안 강화)
-- Nginx를 통해 리버스 프록시 설정
-- `localhost` URL로만 접근 가능
+### 인프라
+- **☁️ AWS**: 클라우드 서비스
+- **🔄 CI/CD**: 지속적 통합 및 배포
 
-### 프로덕션 환경 (Production) 🚀
+## 📦 데이터 모델
 
-**`docker-compose.prod.yaml`**
-```bash
+주요 엔티티:
+- 👤 Member: 사용자 정보
+- 🎵 Song: 곡 정보
+- 🎸 Band: 밴드 정보
+- 📢 BandRecruitment: 밴드 구인 정보
+- 🏆 MemberRank: 사용자 티어 정보
+- 🏠 Livehouse: 라이브하우스 정보
 
-docker-compose -f docker-compose.prod.yaml up --build --force-recreate
-```
+## 👥 팀원 정보
 
-- Docker Hub에서 이미지를 다운로드하여 실행
-- 외부 포트 폐쇄 (보안 강화)
-- Nginx를 통해 리버스 프록시 설정
-- `localhost` URL로만 접근 가능
-
-## 유용한 Docker Compose 명령어 ⌨️
-
-### 서비스 시작 시 추천 플래그
-
-```bash
-
---build          # 컨테이너 시작 전 이미지 다시 빌드
---force-recreate # 컨테이너를 강제로 다시 생성
---no-cache       # 캐시 없이 새롭게 빌드
-```
-### 여러 개의 특정 서비스 빌드
-``` bash
-
-docker-compose build next
-```
-
-### 서비스 종료하기
-
-```bash
-
-docker-compose down
-```
-
-## OpenAPI Generator 사용 가이드 📝
-
-CodeGen 프로젝트는 OpenAPI 명세서를 기반으로 코드를 자동 생성합니다.
-
-```bash
-
-docker-compose up
-```
-
-위 명령어를 실행하면 다음 위치에 API 코드가 생성됩니다:
-- `backend/generated`: 백엔드 API 코드
-- `frontend/generated`: 프론트엔드 API 코드
-
-## 주의사항 ⚠️
-
-- 각 환경에 맞는 Docker Compose 파일을 선택하여 실행하세요.
-- 프로덕션 환경에서는 보안을 위해 직접적인 포트 접근이 차단됩니다.
-- OpenAPI Generator를 통해 API 코드가 자동 생성되므로, API 변경 시 재생성이 필요합니다.
-
-## 시스템 요구사항 💻
-
-- Docker 및 Docker Compose 설치
-- 개발 환경: 포트 3306, 8080, 3000 사용 가능
-- 프로덕션 환경: 포트 80 사용 가능 (Nginx)
-
----
-
-문의사항이 있으시면 프로젝트 관리자에게 연락해 주세요. 😊
+- 박준호 - Backend, Infra
+- 김나율 - Backend
+- 이종화 - AI
+- 박태건 - Unity
+- 김민수 - Frontend
